@@ -20,8 +20,8 @@ Create the admin page as a simple server component with a placeholder UI. The ad
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
