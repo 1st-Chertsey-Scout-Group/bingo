@@ -22,8 +22,8 @@ Create the submission sub-handler that will manage photo submission and leader r
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
