@@ -29,8 +29,8 @@ Create the server-side S3 utility for generating presigned upload URLs. Scouts u
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
