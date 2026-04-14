@@ -23,8 +23,8 @@ Create the custom Node.js server entry point that creates an HTTP server, attach
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
