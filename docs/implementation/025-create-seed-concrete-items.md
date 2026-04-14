@@ -193,8 +193,8 @@ await prisma.item.createMany({
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
