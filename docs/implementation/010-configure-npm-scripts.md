@@ -26,8 +26,8 @@ Update package.json with all npm scripts needed for development, building, testi
 - `package.json` — update `scripts` section and add `prisma` seed config
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: All scripts are present in package.json
