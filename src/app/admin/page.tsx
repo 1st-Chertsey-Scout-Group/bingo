@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
+import { toast } from 'sonner'
 import { Lock, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +14,15 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
+type GameResponse = {
+  gameId: string
+  pin: string
+  leaderPin: string
+  status: string
+  boardSize: number
+  templateCount: number
+}
+
 type GameCreationFormProps = {
   adminPin: string
 }
@@ -23,6 +33,8 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
   const [boardSize, setBoardSize] = useState(25)
   const [templateCount, setTemplateCount] = useState(5)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [createdGame, setCreatedGame] = useState<GameResponse | null>(null)
+  const [formError, setFormError] = useState('')
 
   const templateCountMax = Math.min(10, boardSize)
 
@@ -32,9 +44,34 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
     }
   }, [templateCount, templateCountMax])
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault()
     setIsSubmitting(true)
+    setFormError('')
+
+    try {
+      const response = await fetch('/api/game', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': adminPin,
+        },
+        body: JSON.stringify({ leaderPin, boardSize, templateCount }),
+      })
+
+      if (response.status === 201) {
+        const data = (await response.json()) as GameResponse
+        setCreatedGame(data)
+        toast.success(`Game created! PIN: ${data.pin}`)
+      } else {
+        const errorData = (await response.json()) as { error: string }
+        setFormError(errorData.error)
+      }
+    } catch {
+      setFormError('Failed to create game. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -106,6 +143,10 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
             />
           </div>
 
+          {formError && (
+            <p className="text-destructive text-sm font-medium">{formError}</p>
+          )}
+
           <Button
             type="submit"
             disabled={isSubmitting}
@@ -113,6 +154,17 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
           >
             {isSubmitting ? 'Creating…' : 'Create Game'}
           </Button>
+
+          {createdGame && (
+            <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-center dark:border-green-800 dark:bg-green-950">
+              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+                Game created!
+              </p>
+              <p className="mt-1 text-3xl font-bold text-green-900 dark:text-green-100">
+                PIN: {createdGame.pin}
+              </p>
+            </div>
+          )}
         </form>
       </CardContent>
     </Card>

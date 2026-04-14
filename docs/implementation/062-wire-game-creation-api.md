@@ -26,8 +26,8 @@ Connect the game creation form submission to the POST /api/game endpoint. Handle
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
