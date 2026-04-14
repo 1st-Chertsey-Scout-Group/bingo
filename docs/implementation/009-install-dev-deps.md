@@ -25,8 +25,8 @@ Install all development npm dependencies required for building, testing, linting
 - `package.json` — updated with dev dependencies in the `devDependencies` section
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: All dev packages are listed in `package.json` under `devDependencies`
