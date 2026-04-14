@@ -19,8 +19,8 @@ Create the GET /api/items endpoint for admin item pool management. Returns all i
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
