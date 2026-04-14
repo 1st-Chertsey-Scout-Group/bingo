@@ -204,6 +204,73 @@ type ItemListProps = {
   adminPin: string
 }
 
+type AddItemFormProps = {
+  adminPin: string
+  refreshItems: () => Promise<void>
+}
+
+function AddItemForm({ adminPin, refreshItems }: AddItemFormProps) {
+  const [name, setName] = useState('')
+  const [isAdding, setIsAdding] = useState(false)
+  const [addError, setAddError] = useState('')
+
+  async function handleAdd(e: FormEvent) {
+    e.preventDefault()
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setAddError('Item name cannot be empty')
+      return
+    }
+
+    setIsAdding(true)
+    setAddError('')
+
+    try {
+      const response = await fetch('/api/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': adminPin,
+        },
+        body: JSON.stringify({ name: trimmed }),
+      })
+
+      if (response.status === 201) {
+        setName('')
+        await refreshItems()
+      } else {
+        const data = (await response.json()) as { error: string }
+        setAddError(data.error)
+      }
+    } catch {
+      setAddError('Failed to add item. Please try again.')
+    } finally {
+      setIsAdding(false)
+    }
+  }
+
+  return (
+    <form onSubmit={handleAdd} className="flex flex-col gap-2">
+      <div className="flex gap-2">
+        <Input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="New item name"
+          disabled={isAdding}
+          className="flex-1"
+        />
+        <Button type="submit" disabled={isAdding || !name.trim()}>
+          {isAdding ? 'Adding…' : 'Add'}
+        </Button>
+      </div>
+      {addError && (
+        <p className="text-destructive text-sm font-medium">{addError}</p>
+      )}
+    </form>
+  )
+}
+
 function ItemList({ adminPin }: ItemListProps) {
   const [items, setItems] = useState<Item[]>([])
   const [error, setError] = useState('')
@@ -236,32 +303,38 @@ function ItemList({ adminPin }: ItemListProps) {
     void refreshItems()
   }, [refreshItems])
 
-  if (isLoading) {
-    return <p className="text-muted-foreground text-sm">Loading items…</p>
-  }
-
-  if (error) {
-    return <p className="text-destructive text-sm font-medium">{error}</p>
-  }
-
-  if (items.length === 0) {
-    return <p className="text-muted-foreground text-sm">No items yet</p>
-  }
-
   return (
-    <ScrollArea className="max-h-96">
-      <ul className="flex flex-col gap-2">
-        {items.map((item) => (
-          <li
-            key={item.id}
-            className="flex items-center justify-between rounded-md border px-3 py-2"
-          >
-            <span className="text-sm">{item.name}</span>
-            {item.isTemplate && <Badge variant="secondary">Template</Badge>}
-          </li>
-        ))}
-      </ul>
-    </ScrollArea>
+    <div className="flex flex-col gap-4">
+      <AddItemForm adminPin={adminPin} refreshItems={refreshItems} />
+
+      {isLoading && (
+        <p className="text-muted-foreground text-sm">Loading items…</p>
+      )}
+
+      {!isLoading && error && (
+        <p className="text-destructive text-sm font-medium">{error}</p>
+      )}
+
+      {!isLoading && !error && items.length === 0 && (
+        <p className="text-muted-foreground text-sm">No items yet</p>
+      )}
+
+      {!isLoading && !error && items.length > 0 && (
+        <ScrollArea className="max-h-96">
+          <ul className="flex flex-col gap-2">
+            {items.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-center justify-between rounded-md border px-3 py-2"
+              >
+                <span className="text-sm">{item.name}</span>
+                {item.isTemplate && <Badge variant="secondary">Template</Badge>}
+              </li>
+            ))}
+          </ul>
+        </ScrollArea>
+      )}
+    </div>
   )
 }
 

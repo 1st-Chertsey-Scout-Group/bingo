@@ -28,8 +28,8 @@ Add the "Add Item" form to the item management section. This allows admins to cr
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
