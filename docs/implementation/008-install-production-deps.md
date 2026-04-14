@@ -29,8 +29,8 @@ Install all production npm dependencies required by the Scout Bingo application.
 - `package.json` — updated with production dependencies in the `dependencies` section
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: All production packages are listed in `package.json` under `dependencies`
