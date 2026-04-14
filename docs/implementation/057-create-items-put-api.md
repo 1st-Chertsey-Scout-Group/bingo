@@ -22,8 +22,8 @@ Create the PUT /api/items/[itemId] endpoint to allow admins to rename items. Thi
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
