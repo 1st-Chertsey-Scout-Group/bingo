@@ -18,8 +18,8 @@ Verify that ESLint is configured with Next.js defaults from create-next-app. The
 ```
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: ESLint configuration file exists with the correct extends value
