@@ -50,8 +50,8 @@ Create the team data module containing all 30 predefined team names with their c
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
