@@ -42,3 +42,11 @@ model Item {
   isDefault  Boolean     @default(true)
   roundItems RoundItem[]
 }
+
+model TemplateValue {
+  id       String @id @default(cuid())
+  category String
+  value    String
+
+  @@unique([category, value])
+}
