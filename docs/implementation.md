@@ -49,10 +49,10 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[009 — Install Dev Dependencies](implementation/009-install-dev-deps.md)~~ ✓
 - ~~[010 — Configure npm Scripts](implementation/010-configure-npm-scripts.md)~~ ✓
 - ~~[011 — Initialize shadcn/ui](implementation/011-initialize-shadcn-ui.md)~~ ✓
-- [012 — Add All shadcn/ui Components](implementation/012-add-shadcn-components.md)
-- [013 — Create Root Layout with Tailwind](implementation/013-create-root-layout.md)
-- [014 — Add PWA Manifest](implementation/014-add-pwa-manifest.md)
-- [015 — Add PWA Meta Tags to Layout](implementation/015-add-pwa-meta-tags.md)
+- ~~[012 — Add All shadcn/ui Components](implementation/012-add-shadcn-components.md)~~ ✓
+- ~~[013 — Create Root Layout with Tailwind](implementation/013-create-root-layout.md)~~ ✓
+- ~~[014 — Add PWA Manifest](implementation/014-add-pwa-manifest.md)~~ ✓
+- ~~[015 — Add PWA Meta Tags to Layout](implementation/015-add-pwa-meta-tags.md)~~ ✓
 
 ## Phase 2: Database Layer (016–027)
 
