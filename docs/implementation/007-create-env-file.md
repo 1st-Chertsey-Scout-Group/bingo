@@ -50,8 +50,8 @@ PORT=3000
 - `.gitignore` — verify `.env` is listed; add it if missing
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: `.env.example` exists with all required variables
