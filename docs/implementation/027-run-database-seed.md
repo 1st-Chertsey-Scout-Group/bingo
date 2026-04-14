@@ -25,8 +25,8 @@ Execute the seed script to populate the database with all default bingo items, t
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
