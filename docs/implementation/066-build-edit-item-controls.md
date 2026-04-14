@@ -27,8 +27,8 @@ Add inline editing capability to each item in the item list. Clicking an item na
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

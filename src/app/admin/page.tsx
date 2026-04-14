@@ -1,6 +1,12 @@
 'use client'
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type FormEvent,
+  type KeyboardEvent,
+} from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Lock, Shield } from 'lucide-react'
@@ -275,6 +281,10 @@ function ItemList({ adminPin }: ItemListProps) {
   const [items, setItems] = useState<Item[]>([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)
+  const [editingItemId, setEditingItemId] = useState<string | null>(null)
+  const [editName, setEditName] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [editError, setEditError] = useState('')
 
   const refreshItems = useCallback(async () => {
     setIsLoading(true)
@@ -303,6 +313,64 @@ function ItemList({ adminPin }: ItemListProps) {
     void refreshItems()
   }, [refreshItems])
 
+  function startEditing(item: Item) {
+    setEditingItemId(item.id)
+    setEditName(item.name)
+    setEditError('')
+  }
+
+  function cancelEditing() {
+    setEditingItemId(null)
+    setEditName('')
+    setEditError('')
+  }
+
+  async function saveEdit() {
+    const trimmed = editName.trim()
+    if (!trimmed) {
+      setEditError('Item name cannot be empty')
+      return
+    }
+
+    if (!editingItemId) return
+
+    setIsSaving(true)
+    setEditError('')
+
+    try {
+      const response = await fetch(`/api/items/${editingItemId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Admin-Pin': adminPin,
+        },
+        body: JSON.stringify({ name: trimmed }),
+      })
+
+      if (response.ok) {
+        await refreshItems()
+        setEditingItemId(null)
+        setEditName('')
+      } else {
+        const data = (await response.json()) as { error: string }
+        setEditError(data.error)
+      }
+    } catch {
+      setEditError('Failed to update item. Please try again.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  function handleEditKeyDown(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      void saveEdit()
+    } else if (e.key === 'Escape') {
+      cancelEditing()
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <AddItemForm adminPin={adminPin} refreshItems={refreshItems} />
@@ -325,10 +393,56 @@ function ItemList({ adminPin }: ItemListProps) {
             {items.map((item) => (
               <li
                 key={item.id}
-                className="flex items-center justify-between rounded-md border px-3 py-2"
+                className="flex flex-col gap-1 rounded-md border px-3 py-2"
               >
-                <span className="text-sm">{item.name}</span>
-                {item.isTemplate && <Badge variant="secondary">Template</Badge>}
+                {editingItemId === item.id ? (
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        onKeyDown={handleEditKeyDown}
+                        disabled={isSaving}
+                        className="flex-1 text-sm"
+                        autoFocus
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => void saveEdit()}
+                        disabled={isSaving}
+                      >
+                        {isSaving ? 'Saving…' : 'Save'}
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={cancelEditing}
+                        disabled={isSaving}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                    {editError && (
+                      <p className="text-destructive text-sm font-medium">
+                        {editError}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      className="cursor-pointer text-left text-sm hover:underline"
+                      onClick={() => startEditing(item)}
+                    >
+                      {item.name}
+                    </button>
+                    {item.isTemplate && (
+                      <Badge variant="secondary">Template</Badge>
+                    )}
+                  </div>
+                )}
               </li>
             ))}
           </ul>
