@@ -12,8 +12,8 @@ Ensure TypeScript strict mode is enabled in `tsconfig.json`. Next.js create-next
 - `tsconfig.json` — verify and ensure `"strict": true` exists in `compilerOptions`
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: `tsconfig.json` contains `"strict": true` in the `compilerOptions` block
