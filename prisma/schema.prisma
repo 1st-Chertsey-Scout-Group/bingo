@@ -59,6 +59,23 @@ model RoundItem {
   @@unique([gameId, round, itemId])
 }
 
+model Submission {
+  id          String    @id @default(cuid())
+  roundItemId String
+  roundItem   RoundItem @relation(fields: [roundItemId], references: [id])
+  teamId      String
+  team        Team      @relation(fields: [teamId], references: [id])
+  photoUrl    String
+  status      String    @default("pending")
+  position    Int
+  reviewedBy  String?
+  createdAt   DateTime  @default(now())
+
+  @@index([roundItemId, status])
+  @@index([roundItemId, position])
+  @@index([teamId])
+}
+
 model TemplateValue {
   id       String @id @default(cuid())
   category String
