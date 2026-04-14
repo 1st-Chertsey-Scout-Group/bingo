@@ -38,7 +38,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 1: Project Scaffolding & Config (001–015)
 
-- [001 — Create Devcontainer Configuration](implementation/001-create-devcontainer.md)
+- ~~[001 — Create Devcontainer Configuration](implementation/001-create-devcontainer.md)~~ ✓
 - [002 — Initialize Next.js Project](implementation/002-initialize-nextjs-project.md)
 - [003 — Configure TypeScript Strict Mode](implementation/003-configure-typescript.md)
 - [004 — Create Server TypeScript Config](implementation/004-create-server-tsconfig.md)
