@@ -13,6 +13,7 @@ Show a visual indicator on squares where the scout has submitted a photo that is
   - In `src/components/Board.tsx`, accept an additional prop: `pendingItems?: Set<string>` (set of roundItemIds with pending submissions)
   - Pass `isPending={pendingItems?.has(item.roundItemId) ?? false}` to each Square
 - In `src/components/ScoutGame.tsx`, derive pendingItems from `state.mySubmissions`:
+
   ```typescript
   const pendingItems = new Set(
     [...state.mySubmissions.entries()]
@@ -22,6 +23,7 @@ Show a visual indicator on squares where the scout has submitted a photo that is
   ```
 
   - Pass `pendingItems={pendingItems}` to Board
+
 - Pending square styling (only when unclaimed):
   - Dotted border: `border-2 border-dashed border-amber-400`
   - Subtle pulsing animation: `animate-pulse` (Tailwind built-in) at reduced opacity
