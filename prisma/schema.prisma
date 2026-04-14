@@ -43,6 +43,22 @@ model Item {
   roundItems RoundItem[]
 }
 
+model RoundItem {
+  id              String       @id @default(cuid())
+  gameId          String
+  game            Game         @relation(fields: [gameId], references: [id])
+  itemId          String
+  item            Item         @relation(fields: [itemId], references: [id])
+  displayName     String
+  claimedByTeamId String?
+  lockedByLeader  String?
+  lockedAt        DateTime?
+  round           Int
+  submissions     Submission[]
+  @@index([gameId, round])
+  @@unique([gameId, round, itemId])
+}
+
 model TemplateValue {
   id       String @id @default(cuid())
   category String
