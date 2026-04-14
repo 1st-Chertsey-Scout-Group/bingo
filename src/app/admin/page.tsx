@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { Lock, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,112 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+
+type GameCreationFormProps = {
+  adminPin: string
+}
+
+function GameCreationForm({ adminPin }: GameCreationFormProps) {
+  const [leaderPin, setLeaderPin] = useState('')
+  const [displayName, setDisplayName] = useState('')
+  const [boardSize, setBoardSize] = useState(25)
+  const [templateCount, setTemplateCount] = useState(5)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const templateCountMax = Math.min(10, boardSize)
+
+  useEffect(() => {
+    if (templateCount > templateCountMax) {
+      setTemplateCount(templateCountMax)
+    }
+  }, [templateCount, templateCountMax])
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    setIsSubmitting(true)
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Game Creation</CardTitle>
+        <CardDescription>
+          Create a new bingo game for your scout group.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="leader-pin">Leader PIN</Label>
+            <Input
+              id="leader-pin"
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={4}
+              value={leaderPin}
+              onChange={(e) => setLeaderPin(e.target.value)}
+              placeholder="4-digit PIN"
+              required
+              className="h-12 text-lg"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="display-name">Display Name</Label>
+            <Input
+              id="display-name"
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              placeholder="Your name"
+              required
+              className="h-12 text-lg"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="board-size">
+              Board Size: <span className="font-bold">{boardSize}</span>
+            </Label>
+            <input
+              id="board-size"
+              type="range"
+              min={9}
+              max={25}
+              value={boardSize}
+              onChange={(e) => setBoardSize(Number(e.target.value))}
+              className="h-10 w-full"
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <Label htmlFor="template-count">
+              Template Count: <span className="font-bold">{templateCount}</span>
+            </Label>
+            <input
+              id="template-count"
+              type="range"
+              min={0}
+              max={templateCountMax}
+              value={templateCount}
+              onChange={(e) => setTemplateCount(Number(e.target.value))}
+              className="h-10 w-full"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            className="h-12 text-lg"
+          >
+            {isSubmitting ? 'Creating…' : 'Create Game'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
 
 export function AdminPage() {
   const [adminPin, setAdminPin] = useState<string | null>(null)
@@ -91,19 +197,7 @@ export function AdminPage() {
           <h1 className="text-2xl font-bold">Admin Dashboard</h1>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Game Creation</CardTitle>
-            <CardDescription>
-              Create and manage bingo games. Coming in step 061.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground text-sm">
-              Game creation controls will appear here.
-            </p>
-          </CardContent>
-        </Card>
+        <GameCreationForm adminPin={adminPin} />
 
         <Card>
           <CardHeader>
