@@ -27,8 +27,8 @@ Create the game logic module with board generation and PIN utilities. Board gene
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

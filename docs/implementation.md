@@ -93,7 +93,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[041 — Test Team Assignment Logic](implementation/041-test-team-assignment.md)~~ ✓
 - [042 — Create Template Resolution Utility](implementation/042-create-template-resolution.md)
 - [043 — Test Template Resolution](implementation/043-test-template-resolution.md)
-- [044 — Create Board Generation Utility](implementation/044-create-board-generation.md)
+- ~~[044 — Create Board Generation Utility](implementation/044-create-board-generation.md)~~ ✓
 - [045 — Test Board Generation](implementation/045-test-board-generation.md)
 - [046 — Create S3 Presigned URL Utility](implementation/046-create-s3-utility.md)
 - [047 — Create Image Compression Wrapper](implementation/047-create-image-compression.md)
