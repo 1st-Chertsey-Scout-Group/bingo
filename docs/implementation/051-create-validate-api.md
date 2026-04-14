@@ -22,8 +22,8 @@ Create the POST /api/validate endpoint that checks a 4-digit PIN against active 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
