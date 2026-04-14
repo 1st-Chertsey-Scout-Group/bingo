@@ -1,16 +1,4 @@
-# Step 039: Create Shared Types
-
-## Description
-
-Create the shared type definitions used across client and server code. These types define the shape of game state, socket event payloads, and data structures passed between components.
-
-## Requirements
-
-- Create `src/types.ts`
-- Define and export the following types:
-
-```typescript
-type Team = {
+export type Team = {
   id: string
   index: number
   name: string
@@ -18,7 +6,7 @@ type Team = {
   gameId: string
 }
 
-type RoundItem = {
+export type RoundItem = {
   id: string
   itemId: string
   displayName: string
@@ -28,16 +16,16 @@ type RoundItem = {
   status: 'open' | 'pending' | 'claimed'
 }
 
-type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'discarded'
+export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'discarded'
 
-type TeamSummary = {
+export type TeamSummary = {
   teamId: string
   teamName: string
   teamColour: string
   claimedCount: number
 }
 
-type SubmissionForReview = {
+export type SubmissionForReview = {
   id: string
   roundItemId: string
   displayName: string
@@ -47,12 +35,12 @@ type SubmissionForReview = {
   teamColour: string
 }
 
-type BoardItem = {
+export type BoardItem = {
   itemId: string
   displayName: string
 }
 
-type GameState = {
+export type GameState = {
   status: 'lobby' | 'active' | 'ended'
   teams: Team[]
   board: RoundItem[]
@@ -64,7 +52,7 @@ type GameState = {
   reviewingRoundItemId: string | null
 }
 
-type GameAction =
+export type GameAction =
   | { type: 'GAME_STARTED'; items: RoundItem[]; roundStartedAt: string }
   | {
       type: 'SQUARE_CLAIMED'
@@ -89,29 +77,3 @@ type GameAction =
   | { type: 'GAME_LOBBY' }
   | { type: 'LOBBY_TEAMS'; teams: Team[] }
   | { type: 'FULL_STATE'; state: GameState }
-```
-
-- All types must use `type` keyword, not `interface`
-- Named exports only
-- No `any` types
-- File should have no runtime code, only type definitions
-
-## Files to Create/Modify
-
-- `src/types.ts` — create all shared type definitions
-
-## Checklist
-
-- [x] Implemented
-- [x] Verified
-
-## Verification
-
-- **Check**: All types are exported from `src/types.ts`
-- **Command**: `cat src/types.ts`
-- **Check**: TypeScript compiles without errors
-- **Command**: `npx tsc --noEmit`
-
-## Commit
-
-`feat(types): add shared type definitions for game state and socket events`
