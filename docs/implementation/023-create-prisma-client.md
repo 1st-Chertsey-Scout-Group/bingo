@@ -28,8 +28,8 @@ if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
