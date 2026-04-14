@@ -34,3 +34,11 @@ model Team {
 
   @@index([gameId])
 }
+
+model Item {
+  id         String      @id @default(cuid())
+  name       String
+  isTemplate Boolean     @default(false)
+  isDefault  Boolean     @default(true)
+  roundItems RoundItem[]
+}
