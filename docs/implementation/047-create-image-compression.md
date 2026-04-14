@@ -24,8 +24,8 @@ Create the client-side image compression utility that prepares photos for upload
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
