@@ -22,8 +22,8 @@ Push the Prisma schema to the SQLite database, creating all tables and indexes. 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
