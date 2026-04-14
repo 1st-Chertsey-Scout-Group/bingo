@@ -9,7 +9,18 @@ import {
 } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Lock, Shield } from 'lucide-react'
+import { Lock, Shield, Trash2 } from 'lucide-react'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -285,6 +296,8 @@ function ItemList({ adminPin }: ItemListProps) {
   const [editName, setEditName] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [editError, setEditError] = useState('')
+  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const refreshItems = useCallback(async () => {
     setIsLoading(true)
@@ -371,6 +384,33 @@ function ItemList({ adminPin }: ItemListProps) {
     }
   }
 
+  async function handleDelete(itemId: string) {
+    setIsDeleting(true)
+
+    try {
+      const response = await fetch(`/api/items/${itemId}`, {
+        method: 'DELETE',
+        headers: { 'X-Admin-Pin': adminPin },
+      })
+
+      if (response.status === 204) {
+        setDeletingItemId(null)
+        await refreshItems()
+      } else if (response.status === 409) {
+        setDeletingItemId(null)
+        toast.error('Cannot delete item that is in use in an active round')
+      } else {
+        setDeletingItemId(null)
+        toast.error('Failed to delete item')
+      }
+    } catch {
+      setDeletingItemId(null)
+      toast.error('Failed to delete item')
+    } finally {
+      setIsDeleting(false)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <AddItemForm adminPin={adminPin} refreshItems={refreshItems} />
@@ -438,9 +478,53 @@ function ItemList({ adminPin }: ItemListProps) {
                     >
                       {item.name}
                     </button>
-                    {item.isTemplate && (
-                      <Badge variant="secondary">Template</Badge>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {item.isTemplate && (
+                        <Badge variant="secondary">Template</Badge>
+                      )}
+                      <AlertDialog
+                        open={deletingItemId === item.id}
+                        onOpenChange={(open) => {
+                          if (!open) setDeletingItemId(null)
+                        }}
+                      >
+                        <AlertDialogTrigger
+                          render={
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => setDeletingItemId(item.id)}
+                            />
+                          }
+                        >
+                          <Trash2 className="text-destructive size-4" />
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>Delete item</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              Are you sure you want to delete &quot;{item.name}
+                              &quot;? This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel disabled={isDeleting}>
+                              Cancel
+                            </AlertDialogCancel>
+                            <AlertDialogAction
+                              disabled={isDeleting}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                void handleDelete(item.id)
+                              }}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              {isDeleting ? 'Deleting…' : 'Delete'}
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
                   </div>
                 )}
               </li>
