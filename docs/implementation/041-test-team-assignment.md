@@ -31,8 +31,8 @@ Write unit tests for the team data module to verify the team array integrity and
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

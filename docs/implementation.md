@@ -90,7 +90,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 - [039 — Create Shared Type Definitions](implementation/039-create-shared-types.md)
 - [040 — Create Team Names and Colours Data](implementation/040-create-team-data.md)
-- [041 — Test Team Assignment Logic](implementation/041-test-team-assignment.md)
+- ~~[041 — Test Team Assignment Logic](implementation/041-test-team-assignment.md)~~ ✓
 - [042 — Create Template Resolution Utility](implementation/042-create-template-resolution.md)
 - [043 — Test Template Resolution](implementation/043-test-template-resolution.md)
 - [044 — Create Board Generation Utility](implementation/044-create-board-generation.md)
