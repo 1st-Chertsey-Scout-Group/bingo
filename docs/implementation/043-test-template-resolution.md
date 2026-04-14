@@ -24,8 +24,8 @@ Write unit tests for the template resolution module to verify placeholder substi
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
