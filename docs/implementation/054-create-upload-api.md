@@ -23,8 +23,8 @@ Create the POST /api/upload endpoint that returns a presigned S3 URL for photo u
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
