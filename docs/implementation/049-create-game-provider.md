@@ -25,8 +25,8 @@ Create a React Context provider that makes game state and dispatch available to 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
