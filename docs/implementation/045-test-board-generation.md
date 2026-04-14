@@ -34,8 +34,8 @@ Write unit tests for the board generation and PIN utility functions to verify co
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
