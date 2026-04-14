@@ -41,8 +41,8 @@ Create the GET /api/game/[gameId] endpoint that returns the full state of a game
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
