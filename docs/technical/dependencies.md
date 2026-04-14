@@ -22,24 +22,29 @@
 | `clsx`                           | Conditional class names (shadcn dep)                  |
 | `tailwind-merge`                 | Merge Tailwind classes without conflicts (shadcn dep) |
 | `lucide-react`                   | Icons (shadcn dep)                                    |
+| `@base-ui/react`                 | Headless UI primitives (shadcn dep)                   |
+| `@paralleldrive/cuid2`           | Collision-resistant unique IDs (S3 key generation)    |
+| `next-themes`                    | Dark/light theme support (shadcn dep)                 |
+| `tw-animate-css`                 | CSS animations for Tailwind (shadcn dep)              |
 
 ## Dev
 
-| Package                       | Purpose                             |
-| ----------------------------- | ----------------------------------- |
-| `typescript`                  | Type checking                       |
-| `tsx`                         | TypeScript execution for dev server |
-| `prisma`                      | CLI — migrations, seeding, studio   |
-| `vitest`                      | Test runner                         |
-| `@vitest/coverage-v8`         | Coverage reporting (80% target)     |
-| `eslint`                      | Linting                             |
-| `eslint-config-next`          | Next.js ESLint rules                |
-| `prettier`                    | Code formatting                     |
-| `prettier-plugin-tailwindcss` | Auto-sort Tailwind classes          |
-| `@types/node`                 | Node.js type definitions            |
-| `@types/react`                | React type definitions              |
-| `@types/react-dom`            | React DOM type definitions          |
-| `@types/better-sqlite3`       | better-sqlite3 type definitions     |
+| Package                       | Purpose                                  |
+| ----------------------------- | ---------------------------------------- |
+| `typescript`                  | Type checking                            |
+| `tsx`                         | TypeScript execution for dev server      |
+| `prisma`                      | CLI — migrations, seeding, studio        |
+| `vitest`                      | Test runner                              |
+| `@vitest/coverage-v8`         | Coverage reporting (80% target)          |
+| `eslint`                      | Linting                                  |
+| `eslint-config-next`          | Next.js ESLint rules                     |
+| `prettier`                    | Code formatting                          |
+| `prettier-plugin-tailwindcss` | Auto-sort Tailwind classes               |
+| `@types/node`                 | Node.js type definitions                 |
+| `@types/react`                | React type definitions                   |
+| `@types/react-dom`            | React DOM type definitions               |
+| `@types/better-sqlite3`       | better-sqlite3 type definitions          |
+| `shadcn`                      | CLI for scaffolding shadcn/ui components |
 
 ## Not Used (and why)
 

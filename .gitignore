@@ -47,3 +47,4 @@ next-env.d.ts
 # AI Tools
 .claude/**.local.**
 /src/generated/prisma
+dist/

@@ -3,7 +3,7 @@ import { resolveTemplate } from '@/lib/templates'
 type Item = {
   id: string
   name: string
-  category: string | null
+  isTemplate: boolean
 }
 
 type TemplateValue = {
@@ -87,8 +87,9 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
   for (const template of shuffledTemplates) {
     if (templateSlotsFilled >= templateCount) break
 
-    const category = template.category
-    if (category === null) continue
+    const match = template.name.match(/\[(\w+)]/)
+    if (!match) continue
+    const category = match[1]
 
     const values = templateValues
       .filter((tv) => tv.category === category)

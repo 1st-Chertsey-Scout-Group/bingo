@@ -356,11 +356,12 @@ volumes:
 # Database
 DATABASE_URL="file:./data/scout-bingo.db"
 
-# AWS S3
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
-S3_BUCKET_NAME=
+# S3 (supports AWS or S3-compatible services)
+S3_ACCESS_KEY_ID=
+S3_SECRET_ACCESS_KEY=
+S3_REGION=
+S3_BUCKET=
+S3_ENDPOINT=              # Optional — for S3-compatible services (e.g. MinIO)
 
 # Admin
 ADMIN_PIN=              # Protects /admin page

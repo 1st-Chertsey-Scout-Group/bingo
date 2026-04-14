@@ -34,6 +34,13 @@ export async function POST(request: Request) {
     templateCount?: number
   }
 
+  if (!/^\d{4}$/.test(leaderPin)) {
+    return NextResponse.json(
+      { error: 'leaderPin must be exactly 4 digits' },
+      { status: 400 },
+    )
+  }
+
   if (typeof boardSize !== 'number' || boardSize < 9 || boardSize > 25) {
     return NextResponse.json(
       { error: 'boardSize must be between 9 and 25' },
@@ -59,13 +66,28 @@ export async function POST(request: Request) {
     )
   }
 
+  const leaderPinCollision = await prisma.game.findFirst({
+    where: {
+      status: { not: 'ended' },
+      OR: [{ pin: leaderPin }, { leaderPin }],
+    },
+  })
+
+  if (leaderPinCollision) {
+    return NextResponse.json(
+      { error: 'Leader PIN conflicts with an existing active game' },
+      { status: 409 },
+    )
+  }
+
   let pin: string | null = null
   for (let attempt = 0; attempt < 10; attempt++) {
     const candidate = generatePin()
+    if (candidate === leaderPin) continue
     const existing = await prisma.game.findFirst({
       where: {
-        pin: candidate,
         status: { not: 'ended' },
+        OR: [{ pin: candidate }, { leaderPin: candidate }],
       },
     })
     if (!existing) {

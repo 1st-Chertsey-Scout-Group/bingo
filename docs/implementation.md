@@ -88,47 +88,47 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 5: Shared Utilities & Types (039–047)
 
-- [039 — Create Shared Type Definitions](implementation/039-create-shared-types.md)
-- [040 — Create Team Names and Colours Data](implementation/040-create-team-data.md)
+- ~~[039 — Create Shared Type Definitions](implementation/039-create-shared-types.md)~~ ✓
+- ~~[040 — Create Team Names and Colours Data](implementation/040-create-team-data.md)~~ ✓
 - ~~[041 — Test Team Assignment Logic](implementation/041-test-team-assignment.md)~~ ✓
-- [042 — Create Template Resolution Utility](implementation/042-create-template-resolution.md)
-- [043 — Test Template Resolution](implementation/043-test-template-resolution.md)
+- ~~[042 — Create Template Resolution Utility](implementation/042-create-template-resolution.md)~~ ✓
+- ~~[043 — Test Template Resolution](implementation/043-test-template-resolution.md)~~ ✓
 - ~~[044 — Create Board Generation Utility](implementation/044-create-board-generation.md)~~ ✓
-- [045 — Test Board Generation](implementation/045-test-board-generation.md)
+- ~~[045 — Test Board Generation](implementation/045-test-board-generation.md)~~ ✓
 - ~~[046 — Create S3 Presigned URL Utility](implementation/046-create-s3-utility.md)~~ ✓
-- [047 — Create Image Compression Wrapper](implementation/047-create-image-compression.md)
+- ~~[047 — Create Image Compression Wrapper](implementation/047-create-image-compression.md)~~ ✓
 
 ## Phase 6: State Management (048–050)
 
-- [048 — Create Game State Reducer](implementation/048-create-game-reducer.md)
-- [049 — Create GameProvider Context](implementation/049-create-game-provider.md)
-- [050 — Create useSocket Hook](implementation/050-create-use-socket-hook.md)
+- ~~[048 — Create Game State Reducer](implementation/048-create-game-reducer.md)~~ ✓
+- ~~[049 — Create GameProvider Context](implementation/049-create-game-provider.md)~~ ✓
+- ~~[050 — Create useSocket Hook](implementation/050-create-use-socket-hook.md)~~ ✓
 
 ## Phase 7: API Routes (051–058)
 
-- [051 — Create PIN Validation Route](implementation/051-create-validate-api.md)
-- [052 — Create Game Creation Route](implementation/052-create-game-post-api.md)
-- [053 — Create Game State Route](implementation/053-create-game-get-api.md)
-- [054 — Create Presigned Upload URL Route](implementation/054-create-upload-api.md)
-- [055 — Create Get Items Route](implementation/055-create-items-get-api.md)
-- [056 — Create Add Item Route](implementation/056-create-items-post-api.md)
-- [057 — Create Update Item Route](implementation/057-create-items-put-api.md)
-- [058 — Create Delete Item Route](implementation/058-create-items-delete-api.md)
+- ~~[051 — Create PIN Validation Route](implementation/051-create-validate-api.md)~~ ✓
+- ~~[052 — Create Game Creation Route](implementation/052-create-game-post-api.md)~~ ✓
+- ~~[053 — Create Game State Route](implementation/053-create-game-get-api.md)~~ ✓
+- ~~[054 — Create Presigned Upload URL Route](implementation/054-create-upload-api.md)~~ ✓
+- ~~[055 — Create Get Items Route](implementation/055-create-items-get-api.md)~~ ✓
+- ~~[056 — Create Add Item Route](implementation/056-create-items-post-api.md)~~ ✓
+- ~~[057 — Create Update Item Route](implementation/057-create-items-put-api.md)~~ ✓
+- ~~[058 — Create Delete Item Route](implementation/058-create-items-delete-api.md)~~ ✓
 
 ## Phase 8: Admin — Game Creation (059–063)
 
-- [059 — Create Admin PIN Check Utility](implementation/059-create-admin-pin-check.md)
-- [060 — Build Admin Page Layout with PIN Gate](implementation/060-build-admin-layout.md)
-- [061 — Build Game Creation Form](implementation/061-build-game-creation-form.md)
-- [062 — Wire Game Creation to API](implementation/062-wire-game-creation-api.md)
-- [063 — Add localStorage Seed and Redirect](implementation/063-add-admin-redirect.md)
+- ~~[059 — Create Admin PIN Check Utility](implementation/059-create-admin-pin-check.md)~~ ✓
+- ~~[060 — Build Admin Page Layout with PIN Gate](implementation/060-build-admin-layout.md)~~ ✓
+- ~~[061 — Build Game Creation Form](implementation/061-build-game-creation-form.md)~~ ✓
+- ~~[062 — Wire Game Creation to API](implementation/062-wire-game-creation-api.md)~~ ✓
+- ~~[063 — Add localStorage Seed and Redirect](implementation/063-add-admin-redirect.md)~~ ✓
 
 ## Phase 9: Admin — Item Pool Management (064–067)
 
-- [064 — Build Item List Display](implementation/064-build-item-list.md)
-- [065 — Build Add Item Form](implementation/065-build-add-item-form.md)
-- [066 — Build Edit Item Controls](implementation/066-build-edit-item-controls.md)
-- [067 — Build Delete Item with Confirmation](implementation/067-build-delete-item.md)
+- ~~[064 — Build Item List Display](implementation/064-build-item-list.md)~~ ✓
+- ~~[065 — Build Add Item Form](implementation/065-build-add-item-form.md)~~ ✓
+- ~~[066 — Build Edit Item Controls](implementation/066-build-edit-item-controls.md)~~ ✓
+- ~~[067 — Build Delete Item with Confirmation](implementation/067-build-delete-item.md)~~ ✓
 
 ## Phase 10: Landing Page (068–072)
 

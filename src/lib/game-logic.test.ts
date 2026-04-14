@@ -4,13 +4,13 @@ import { generateBoard, generatePin, validatePinUnique } from './game-logic'
 const mockConcreteItems = Array.from({ length: 30 }, (_, i) => ({
   id: `item-${i + 1}`,
   name: `Item ${i + 1}`,
-  category: null,
+  isTemplate: false,
 }))
 
 const mockTemplateItems = [
-  { id: 'tpl-1', name: 'A [colour] flower', category: 'colour' },
-  { id: 'tpl-2', name: 'A [colour] leaf', category: 'colour' },
-  { id: 'tpl-3', name: 'A [tree] tree', category: 'tree' },
+  { id: 'tpl-1', name: 'A [colour] flower', isTemplate: true },
+  { id: 'tpl-2', name: 'A [colour] leaf', isTemplate: true },
+  { id: 'tpl-3', name: 'A [tree] tree', isTemplate: true },
 ]
 
 const mockTemplateValues = [
