@@ -43,7 +43,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - [003 — Configure TypeScript Strict Mode](implementation/003-configure-typescript.md)
 - ~~[004 — Create Server TypeScript Config](implementation/004-create-server-tsconfig.md)~~ ✓
 - ~~[005 — Configure Prettier](implementation/005-configure-prettier.md)~~ ✓
-- [006 — Configure ESLint](implementation/006-configure-eslint.md)
+- ~~[006 — Configure ESLint](implementation/006-configure-eslint.md)~~ ✓
 - [007 — Create Environment Variables File](implementation/007-create-env-file.md)
 - [008 — Install Production Dependencies](implementation/008-install-production-deps.md)
 - [009 — Install Dev Dependencies](implementation/009-install-dev-deps.md)
