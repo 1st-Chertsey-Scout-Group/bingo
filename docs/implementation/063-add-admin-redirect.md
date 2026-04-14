@@ -28,8 +28,8 @@ After successful game creation, seed localStorage with the leader session data a
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

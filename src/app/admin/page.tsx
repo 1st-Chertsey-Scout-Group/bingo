@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, type FormEvent } from 'react'
+import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Lock, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -28,6 +29,7 @@ type GameCreationFormProps = {
 }
 
 function GameCreationForm({ adminPin }: GameCreationFormProps) {
+  const router = useRouter()
   const [leaderPin, setLeaderPin] = useState('')
   const [displayName, setDisplayName] = useState('')
   const [boardSize, setBoardSize] = useState(25)
@@ -63,6 +65,25 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
         const data = (await response.json()) as GameResponse
         setCreatedGame(data)
         toast.success(`Game created! PIN: ${data.pin}`)
+
+        try {
+          localStorage.setItem(
+            'scout-bingo-session',
+            JSON.stringify({
+              gamePin: data.pin,
+              leaderPin,
+              gameId: data.gameId,
+              leaderName: displayName,
+              role: 'leader',
+            }),
+          )
+        } catch {
+          // localStorage may be unavailable in private browsing
+        }
+
+        setTimeout(() => {
+          router.push(`/leader/${data.gameId}`)
+        }, 500)
       } else {
         const errorData = (await response.json()) as { error: string }
         setFormError(errorData.error)
