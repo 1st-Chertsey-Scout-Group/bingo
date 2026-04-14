@@ -31,8 +31,8 @@ Add all required shadcn/ui components to the project. These pre-built components
 - `src/components/ui/separator.tsx` — separator component
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: All components are installed
