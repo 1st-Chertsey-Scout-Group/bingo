@@ -71,20 +71,20 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 3: Custom Server & Socket.IO Wiring (028–033)
 
-- [028 — Create Custom Server Entry](implementation/028-create-custom-server.md)
-- [029 — Create Socket Handler Entry Point](implementation/029-create-socket-handler-entry.md)
-- [030 — Create Lobby Socket Handlers Stub](implementation/030-create-lobby-handlers-stub.md)
-- [031 — Create Game Socket Handlers Stub](implementation/031-create-game-handlers-stub.md)
-- [032 — Create Submission Socket Handlers Stub](implementation/032-create-submission-handlers-stub.md)
-- [033 — Create Socket.IO Client Utility](implementation/033-create-socket-client.md)
+- ~~[028 — Create Custom Server Entry](implementation/028-create-custom-server.md)~~ ✓
+- ~~[029 — Create Socket Handler Entry Point](implementation/029-create-socket-handler-entry.md)~~ ✓
+- ~~[030 — Create Lobby Socket Handlers Stub](implementation/030-create-lobby-handlers-stub.md)~~ ✓
+- ~~[031 — Create Game Socket Handlers Stub](implementation/031-create-game-handlers-stub.md)~~ ✓
+- ~~[032 — Create Submission Socket Handlers Stub](implementation/032-create-submission-handlers-stub.md)~~ ✓
+- ~~[033 — Create Socket.IO Client Utility](implementation/033-create-socket-client.md)~~ ✓
 
 ## Phase 4: Stub Pages & Dev Server (034–038)
 
-- [034 — Create Landing Page Stub](implementation/034-create-landing-page-stub.md)
-- [035 — Create Scout Page Stub](implementation/035-create-scout-page-stub.md)
-- [036 — Create Leader Page Stub](implementation/036-create-leader-page-stub.md)
-- [037 — Create Admin Page Stub](implementation/037-create-admin-page-stub.md)
-- [038 — Verify Dev Server Starts](implementation/038-verify-dev-server.md)
+- ~~[034 — Create Landing Page Stub](implementation/034-create-landing-page-stub.md)~~ ✓
+- ~~[035 — Create Scout Page Stub](implementation/035-create-scout-page-stub.md)~~ ✓
+- ~~[036 — Create Leader Page Stub](implementation/036-create-leader-page-stub.md)~~ ✓
+- ~~[037 — Create Admin Page Stub](implementation/037-create-admin-page-stub.md)~~ ✓
+- ~~[038 — Verify Dev Server Starts](implementation/038-verify-dev-server.md)~~ ✓
 
 ## Phase 5: Shared Utilities & Types (039–047)
 

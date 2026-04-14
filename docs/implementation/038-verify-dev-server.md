@@ -23,8 +23,8 @@ Manually verify that the custom server, page routes, and Socket.IO connection al
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
