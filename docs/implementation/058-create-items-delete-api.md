@@ -22,8 +22,8 @@ Add a DELETE handler to the items/[itemId] route to allow admins to remove items
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

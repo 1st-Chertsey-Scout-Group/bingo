@@ -48,3 +48,45 @@ export async function PUT(
     isTemplate: item.isTemplate,
   })
 }
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: Promise<{ itemId: string }> },
+) {
+  const adminPin = request.headers.get('x-admin-pin')
+  if (!adminPin || adminPin !== process.env.ADMIN_PIN) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  const { itemId } = await params
+
+  const existing = await prisma.item.findUnique({
+    where: { id: itemId },
+  })
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+  }
+
+  const activeRoundItem = await prisma.roundItem.findFirst({
+    where: {
+      itemId,
+      game: {
+        status: 'active',
+      },
+    },
+  })
+
+  if (activeRoundItem) {
+    return NextResponse.json(
+      { error: 'Cannot delete item that is in use in an active round' },
+      { status: 409 },
+    )
+  }
+
+  await prisma.item.delete({
+    where: { id: itemId },
+  })
+
+  return new NextResponse(null, { status: 204 })
+}
