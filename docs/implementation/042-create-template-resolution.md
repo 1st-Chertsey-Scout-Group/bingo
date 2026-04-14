@@ -25,8 +25,8 @@ Create the template resolution module that substitutes placeholders in bingo ite
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
