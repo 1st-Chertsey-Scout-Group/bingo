@@ -20,8 +20,8 @@ Create the game sub-handler that will manage game lifecycle events. This step cr
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
