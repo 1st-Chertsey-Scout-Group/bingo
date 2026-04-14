@@ -8,31 +8,31 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Overview
 
-| Phase | Steps | Coverage |
-|-------|-------|----------|
-| Project Scaffolding & Config | 001–015 | Next.js, TS, Prettier, ESLint, env, devcontainer, shadcn/ui, layout, PWA manifest |
-| Database Layer | 016–027 | Prisma schema (6 models), client singleton, seed with all 85 items + templates |
-| Custom Server & Socket.IO | 028–033 | server.ts, handler entry, 3 handler stubs, client utility |
-| Stub Pages & Dev Server | 034–038 | Landing, scout, leader, admin pages + dev server verification |
-| Shared Utilities & Types | 039–047 | Types, teams (30), templates, board generation, S3, image compression + tests |
-| State Management | 048–050 | Reducer, GameProvider context, useSocket hook |
-| API Routes | 051–058 | Validate, game CRUD, upload, items CRUD |
-| Admin — Game Creation | 059–063 | PIN gate, form, API wiring, localStorage + redirect |
-| Admin — Item Management | 064–067 | List, add, edit, delete |
-| Landing Page | 068–072 | PIN form, validation, role redirect, leader name, homescreen hint |
-| Scout Join & Lobby | 073–078 | ScoutGame shell, lobby:join handler, Lobby component, teams event |
-| Leader Join & Lobby | 079–085 | LeaderGame shell, leader join, name validation, PINs, landscape, start button |
-| Game Start & Board Generation | 086–090 | game:start handler, board generation, RoundItems, client wiring |
-| Board UI | 091–096 | Board + Square components, all square states, scout active render |
-| Scout Active Round | 097–104 | Camera trigger, compression, S3 upload, submission, pending indicator, toasts |
-| Submission Processing | 105–107 | Server handler, square:pending, submission:received |
-| Leader Active Round | 108–112 | Leader board, RoundHeader, needs-review + locked styling |
-| Leader Review Flow | 113–123 | review:open/approve/reject/close handlers, ReviewModal, lock display |
-| Round End | 124–128 | game:end handler, auto-end, scout overlay, leader summary |
-| New Round | 129–132 | game:newround handler, lobby reset, localStorage clear |
-| Resilience | 133–145 | Reconnection, banner, caching, rejoin, upload retry, lock timeout |
-| PWA Service Worker | 146–148 | Service worker, registration, icons |
-| Docker & Deployment | 149–153 | Dockerfile, compose, entrypoint, S3 lifecycle, production env |
+| Phase                         | Steps   | Coverage                                                                          |
+| ----------------------------- | ------- | --------------------------------------------------------------------------------- |
+| Project Scaffolding & Config  | 001–015 | Next.js, TS, Prettier, ESLint, env, devcontainer, shadcn/ui, layout, PWA manifest |
+| Database Layer                | 016–027 | Prisma schema (6 models), client singleton, seed with all 85 items + templates    |
+| Custom Server & Socket.IO     | 028–033 | server.ts, handler entry, 3 handler stubs, client utility                         |
+| Stub Pages & Dev Server       | 034–038 | Landing, scout, leader, admin pages + dev server verification                     |
+| Shared Utilities & Types      | 039–047 | Types, teams (30), templates, board generation, S3, image compression + tests     |
+| State Management              | 048–050 | Reducer, GameProvider context, useSocket hook                                     |
+| API Routes                    | 051–058 | Validate, game CRUD, upload, items CRUD                                           |
+| Admin — Game Creation         | 059–063 | PIN gate, form, API wiring, localStorage + redirect                               |
+| Admin — Item Management       | 064–067 | List, add, edit, delete                                                           |
+| Landing Page                  | 068–072 | PIN form, validation, role redirect, leader name, homescreen hint                 |
+| Scout Join & Lobby            | 073–078 | ScoutGame shell, lobby:join handler, Lobby component, teams event                 |
+| Leader Join & Lobby           | 079–085 | LeaderGame shell, leader join, name validation, PINs, landscape, start button     |
+| Game Start & Board Generation | 086–090 | game:start handler, board generation, RoundItems, client wiring                   |
+| Board UI                      | 091–096 | Board + Square components, all square states, scout active render                 |
+| Scout Active Round            | 097–104 | Camera trigger, compression, S3 upload, submission, pending indicator, toasts     |
+| Submission Processing         | 105–107 | Server handler, square:pending, submission:received                               |
+| Leader Active Round           | 108–112 | Leader board, RoundHeader, needs-review + locked styling                          |
+| Leader Review Flow            | 113–123 | review:open/approve/reject/close handlers, ReviewModal, lock display              |
+| Round End                     | 124–128 | game:end handler, auto-end, scout overlay, leader summary                         |
+| New Round                     | 129–132 | game:newround handler, lobby reset, localStorage clear                            |
+| Resilience                    | 133–145 | Reconnection, banner, caching, rejoin, upload retry, lock timeout                 |
+| PWA Service Worker            | 146–148 | Service worker, registration, icons                                               |
+| Docker & Deployment           | 149–153 | Dockerfile, compose, entrypoint, S3 lifecycle, production env                     |
 
 ---
 
@@ -46,9 +46,9 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[006 — Configure ESLint](implementation/006-configure-eslint.md)~~ ✓
 - ~~[007 — Create Environment Variables File](implementation/007-create-env-file.md)~~ ✓
 - ~~[008 — Install Production Dependencies](implementation/008-install-production-deps.md)~~ ✓
-- [009 — Install Dev Dependencies](implementation/009-install-dev-deps.md)
-- [010 — Configure npm Scripts](implementation/010-configure-npm-scripts.md)
-- [011 — Initialize shadcn/ui](implementation/011-initialize-shadcn-ui.md)
+- ~~[009 — Install Dev Dependencies](implementation/009-install-dev-deps.md)~~ ✓
+- ~~[010 — Configure npm Scripts](implementation/010-configure-npm-scripts.md)~~ ✓
+- ~~[011 — Initialize shadcn/ui](implementation/011-initialize-shadcn-ui.md)~~ ✓
 - [012 — Add All shadcn/ui Components](implementation/012-add-shadcn-components.md)
 - [013 — Create Root Layout with Tailwind](implementation/013-create-root-layout.md)
 - [014 — Add PWA Manifest](implementation/014-add-pwa-manifest.md)
