@@ -27,8 +27,8 @@ Extract the admin PIN validation logic into a reusable helper function. This eli
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 
+import { checkAdminPin, unauthorizedResponse } from '@/lib/admin'
 import { prisma } from '@/lib/prisma'
 
 export async function GET(request: Request) {
-  const adminPin = request.headers.get('x-admin-pin')
-  if (!adminPin || adminPin !== process.env.ADMIN_PIN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdminPin(request.headers)) {
+    return unauthorizedResponse()
   }
 
   const items = await prisma.item.findMany({
@@ -17,9 +17,8 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const adminPin = request.headers.get('x-admin-pin')
-  if (!adminPin || adminPin !== process.env.ADMIN_PIN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdminPin(request.headers)) {
+    return unauthorizedResponse()
   }
 
   const body: unknown = await request.json()

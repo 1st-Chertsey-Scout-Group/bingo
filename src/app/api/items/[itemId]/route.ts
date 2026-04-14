@@ -1,14 +1,14 @@
 import { NextResponse } from 'next/server'
 
+import { checkAdminPin, unauthorizedResponse } from '@/lib/admin'
 import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: Request,
   { params }: { params: Promise<{ itemId: string }> },
 ) {
-  const adminPin = request.headers.get('x-admin-pin')
-  if (!adminPin || adminPin !== process.env.ADMIN_PIN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdminPin(request.headers)) {
+    return unauthorizedResponse()
   }
 
   const { itemId } = await params
@@ -53,9 +53,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ itemId: string }> },
 ) {
-  const adminPin = request.headers.get('x-admin-pin')
-  if (!adminPin || adminPin !== process.env.ADMIN_PIN) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!checkAdminPin(request.headers)) {
+    return unauthorizedResponse()
   }
 
   const { itemId } = await params
