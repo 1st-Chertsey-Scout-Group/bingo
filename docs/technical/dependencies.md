@@ -2,24 +2,26 @@
 
 ## Production
 
-| Package                         | Purpose                                               |
-| ------------------------------- | ----------------------------------------------------- |
-| `next`                          | Framework — App Router, SSR, API routes               |
-| `react`                         | UI library                                            |
-| `react-dom`                     | React DOM rendering                                   |
-| `socket.io`                     | Server-side WebSocket (rooms, broadcasting)           |
-| `socket.io-client`              | Client-side WebSocket (auto-reconnect)                |
-| `@prisma/client`                | Database ORM (SQLite)                                 |
-| `@aws-sdk/client-s3`            | S3 operations (PutObject)                             |
-| `@aws-sdk/s3-request-presigner` | Presigned URL generation                              |
-| `browser-image-compression`     | Client-side photo compression to WebP                 |
-| `sonner`                        | Toast notifications (via shadcn)                      |
-| `tailwindcss`                   | Utility-first CSS                                     |
-| `@tailwindcss/postcss`          | PostCSS plugin for Tailwind                           |
-| `class-variance-authority`      | Component variant styling (shadcn dep)                |
-| `clsx`                          | Conditional class names (shadcn dep)                  |
-| `tailwind-merge`                | Merge Tailwind classes without conflicts (shadcn dep) |
-| `lucide-react`                  | Icons (shadcn dep)                                    |
+| Package                          | Purpose                                               |
+| -------------------------------- | ----------------------------------------------------- |
+| `next`                           | Framework — App Router, SSR, API routes               |
+| `react`                          | UI library                                            |
+| `react-dom`                      | React DOM rendering                                   |
+| `socket.io`                      | Server-side WebSocket (rooms, broadcasting)           |
+| `socket.io-client`               | Client-side WebSocket (auto-reconnect)                |
+| `@prisma/client`                 | Database ORM (SQLite)                                 |
+| `@prisma/adapter-better-sqlite3` | Prisma adapter for better-sqlite3 driver              |
+| `better-sqlite3`                 | Synchronous SQLite driver (WAL mode, better perf)     |
+| `@aws-sdk/client-s3`             | S3 operations (PutObject)                             |
+| `@aws-sdk/s3-request-presigner`  | Presigned URL generation                              |
+| `browser-image-compression`      | Client-side photo compression to WebP                 |
+| `sonner`                         | Toast notifications (via shadcn)                      |
+| `tailwindcss`                    | Utility-first CSS                                     |
+| `@tailwindcss/postcss`           | PostCSS plugin for Tailwind                           |
+| `class-variance-authority`       | Component variant styling (shadcn dep)                |
+| `clsx`                           | Conditional class names (shadcn dep)                  |
+| `tailwind-merge`                 | Merge Tailwind classes without conflicts (shadcn dep) |
+| `lucide-react`                   | Icons (shadcn dep)                                    |
 
 ## Dev
 
@@ -37,6 +39,7 @@
 | `@types/node`                 | Node.js type definitions            |
 | `@types/react`                | React type definitions              |
 | `@types/react-dom`            | React DOM type definitions          |
+| `@types/better-sqlite3`       | better-sqlite3 type definitions     |
 
 ## Not Used (and why)
 

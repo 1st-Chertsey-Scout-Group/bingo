@@ -11,7 +11,8 @@ datasource db {
 }
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 model Game {

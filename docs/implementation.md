@@ -56,18 +56,18 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 2: Database Layer (016–027)
 
-- [016 — Create Prisma Schema with Datasource](implementation/016-create-prisma-schema.md)
+- ~~[016 — Create Prisma Schema with Datasource](implementation/016-create-prisma-schema.md)~~ ✓
 - ~~[017 — Add Game Model](implementation/017-add-game-model.md)~~ ✓
 - ~~[018 — Add Team Model](implementation/018-add-team-model.md)~~ ✓
-- [019 — Add Item Model](implementation/019-add-item-model.md)
-- [020 — Add TemplateValue Model](implementation/020-add-template-value-model.md)
-- [021 — Add RoundItem Model](implementation/021-add-round-item-model.md)
-- [022 — Add Submission Model](implementation/022-add-submission-model.md)
-- [023 — Create Prisma Client Singleton](implementation/023-create-prisma-client.md)
-- [024 — Push Database Schema](implementation/024-push-database-schema.md)
-- [025 — Create Seed File with Concrete Items](implementation/025-create-seed-concrete-items.md)
-- [026 — Add Templates and Template Values to Seed](implementation/026-add-seed-templates.md)
-- [027 — Run Database Seed](implementation/027-run-database-seed.md)
+- ~~[019 — Add Item Model](implementation/019-add-item-model.md)~~ ✓
+- ~~[020 — Add TemplateValue Model](implementation/020-add-template-value-model.md)~~ ✓
+- ~~[021 — Add RoundItem Model](implementation/021-add-round-item-model.md)~~ ✓
+- ~~[022 — Add Submission Model](implementation/022-add-submission-model.md)~~ ✓
+- ~~[023 — Create Prisma Client Singleton](implementation/023-create-prisma-client.md)~~ ✓
+- ~~[024 — Push Database Schema](implementation/024-push-database-schema.md)~~ ✓
+- ~~[025 — Create Seed File with Concrete Items](implementation/025-create-seed-concrete-items.md)~~ ✓
+- ~~[026 — Add Templates and Template Values to Seed](implementation/026-add-seed-templates.md)~~ ✓
+- ~~[027 — Run Database Seed](implementation/027-run-database-seed.md)~~ ✓
 
 ## Phase 3: Custom Server & Socket.IO Wiring (028–033)
 
