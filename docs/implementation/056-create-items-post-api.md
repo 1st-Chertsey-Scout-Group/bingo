@@ -19,8 +19,8 @@ Add a POST handler to the items route to allow admins to create new items. New i
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
