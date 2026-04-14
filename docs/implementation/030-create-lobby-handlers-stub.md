@@ -19,8 +19,8 @@ Create the lobby sub-handler that will manage team joining and reconnection even
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
