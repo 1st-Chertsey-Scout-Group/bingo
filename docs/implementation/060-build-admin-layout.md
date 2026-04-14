@@ -26,8 +26,8 @@ Build the admin page as a client component with PIN-based authentication. The ad
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
