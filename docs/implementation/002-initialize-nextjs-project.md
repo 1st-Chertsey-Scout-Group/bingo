@@ -28,8 +28,8 @@ Initialize a new Next.js project with TypeScript, App Router, and Tailwind CSS u
 - `.gitignore` — generated gitignore
 
 ## Checklist
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 - **Check**: The project directory contains `package.json`, `tsconfig.json`, `next.config.ts`, and `src/app/layout.tsx`
