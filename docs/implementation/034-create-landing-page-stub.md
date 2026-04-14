@@ -21,8 +21,8 @@ Create the landing page as a simple server component. This is the entry point fo
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
