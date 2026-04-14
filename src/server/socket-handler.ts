@@ -1,5 +1,19 @@
-import type { Server } from 'socket.io'
+import type { Server, Socket } from 'socket.io'
 
-export function registerSocketHandlers(_io: Server): void {
-  // TODO: register connection and event handlers (step 029)
+import { registerGameHandlers } from '@/server/socket/game'
+import { registerLobbyHandlers } from '@/server/socket/lobby'
+import { registerSubmissionHandlers } from '@/server/socket/submission'
+
+export function registerSocketHandlers(io: Server): void {
+  io.on('connection', (socket: Socket) => {
+    console.log(`Socket connected: ${socket.id}`)
+
+    registerLobbyHandlers(io, socket)
+    registerGameHandlers(io, socket)
+    registerSubmissionHandlers(io, socket)
+
+    socket.on('disconnect', () => {
+      console.log(`Socket disconnected: ${socket.id}`)
+    })
+  })
 }
