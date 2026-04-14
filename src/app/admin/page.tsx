@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 import { Lock, Shield } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { ScrollArea } from '@/components/ui/scroll-area'
 
 type GameResponse = {
   gameId: string
@@ -192,6 +194,77 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
   )
 }
 
+type Item = {
+  id: string
+  name: string
+  isTemplate: boolean
+}
+
+type ItemListProps = {
+  adminPin: string
+}
+
+function ItemList({ adminPin }: ItemListProps) {
+  const [items, setItems] = useState<Item[]>([])
+  const [error, setError] = useState('')
+  const [isLoading, setIsLoading] = useState(true)
+
+  const refreshItems = useCallback(async () => {
+    setIsLoading(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/items', {
+        headers: { 'X-Admin-Pin': adminPin },
+      })
+
+      if (!response.ok) {
+        setError('Failed to load items')
+        return
+      }
+
+      const data = (await response.json()) as { items: Item[] }
+      setItems(data.items)
+    } catch {
+      setError('Failed to load items')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [adminPin])
+
+  useEffect(() => {
+    void refreshItems()
+  }, [refreshItems])
+
+  if (isLoading) {
+    return <p className="text-muted-foreground text-sm">Loading items…</p>
+  }
+
+  if (error) {
+    return <p className="text-destructive text-sm font-medium">{error}</p>
+  }
+
+  if (items.length === 0) {
+    return <p className="text-muted-foreground text-sm">No items yet</p>
+  }
+
+  return (
+    <ScrollArea className="max-h-96">
+      <ul className="flex flex-col gap-2">
+        {items.map((item) => (
+          <li
+            key={item.id}
+            className="flex items-center justify-between rounded-md border px-3 py-2"
+          >
+            <span className="text-sm">{item.name}</span>
+            {item.isTemplate && <Badge variant="secondary">Template</Badge>}
+          </li>
+        ))}
+      </ul>
+    </ScrollArea>
+  )
+}
+
 export function AdminPage() {
   const [adminPin, setAdminPin] = useState<string | null>(null)
   const [pinInput, setPinInput] = useState('')
@@ -276,13 +349,11 @@ export function AdminPage() {
           <CardHeader>
             <CardTitle>Item Management</CardTitle>
             <CardDescription>
-              Manage bingo board items. Coming in step 064.
+              Manage bingo board items for the game.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <p className="text-muted-foreground text-sm">
-              Item management controls will appear here.
-            </p>
+            <ItemList adminPin={adminPin} />
           </CardContent>
         </Card>
       </div>
