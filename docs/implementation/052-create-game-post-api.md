@@ -25,8 +25,8 @@ Create the POST /api/game endpoint that allows admins to create a new game. This
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
