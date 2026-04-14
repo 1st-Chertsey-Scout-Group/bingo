@@ -22,8 +22,8 @@ Create the client-side Socket.IO instance that will be shared across the applica
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
