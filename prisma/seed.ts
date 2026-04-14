@@ -116,6 +116,60 @@ async function main() {
   })
 
   console.log(`Seeded ${concreteItems.length} concrete items`)
+
+  // Template items
+  const templateItems = ['Something [colour]', 'Something [texture]']
+
+  await prisma.item.deleteMany({ where: { isDefault: true, isTemplate: true } })
+
+  await prisma.item.createMany({
+    data: templateItems.map((name) => ({
+      name,
+      isTemplate: true,
+      isDefault: true,
+    })),
+  })
+
+  console.log(`Seeded ${templateItems.length} template items`)
+
+  // Template values
+  const templateValues = [
+    // colour
+    { category: 'colour', value: 'Red' },
+    { category: 'colour', value: 'Blue' },
+    { category: 'colour', value: 'Green' },
+    { category: 'colour', value: 'Yellow' },
+    { category: 'colour', value: 'Orange' },
+    { category: 'colour', value: 'Brown' },
+    { category: 'colour', value: 'White' },
+    { category: 'colour', value: 'Black' },
+    { category: 'colour', value: 'Purple' },
+    { category: 'colour', value: 'Pink' },
+    // texture
+    { category: 'texture', value: 'Smooth' },
+    { category: 'texture', value: 'Rough' },
+    { category: 'texture', value: 'Bumpy' },
+    { category: 'texture', value: 'Soft' },
+    { category: 'texture', value: 'Spiky' },
+    { category: 'texture', value: 'Fuzzy' },
+    { category: 'texture', value: 'Hard' },
+    { category: 'texture', value: 'Crumbly' },
+  ]
+
+  for (const tv of templateValues) {
+    await prisma.templateValue.upsert({
+      where: {
+        category_value: {
+          category: tv.category,
+          value: tv.value,
+        },
+      },
+      update: {},
+      create: tv,
+    })
+  }
+
+  console.log(`Seeded ${templateValues.length} template values`)
 }
 
 main()

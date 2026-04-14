@@ -95,8 +95,8 @@ console.log(`Seeded ${templateValues.length} template values`)
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
