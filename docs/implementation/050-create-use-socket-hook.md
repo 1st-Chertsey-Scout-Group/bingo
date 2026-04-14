@@ -26,8 +26,8 @@ Create the useSocket React hook that manages the Socket.IO client connection lif
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
