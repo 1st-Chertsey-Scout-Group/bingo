@@ -6,3 +6,17 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+
+model Game {
+  id             String    @id @default(cuid())
+  pin            String    @unique
+  leaderPin      String
+  status         String    @default("lobby") // lobby | active | ended
+  round          Int       @default(0)
+  boardSize      Int       @default(25)
+  templateCount  Int       @default(5)
+  roundStartedAt DateTime?
+  createdAt      DateTime  @default(now())
+  teams          Team[]
+  roundItems     RoundItem[]
+}

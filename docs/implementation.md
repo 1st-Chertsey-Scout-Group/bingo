@@ -57,7 +57,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 ## Phase 2: Database Layer (016–027)
 
 - [016 — Create Prisma Schema with Datasource](implementation/016-create-prisma-schema.md)
-- [017 — Add Game Model](implementation/017-add-game-model.md)
+- ~~[017 — Add Game Model](implementation/017-add-game-model.md)~~ ✓
 - [018 — Add Team Model](implementation/018-add-team-model.md)
 - [019 — Add Item Model](implementation/019-add-item-model.md)
 - [020 — Add TemplateValue Model](implementation/020-add-template-value-model.md)
