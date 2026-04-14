@@ -1,9 +1,11 @@
 # Step 039: Create Shared Types
 
 ## Description
+
 Create the shared type definitions used across client and server code. These types define the shape of game state, socket event payloads, and data structures passed between components.
 
 ## Requirements
+
 - Create `src/types.ts`
 - Define and export the following types:
 
@@ -64,7 +66,13 @@ type GameState = {
 
 type GameAction =
   | { type: 'GAME_STARTED'; items: RoundItem[]; roundStartedAt: string }
-  | { type: 'SQUARE_CLAIMED'; roundItemId: string; teamId: string; teamName: string; teamColour: string }
+  | {
+      type: 'SQUARE_CLAIMED'
+      roundItemId: string
+      teamId: string
+      teamName: string
+      teamColour: string
+    }
   | { type: 'SQUARE_PENDING'; roundItemId: string }
   | { type: 'SQUARE_LOCKED'; roundItemId: string; leaderName: string }
   | { type: 'SQUARE_UNLOCKED'; roundItemId: string }
@@ -72,7 +80,11 @@ type GameAction =
   | { type: 'SUBMISSION_APPROVED'; itemId: string }
   | { type: 'SUBMISSION_REJECTED'; itemId: string }
   | { type: 'SUBMISSION_DISCARDED'; itemId: string }
-  | { type: 'REVIEW_PROMOTED'; roundItemId: string; submission: SubmissionForReview }
+  | {
+      type: 'REVIEW_PROMOTED'
+      roundItemId: string
+      submission: SubmissionForReview
+    }
   | { type: 'GAME_ENDED'; summary: TeamSummary[] }
   | { type: 'GAME_LOBBY' }
   | { type: 'LOBBY_TEAMS'; teams: Team[] }
@@ -85,17 +97,21 @@ type GameAction =
 - File should have no runtime code, only type definitions
 
 ## Files to Create/Modify
+
 - `src/types.ts` — create all shared type definitions
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: All types are exported from `src/types.ts`
 - **Command**: `cat src/types.ts`
 - **Check**: TypeScript compiles without errors
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(types): add shared type definitions for game state and socket events`

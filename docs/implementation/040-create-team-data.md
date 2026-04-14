@@ -1,9 +1,11 @@
 # Step 040: Create Team Data
 
 ## Description
+
 Create the team data module containing all 30 predefined team names with their colours, plus utility functions for team assignment. Teams are assigned sequentially as scouts join a game.
 
 ## Requirements
+
 - Create `src/lib/teams.ts`
 - Export a `TEAMS` array containing all 30 teams in order, each with `{ index: number, name: string, colour: string }`
 - Primary teams (index 0-14):
@@ -43,13 +45,16 @@ Create the team data module containing all 30 predefined team names with their c
 - Follow project code standards: named exports, no `any`, TypeScript strict
 
 ## Files to Create/Modify
+
 - `src/lib/teams.ts` — create team data array and utility functions
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: TEAMS array has exactly 30 entries
 - **Command**: `grep -c 'index:' src/lib/teams.ts` (should be 30)
 - **Check**: All team names and hex colours match the specification
@@ -58,4 +63,5 @@ Create the team data module containing all 30 predefined team names with their c
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(data): add team names, colours, and assignment utilities`

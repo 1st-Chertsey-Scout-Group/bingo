@@ -1,9 +1,11 @@
 # Step 067: Build Delete Item with Confirmation
 
 ## Description
+
 Add a delete button to each item in the list with a confirmation dialog. Items in use in active game rounds are protected from deletion with a clear error message.
 
 ## Requirements
+
 - Add a delete button (trash icon or "Delete" text) to each item row in the list
 - Clicking the delete button opens a shadcn Dialog (AlertDialog) confirmation:
   - Title: "Delete item"
@@ -20,13 +22,16 @@ Add a delete button to each item in the list with a confirmation dialog. Items i
 - Use shadcn toast (if available) or inline error message for the 409 feedback
 
 ## Files to Create/Modify
+
 - `src/app/admin/page.tsx` — add delete button and confirmation dialog to item list
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Delete button appears on each item row
 - **Check**: Clicking delete opens confirmation dialog
 - **Check**: Cancel dismisses dialog without API call
@@ -35,4 +40,5 @@ Add a delete button to each item in the list with a confirmation dialog. Items i
 - **Check**: Item is removed from list after successful deletion
 
 ## Commit
+
 `feat(admin): add delete item button with confirmation dialog`

@@ -1,9 +1,11 @@
 # Step 050: Create useSocket Hook
 
 ## Description
+
 Create the useSocket React hook that manages the Socket.IO client connection lifecycle. The hook creates a connection on mount and cleans it up on unmount, providing the socket instance to components that need real-time communication.
 
 ## Requirements
+
 - Create `src/hooks/useSocket.ts`
 - Add `'use client'` directive at the top
 - Import `getSocket` from `@/lib/socket`
@@ -19,13 +21,16 @@ Create the useSocket React hook that manages the Socket.IO client connection lif
 - Follow project code standards: named exports, no `any`, TypeScript strict
 
 ## Files to Create/Modify
+
 - `src/hooks/useSocket.ts` — create the useSocket hook
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: File exports `useSocket` hook
 - **Command**: `cat src/hooks/useSocket.ts`
 - **Check**: Uses `useEffect` for lifecycle management
@@ -35,4 +40,5 @@ Create the useSocket React hook that manages the Socket.IO client connection lif
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(hooks): add useSocket hook for Socket.IO connection lifecycle`

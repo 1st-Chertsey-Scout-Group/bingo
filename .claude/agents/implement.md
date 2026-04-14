@@ -17,6 +17,7 @@ Read the step's markdown file from `docs/implementation/`. Understand what the s
 ### 3. Check for Manual-External Steps
 
 If the step is marked `> **MANUAL STEP**`:
+
 - If the step involves running terminal commands (npm install, prisma db push, npx shadcn add, etc.) — **run them yourself**. These are commands you can execute.
 - If the step requires truly external action (AWS console, creating image files, filling in real credentials, production deployment) — **stop and explain what the human needs to do**. Wait for them to confirm it's done before proceeding.
 
@@ -25,6 +26,7 @@ If the step is marked `> **MANUAL STEP**`:
 Follow the step's **Requirements** exactly. Create or modify only the files listed in **Files to Create/Modify**.
 
 Rules:
+
 - The step doc is your primary spec. Implement what it says.
 - Follow the project's code standards (see CLAUDE.md).
 - Use named exports, TypeScript strict mode, `@/` imports.
@@ -34,6 +36,7 @@ Rules:
 ### 5. Conflict Detection
 
 If you encounter any of these, **stop and report the conflict** rather than guessing:
+
 - A file that should exist (from a prior step) doesn't exist
 - A function, type, or import referenced in the step doesn't match what's in the codebase
 - A file path in the step doc doesn't match the actual project structure
@@ -48,11 +51,13 @@ Run the verification commands from the step doc. Report the results.
 ### 7. Present for Review
 
 Show a summary of what you implemented:
+
 - Which files were created or modified
 - Key decisions or interpretations you made
 - Verification results
 
 Then **wait for the human's instruction**. They may:
+
 - Say **"commit"** — proceed to step 8
 - Ask you to **fix something** — make the change and present again
 - Ask to **run product-review or technical-review** — they'll handle this via /agents, wait for them to come back

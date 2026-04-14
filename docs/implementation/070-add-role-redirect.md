@@ -1,9 +1,11 @@
 # Step 070: Handle Leader Role PIN Validation
 
 ## Description
+
 When a leader PIN is validated, transition the form to collect the leader's display name before redirecting. This two-step flow ensures the leader provides a name for the lobby display.
 
 ## Requirements
+
 - Track a `phase` state in the PIN form component: `'pin'` or `'leader-name'`
 - When POST /api/validate returns `{ valid: true, role: "leader" }`:
   - Set phase to `'leader-name'`
@@ -17,17 +19,21 @@ When a leader PIN is validated, transition the form to collect the leader's disp
 - Back button or ability to return to PIN entry phase (optional but recommended)
 
 ## Files to Create/Modify
+
 - `src/app/page.tsx` — add phase state management and leader role handling
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Leader PIN validation transitions form to leader-name phase
 - **Check**: PIN input is hidden in leader-name phase
 - **Check**: gameId and validatedPin are preserved in state
 - **Check**: Scout PIN flow is unaffected (still redirects immediately)
 
 ## Commit
+
 `feat(ui): add leader role detection with form phase transition`

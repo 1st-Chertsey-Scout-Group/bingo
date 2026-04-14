@@ -1,9 +1,11 @@
 # Step 091: Build Board Component
 
 ## Description
+
 Create the Board component that renders the bingo grid. This is the core visual element of the game, used by both scouts and leaders with role-specific behaviour.
 
 ## Requirements
+
 - Create `src/components/Board.tsx`
   - 'use client' directive
   - Named export: `export function Board({ items, role, myTeamId, onSquareTap }: BoardProps)`
@@ -28,13 +30,16 @@ Create the Board component that renders the bingo grid. This is the core visual 
   - Variable number of rows based on item count (CSS grid auto-rows)
 
 ## Files to Create/Modify
+
 - `src/components/Board.tsx` — create the bingo board grid component
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Board renders a 3-column grid
 - **Check**: Each item in the items array produces a Square component
 - **Check**: Grid scrolls vertically when items exceed viewport height
@@ -42,4 +47,5 @@ Create the Board component that renders the bingo grid. This is the core visual 
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): build board component with 3-column grid layout`

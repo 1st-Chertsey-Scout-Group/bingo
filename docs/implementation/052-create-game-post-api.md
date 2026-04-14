@@ -1,9 +1,11 @@
 # Step 052: Create Game POST API Route
 
 ## Description
+
 Create the POST /api/game endpoint that allows admins to create a new game. This is the primary admin action and produces the game record that scouts and leaders will join.
 
 ## Requirements
+
 - Create `src/app/api/game/route.ts`
 - Export a named `POST` handler
 - Check `x-admin-pin` header against `process.env.ADMIN_PIN`; return 401 `{ error: "Unauthorized" }` if invalid or missing
@@ -18,13 +20,16 @@ Create the POST /api/game endpoint that allows admins to create a new game. This
 - Return 201 with `{ gameId: game.id, pin: game.pin, leaderPin: game.leaderPin, status: game.status, boardSize: game.boardSize, templateCount: game.templateCount }`
 
 ## Files to Create/Modify
+
 - `src/app/api/game/route.ts` — create the game creation endpoint
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Returns 401 without valid X-Admin-Pin header
 - **Check**: Returns 400 for missing leaderPin
 - **Check**: Returns 400 for boardSize outside 9-25
@@ -34,4 +39,5 @@ Create the POST /api/game endpoint that allows admins to create a new game. This
 - **Check**: Generated PIN is a 4-digit string
 
 ## Commit
+
 `feat(api): create POST /api/game admin game creation endpoint`

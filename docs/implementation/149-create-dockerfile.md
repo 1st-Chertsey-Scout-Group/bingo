@@ -1,13 +1,16 @@
 # Step 149: Create Dockerfile
 
 ## Description
+
 Create a multi-stage Dockerfile using Alpine-based Node images to produce a small, production-ready container. The builder stage compiles the app; the runner stage contains only what is needed to serve it.
 
 ## Requirements
+
 - Create `Dockerfile` at the project root
 - Multi-stage build with two stages:
 
 **Stage 1: Builder**
+
 ```dockerfile
 FROM node:20-alpine AS builder
 WORKDIR /app
@@ -19,6 +22,7 @@ RUN npm run build
 ```
 
 **Stage 2: Runner**
+
 ```dockerfile
 FROM node:20-alpine AS runner
 WORKDIR /app
@@ -48,14 +52,17 @@ CMD ["node", "dist/server.js"]
 - Add a `.dockerignore` file to exclude: `node_modules`, `.next`, `dist`, `.env`, `.git`, `data`
 
 ## Files to Create/Modify
+
 - `Dockerfile` — Create the multi-stage build file
 - `.dockerignore` — Create to exclude unnecessary files from build context
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: `docker build -t scout-bingo .` completes successfully
 - **Check**: Final image size is reasonable (< 500MB)
 - **Check**: Running the container starts the Node.js server on port 3000
@@ -63,4 +70,5 @@ CMD ["node", "dist/server.js"]
 - **Command**: `docker images scout-bingo` — check image size
 
 ## Commit
+
 `feat(docker): create multi-stage Alpine Dockerfile for production build`

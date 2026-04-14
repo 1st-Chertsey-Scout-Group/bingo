@@ -2,33 +2,33 @@
 
 ## Stack
 
-| Layer | Technology | Rationale |
-|-------|-----------|-----------|
-| Framework | Next.js (App Router) | SSR for initial load, API routes for REST, custom server for Socket.IO |
-| Real-time | Socket.IO | Reliable WebSocket with auto-reconnect, room-based broadcasting, fallback to polling |
-| Database | SQLite via Prisma | Single-file DB, zero config, WAL mode for concurrent reads/writes |
-| Photo storage | AWS S3 | Pre-existing bucket, presigned URLs for direct upload, public read |
-| Styling | Tailwind CSS + shadcn/ui | Utility-first CSS with pre-built accessible components |
-| Toasts | Sonner (via shadcn) | Submission feedback, error messages |
-| Icons | Lucide React (via shadcn) | Approve/reject, camera, minimal UI icons |
-| Image compression | browser-image-compression | Client-side WebP compression with Worker offloading |
-| Runtime | Node 20 LTS | Long-term support, devcontainer managed |
-| Package manager | npm | Standard, no additional tooling |
-| Language | TypeScript (strict) | Strict mode, catches null bugs around claims/sockets |
-| Testing | Vitest | Fast, native TypeScript, 80% coverage target |
-| Linting | ESLint (Next.js default) | No custom rules |
-| Formatting | Prettier | Single quotes, no semicolons, 2-space indent |
+| Layer             | Technology                | Rationale                                                                            |
+| ----------------- | ------------------------- | ------------------------------------------------------------------------------------ |
+| Framework         | Next.js (App Router)      | SSR for initial load, API routes for REST, custom server for Socket.IO               |
+| Real-time         | Socket.IO                 | Reliable WebSocket with auto-reconnect, room-based broadcasting, fallback to polling |
+| Database          | SQLite via Prisma         | Single-file DB, zero config, WAL mode for concurrent reads/writes                    |
+| Photo storage     | AWS S3                    | Pre-existing bucket, presigned URLs for direct upload, public read                   |
+| Styling           | Tailwind CSS + shadcn/ui  | Utility-first CSS with pre-built accessible components                               |
+| Toasts            | Sonner (via shadcn)       | Submission feedback, error messages                                                  |
+| Icons             | Lucide React (via shadcn) | Approve/reject, camera, minimal UI icons                                             |
+| Image compression | browser-image-compression | Client-side WebP compression with Worker offloading                                  |
+| Runtime           | Node 20 LTS               | Long-term support, devcontainer managed                                              |
+| Package manager   | npm                       | Standard, no additional tooling                                                      |
+| Language          | TypeScript (strict)       | Strict mode, catches null bugs around claims/sockets                                 |
+| Testing           | Vitest                    | Fast, native TypeScript, 80% coverage target                                         |
+| Linting           | ESLint (Next.js default)  | No custom rules                                                                      |
+| Formatting        | Prettier                  | Single quotes, no semicolons, 2-space indent                                         |
 
 ## Routes
 
 State-driven rendering — each route renders different UI based on game status (lobby/active/ended).
 
-| Route | Purpose |
-|-------|---------|
-| `/` | Landing page — enter PIN (determines scout or leader) |
-| `/play/[gameId]` | Scout experience (lobby, board, end-of-round) |
-| `/leader/[gameId]` | Leader experience (lobby, board + review modal, summary) |
-| `/admin` | Game creation (leader PIN, display name, board size/template count sliders) + item pool management (protected by `ADMIN_PIN` env var). On game creation: seeds localStorage with leader session, redirects to `/leader/[gameId]` |
+| Route              | Purpose                                                                                                                                                                                                                          |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                | Landing page — enter PIN (determines scout or leader)                                                                                                                                                                            |
+| `/play/[gameId]`   | Scout experience (lobby, board, end-of-round)                                                                                                                                                                                    |
+| `/leader/[gameId]` | Leader experience (lobby, board + review modal, summary)                                                                                                                                                                         |
+| `/admin`           | Game creation (leader PIN, display name, board size/template count sliders) + item pool management (protected by `ADMIN_PIN` env var). On game creation: seeds localStorage with leader session, redirects to `/leader/[gameId]` |
 
 ## Project Structure
 
@@ -137,28 +137,38 @@ type GameState = {
   myTeam: Team | null
   mySubmissions: Map<string, SubmissionStatus>
   summary: TeamSummary[] | null
-  roundStartedAt: string | null       // ISO timestamp for round timer
+  roundStartedAt: string | null // ISO timestamp for round timer
   // Leader-only state:
-  locks: Map<string, string>          // roundItemId -> leaderName
+  locks: Map<string, string> // roundItemId -> leaderName
   reviewingRoundItemId: string | null // which square this leader has open
 }
 
 // Socket events dispatch actions to the reducer
 type GameAction =
   | { type: 'GAME_STARTED'; items: RoundItem[]; roundStartedAt: string }
-  | { type: 'SQUARE_CLAIMED'; roundItemId: string; teamId: string; teamName: string; teamColour: string }
-  | { type: 'SQUARE_PENDING'; roundItemId: string }         // new submission queued for this square
+  | {
+      type: 'SQUARE_CLAIMED'
+      roundItemId: string
+      teamId: string
+      teamName: string
+      teamColour: string
+    }
+  | { type: 'SQUARE_PENDING'; roundItemId: string } // new submission queued for this square
   | { type: 'SQUARE_LOCKED'; roundItemId: string; leaderName: string }
   | { type: 'SQUARE_UNLOCKED'; roundItemId: string }
   | { type: 'SUBMISSION_RECEIVED'; itemId: string }
   | { type: 'SUBMISSION_APPROVED'; itemId: string }
   | { type: 'SUBMISSION_REJECTED'; itemId: string }
   | { type: 'SUBMISSION_DISCARDED'; itemId: string }
-  | { type: 'REVIEW_PROMOTED'; roundItemId: string; submission: SubmissionForReview }  // next in queue
+  | {
+      type: 'REVIEW_PROMOTED'
+      roundItemId: string
+      submission: SubmissionForReview
+    } // next in queue
   | { type: 'GAME_ENDED'; summary: TeamSummary[] }
-  | { type: 'GAME_LOBBY' }    // clears teamId from localStorage — scouts must re-join for fresh team
+  | { type: 'GAME_LOBBY' } // clears teamId from localStorage — scouts must re-join for fresh team
   | { type: 'LOBBY_TEAMS'; teams: Team[] }
-  | { type: 'FULL_STATE'; state: GameState }  // rejoin hydration
+  | { type: 'FULL_STATE'; state: GameState } // rejoin hydration
 ```
 
 A `GameProvider` context wraps the client components, making state available to nested components without prop drilling.
@@ -212,11 +222,11 @@ Separate `tsconfig.server.json` for compiling server code:
 
 Rooms scope broadcasts to relevant clients:
 
-| Room | Members | Purpose |
-|------|---------|---------|
-| `game:{gameId}` | All clients (scouts + leaders) | Board state updates, game flow events |
-| `leaders:{gameId}` | Leaders only | Review queue events |
-| `team:{teamId}` | Single team's device(s) | Submission feedback (approved/rejected/discarded) |
+| Room               | Members                        | Purpose                                           |
+| ------------------ | ------------------------------ | ------------------------------------------------- |
+| `game:{gameId}`    | All clients (scouts + leaders) | Board state updates, game flow events             |
+| `leaders:{gameId}` | Leaders only                   | Review queue events                               |
+| `team:{teamId}`    | Single team's device(s)        | Submission feedback (approved/rejected/discarded) |
 
 ### Socket Handler Structure
 
@@ -261,12 +271,14 @@ SQLite transactions are serialised by default — no double-claims possible.
 ## Error Handling
 
 ### Client-Side (Scout-Friendly)
+
 - **No connection**: banner at top — "No connection — trying to reconnect..."
 - **Photo upload failed**: inline on square — "Photo didn't send — tap to try again"
 - **Unrecoverable**: redirect to `/` — re-enter PIN to rejoin
 - No technical error messages, no error codes, no modals
 
 ### Server-Side
+
 - `console.error` to stdout — captured by Coolify logs
 - No logging library — single process, stdout is sufficient
 - Socket event handlers catch errors and emit simple messages to the client
@@ -274,6 +286,7 @@ SQLite transactions are serialised by default — no double-claims possible.
 ## Deployment
 
 ### Infrastructure
+
 - **Host:** Hetzner VPS
 - **Platform:** Coolify
 - **Container:** Docker Compose
@@ -325,7 +338,7 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - '3000:3000'
     volumes:
       - sqlite-data:/app/data
     environment:

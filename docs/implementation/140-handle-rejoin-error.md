@@ -1,9 +1,11 @@
 # Step 140: Handle rejoin:error Event on Client
 
 ## Description
+
 Listen for the `rejoin:error` socket event and gracefully recover by clearing the stale session and redirecting the user to the landing page. This handles cases where the cached session is no longer valid (game ended, team removed, PIN changed).
 
 ## Requirements
+
 - Listen for `rejoin:error` event in both `ScoutGame` and `LeaderGame` components
 - The event payload is `{ message: string }`
 - On receiving `rejoin:error`:
@@ -14,14 +16,17 @@ Listen for the `rejoin:error` socket event and gracefully recover by clearing th
 - Ensure socket listeners are cleaned up before redirect to prevent memory leaks
 
 ## Files to Create/Modify
+
 - `src/components/ScoutGame.tsx` — Listen for `rejoin:error`, clear session, redirect
 - `src/components/LeaderGame.tsx` — Listen for `rejoin:error`, clear session, redirect
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Scout with stale teamId refreshes page — receives `rejoin:error`, localStorage cleared, redirected to `/`
 - **Check**: Leader with wrong PIN refreshes — receives `rejoin:error`, localStorage cleared, redirected to `/`
 - **Check**: After redirect, user can re-enter PIN and join normally
@@ -29,4 +34,5 @@ Listen for the `rejoin:error` socket event and gracefully recover by clearing th
 - **Command**: In browser console after redirect: `localStorage.getItem('scout-bingo-session')` returns `null`
 
 ## Commit
+
 `feat(rejoin): handle rejoin:error by clearing session and redirecting to landing page`

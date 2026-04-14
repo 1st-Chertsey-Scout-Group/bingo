@@ -52,8 +52,8 @@ git diff HEAD~1
 
 ## When to Use This vs /implement
 
-| Use `/implement` when | Use teammates when |
-|---|---|
-| Working through steps sequentially | Jumping to a specific step out of order |
-| Want an automated loop with review pauses | Want full manual control per step |
-| Solo session, focused build | Running reviews in parallel while implementing |
+| Use `/implement` when                     | Use teammates when                             |
+| ----------------------------------------- | ---------------------------------------------- |
+| Working through steps sequentially        | Jumping to a specific step out of order        |
+| Want an automated loop with review pauses | Want full manual control per step              |
+| Solo session, focused build               | Running reviews in parallel while implementing |

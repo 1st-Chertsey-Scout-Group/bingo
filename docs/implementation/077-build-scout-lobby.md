@@ -1,9 +1,11 @@
 # Step 077: Build Scout Lobby Components
 
 ## Description
+
 Create the scout lobby UI that shows the assigned team identity and a live list of all teams in the lobby. This is screen S2 from the spec — the waiting room before the round starts.
 
 ## Requirements
+
 - Create `src/components/TeamBadge.tsx`
   - 'use client' directive
   - Props: `{ name: string, colour: string }`
@@ -22,14 +24,17 @@ Create the scout lobby UI that shows the assigned team identity and a live list 
   - Named exports for both components
 
 ## Files to Create/Modify
+
 - `src/components/TeamBadge.tsx` — create team colour badge component
 - `src/components/Lobby.tsx` — create lobby component with scout view
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: TeamBadge renders with correct background colour and white text
 - **Check**: Lobby displays "You are: [Team Name]" with team colour background
 - **Check**: Lobby shows "Waiting for the leader to start..." message
@@ -37,4 +42,5 @@ Create the scout lobby UI that shows the assigned team identity and a live list 
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): build scout lobby and team badge components`

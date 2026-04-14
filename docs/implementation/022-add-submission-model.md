@@ -1,9 +1,11 @@
 # Step 022: Add Submission Model
 
 ## Description
+
 Add the Submission model to the Prisma schema. Submissions represent photo evidence uploaded by teams for specific bingo squares. Each submission links to a round item and a team, tracks its review status, and stores the photo URL from S3.
 
 ## Requirements
+
 - Add the `Submission` model to `prisma/schema.prisma`
 - The model must have the following fields:
   - `id` — String, primary key, default `cuid()`
@@ -21,6 +23,7 @@ Add the Submission model to the Prisma schema. Submissions represent photo evide
 - Add an index on `[teamId]` for looking up all submissions by a team
 
 ## Files to Create/Modify
+
 - `prisma/schema.prisma` — add the following model:
 
 ```prisma
@@ -42,14 +45,17 @@ model Submission {
 ```
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: The Submission model is present in `prisma/schema.prisma` with all specified fields, relations, and indexes
 - **Command**: `cat prisma/schema.prisma`
 - **Check**: The complete schema (all models from steps 016-022) validates successfully
 - **Command**: `npx prisma validate`
 
 ## Commit
+
 `feat(db): add Submission model to Prisma schema`

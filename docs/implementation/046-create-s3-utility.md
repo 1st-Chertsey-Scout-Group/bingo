@@ -1,9 +1,11 @@
 # Step 046: Create S3 Utility
 
 ## Description
+
 Create the server-side S3 utility for generating presigned upload URLs. Scouts upload photos directly to S3 using these presigned URLs, avoiding the need to proxy large files through the server.
 
 ## Requirements
+
 - Create `src/lib/s3.ts`
 - Server-side only (no `'use client'` directive)
 - Create an S3Client instance using environment variables:
@@ -22,13 +24,16 @@ Create the server-side S3 utility for generating presigned upload URLs. Scouts u
 - Handle missing environment variables gracefully (log a warning, throw descriptive error)
 
 ## Files to Create/Modify
+
 - `src/lib/s3.ts` — create S3 client and presigned URL generation
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: File exports `getPresignedUploadUrl` function
 - **Command**: `cat src/lib/s3.ts`
 - **Check**: Uses `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` imports
@@ -37,4 +42,5 @@ Create the server-side S3 utility for generating presigned upload URLs. Scouts u
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(s3): add presigned upload URL generation for photo submissions`

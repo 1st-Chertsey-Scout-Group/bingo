@@ -3,9 +3,11 @@
 > **MANUAL STEP** — requires human action.
 
 ## Description
+
 Configure the production environment variables and deploy the app via Coolify on the Hetzner VPS. This is the final deployment step that makes the app accessible to users.
 
 ## Requirements
+
 - Create or configure the `.env` file on the production server (or set environment variables in Coolify's UI):
   ```
   DATABASE_URL=file:/app/data/scout-bingo.db
@@ -38,14 +40,17 @@ Configure the production environment variables and deploy the app via Coolify on
   - Ensure HTTPS is configured (Coolify/Caddy handles this with Let's Encrypt)
 
 ## Files to Create/Modify
+
 - `.env` on the production server (NOT committed to git) — Set all environment variables
 - Coolify project configuration — Configure Docker Compose deployment
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Container starts without errors — `docker compose logs app` shows no crashes
 - **Check**: App is accessible at the production URL over HTTPS
 - **Check**: Database is created on first start (check container logs for Prisma output)
@@ -56,4 +61,5 @@ Configure the production environment variables and deploy the app via Coolify on
 - **Command**: `curl -I https://your-domain.com` — should return 200 OK
 
 ## Commit
+
 `chore(deploy): document production environment setup and deployment process`

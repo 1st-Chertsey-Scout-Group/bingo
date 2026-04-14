@@ -1,9 +1,11 @@
 # Step 104: Add Scout Submission Toast Notifications
 
 ## Description
+
 Add toast notifications for submission lifecycle events so scouts get clear feedback on what happened to their photos. Uses Sonner for lightweight, mobile-friendly toasts.
 
 ## Requirements
+
 - In `src/components/ScoutGame.tsx`, add useEffect listeners for submission events on the team-specific channel:
   - `submission:received` — payload: `{ roundItemId: string }`
     - Toast: `toast('Submitted!')` (confirmation that server received the photo)
@@ -26,14 +28,17 @@ Add toast notifications for submission lifecycle events so scouts get clear feed
 - Import `toast` from `sonner`
 
 ## Files to Create/Modify
+
 - `src/components/ScoutGame.tsx` — add socket listeners for submission events with toast notifications
 - Game state reducer file — add `SUBMISSION_RESOLVED` action
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: `submission:received` shows "Submitted!" toast
 - **Check**: `submission:approved` shows "Approved!" toast
 - **Check**: `submission:rejected` shows "Rejected — try again!" toast and allows retap
@@ -43,4 +48,5 @@ Add toast notifications for submission lifecycle events so scouts get clear feed
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): add scout submission toast notifications`

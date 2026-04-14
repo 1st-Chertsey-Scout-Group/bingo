@@ -7,14 +7,17 @@
 Templates generate board items at round time by substituting a random value. Max 5 template-generated items per board of 25. No duplicate values on the same board.
 
 ### Something [colour]
+
 **Values:** Red, Blue, Green, Yellow, Orange, Brown, White, Black, Purple, Pink
 
 ### Something [texture]
+
 **Values:** Smooth, Rough, Bumpy, Soft, Spiky, Fuzzy, Hard, Crumbly
 
 ---
 
 ## Nature — Trees & Plants
+
 1. Oak leaf
 2. Pine cone
 3. Birch bark
@@ -37,6 +40,7 @@ Templates generate board items at round time by substituting a random value. Max
 20. Daisy
 
 ## Nature — Animals & Insects
+
 21. Spider web
 22. Bird in tree
 23. Ant trail
@@ -54,6 +58,7 @@ Templates generate board items at round time by substituting a random value. Max
 35. Bee on flower
 
 ## Nature — Landscape & Features
+
 36. Puddle reflection
 37. Cloud shape
 38. Stream or ditch
@@ -71,6 +76,7 @@ Templates generate board items at round time by substituting a random value. Max
 50. Patch of wildflowers
 
 ## Activities & Challenges
+
 51. Team star jump
 52. Leaf crown
 53. Stick tower
@@ -88,6 +94,7 @@ Templates generate board items at round time by substituting a random value. Max
 65. Mud war paint
 
 ## Scavenger Finds
+
 66. Something camouflaged
 67. Three different leaves
 68. Two different berries
@@ -100,6 +107,7 @@ Templates generate board items at round time by substituting a random value. Max
 75. Curly twig
 
 ## Observation
+
 76. Bird flying
 77. Sun through leaves
 78. Dew drops

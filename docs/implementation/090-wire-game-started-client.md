@@ -1,9 +1,11 @@
 # Step 090: Wire game:started Event on Client
 
 ## Description
+
 Listen for the `game:started` socket event in both ScoutGame and LeaderGame components. This transitions the UI from the lobby to the active board view.
 
 ## Requirements
+
 - Add `GAME_STARTED` action to the game state reducer:
   - Payload: `{ board: RoundItem[], roundStartedAt: string }`
   - Sets `state.status = 'active'`
@@ -19,15 +21,18 @@ Listen for the `game:started` socket event in both ScoutGame and LeaderGame comp
 - Both components should now render the active view when status transitions to `'active'`
 
 ## Files to Create/Modify
+
 - Game state reducer file — add `GAME_STARTED` action
 - `src/components/ScoutGame.tsx` — listen for `game:started` and dispatch
 - `src/components/LeaderGame.tsx` — listen for `game:started` and dispatch
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Receiving `game:started` transitions state.status to 'active'
 - **Check**: Board items are stored in state.board
 - **Check**: roundStartedAt is stored in state
@@ -35,4 +40,5 @@ Listen for the `game:started` socket event in both ScoutGame and LeaderGame comp
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(state): wire game:started event to client game state`

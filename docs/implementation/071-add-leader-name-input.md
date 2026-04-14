@@ -1,9 +1,11 @@
 # Step 071: Add Leader Name Input and Redirect
 
 ## Description
+
 Complete the leader join flow by showing a display name input after PIN validation. On submit, store the full leader session in localStorage and redirect to the leader game view.
 
 ## Requirements
+
 - When phase is `'leader-name'`, render within the same card layout:
   - Heading or subheading: "Welcome, Leader"
   - Text input for display name, placeholder "Your name", auto-focused
@@ -25,13 +27,16 @@ Complete the leader join flow by showing a display name input after PIN validati
 - If localStorage write fails, still attempt the redirect
 
 ## Files to Create/Modify
+
 - `src/app/page.tsx` — add leader name input form and redirect logic
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Leader name input renders after leader PIN validation
 - **Check**: "Join as Leader" button is disabled when name is empty
 - **Check**: Submit stores full session object in localStorage
@@ -39,4 +44,5 @@ Complete the leader join flow by showing a display name input after PIN validati
 - **Check**: Redirect goes to /leader/[gameId]
 
 ## Commit
+
 `feat(ui): add leader name input and redirect to leader view`

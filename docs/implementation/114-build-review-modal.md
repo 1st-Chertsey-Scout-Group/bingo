@@ -1,9 +1,11 @@
 # Step 114: Build ReviewModal Component
 
 ## Description
+
 Create the ReviewModal component that overlays the leader's board, showing the submitted photo and approve/reject controls. This is the primary interface leaders use to judge scout submissions.
 
 ## Requirements
+
 - Create `src/components/ReviewModal.tsx`
 - Overlay on top of the board (board remains visible beneath for spatial context)
 - Use shadcn Dialog or a custom overlay with backdrop
@@ -19,13 +21,16 @@ Create the ReviewModal component that overlays the leader's board, showing the s
 - Buttons should be large enough for easy tapping on mobile/tablet
 
 ## Files to Create/Modify
+
 - `src/components/ReviewModal.tsx` — New component with photo display, team info, and approve/reject/dismiss controls
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Modal displays the photo at a usable size
 - **Check**: Team name and colour badge are clearly visible
 - **Check**: Approve and Reject buttons are large and easy to tap
@@ -33,4 +38,5 @@ Create the ReviewModal component that overlays the leader's board, showing the s
 - **Check**: Board behind the modal is visible but not interactive
 
 ## Commit
+
 `feat(client): build ReviewModal with photo display and approve/reject controls`

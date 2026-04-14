@@ -1,9 +1,11 @@
 # Step 069: Wire PIN Form to Validation API
 
 ## Description
+
 Connect the landing page PIN form to the POST /api/validate endpoint. Handle scout role responses by storing session data and redirecting to the game view.
 
 ## Requirements
+
 - On form submit, send POST request to `/api/validate` with body `{ "pin": "<value>" }`
 - While request is in flight, disable the input and button, show loading state
 - On response where `valid` is `false`:
@@ -19,13 +21,16 @@ Connect the landing page PIN form to the POST /api/validate endpoint. Handle sco
 - On network error, display "Something went wrong. Please try again."
 
 ## Files to Create/Modify
+
 - `src/app/page.tsx` — wire PIN form submit to POST /api/validate
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Invalid PIN shows "Invalid PIN" error message
 - **Check**: Valid scout PIN stores session in localStorage and redirects to /play/[gameId]
 - **Check**: Valid leader PIN does not redirect (yet)
@@ -33,4 +38,5 @@ Connect the landing page PIN form to the POST /api/validate endpoint. Handle sco
 - **Check**: Network errors show appropriate message
 
 ## Commit
+
 `feat(ui): wire PIN form to validation API with scout redirect`

@@ -4,21 +4,21 @@ Real-time web app for scout nature bingo evenings. Teams of 2 scouts photograph 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Next.js (App Router) |
-| Real-time | Socket.IO |
-| Database | SQLite via Prisma (WAL mode) |
-| Photo storage | AWS S3 (presigned URLs) |
-| Styling | Tailwind CSS + shadcn/ui |
-| Toasts | Sonner |
-| Icons | Lucide React |
-| Image compression | browser-image-compression |
-| Runtime | Node 20 LTS |
-| Language | TypeScript (strict mode) |
-| Testing | Vitest |
-| Formatting | Prettier (single quotes, no semicolons, 2-space indent) |
-| Linting | ESLint (Next.js defaults) |
+| Layer             | Technology                                              |
+| ----------------- | ------------------------------------------------------- |
+| Framework         | Next.js (App Router)                                    |
+| Real-time         | Socket.IO                                               |
+| Database          | SQLite via Prisma (WAL mode)                            |
+| Photo storage     | AWS S3 (presigned URLs)                                 |
+| Styling           | Tailwind CSS + shadcn/ui                                |
+| Toasts            | Sonner                                                  |
+| Icons             | Lucide React                                            |
+| Image compression | browser-image-compression                               |
+| Runtime           | Node 20 LTS                                             |
+| Language          | TypeScript (strict mode)                                |
+| Testing           | Vitest                                                  |
+| Formatting        | Prettier (single quotes, no semicolons, 2-space indent) |
+| Linting           | ESLint (Next.js defaults)                               |
 
 ## Commands
 
@@ -76,12 +76,14 @@ scout-bingo/
 ## Documentation
 
 ### Product docs (`docs/product/`)
+
 - `spec.md` — full product specification, game flow, roles, board rules
 - `screens.md` — screen-by-screen UI breakdown for scouts, leaders, admin
 - `default-items.md` — 85 concrete items + 2 templates with values
 - `team-names.md` — 30 team names with hex colours
 
 ### Technical docs (`docs/technical/`)
+
 - `architecture.md` — stack, routes, project structure, server setup, deployment
 - `data-model.md` — Prisma schema with all 6 models and relationships
 - `api-routes.md` — REST endpoints with request/response shapes
@@ -92,7 +94,9 @@ scout-bingo/
 - `resilience.md` — reconnection, caching, retry, lock timeout
 
 ### Implementation docs (`docs/implementation/`)
+
 153 atomic step-by-step build instructions. Each step is a self-contained work order with:
+
 - Description, Requirements, Files to Create/Modify
 - Checkboxes (ticked when complete)
 - Verification commands
@@ -104,12 +108,12 @@ The table of contents is `docs/implementation.md` — shows all steps with compl
 
 ## Agents
 
-| Agent | Purpose |
-|-------|---------|
-| `implement` | Executes implementation steps — reads step doc, builds code, verifies, commits |
-| `frontend-design` | Builds polished UI components/pages using the `frontend-design` skill |
-| `product-review` | Read-only audit of source against product docs |
-| `technical-review` | Read-only audit of source against technical docs |
+| Agent              | Purpose                                                                        |
+| ------------------ | ------------------------------------------------------------------------------ |
+| `implement`        | Executes implementation steps — reads step doc, builds code, verifies, commits |
+| `frontend-design`  | Builds polished UI components/pages using the `frontend-design` skill          |
+| `product-review`   | Read-only audit of source against product docs                                 |
+| `technical-review` | Read-only audit of source against technical docs                               |
 
 ### Workflow
 

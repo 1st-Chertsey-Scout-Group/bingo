@@ -3,9 +3,11 @@
 > **MANUAL STEP** — requires human action.
 
 ## Description
+
 Add all required shadcn/ui components to the project. These pre-built components provide accessible, styled UI elements used throughout the application for buttons, cards, dialogs, forms, and notifications.
 
 ## Requirements
+
 - Add the following shadcn/ui components using the CLI:
   - `button` — primary action buttons throughout the app
   - `card` — card containers for game panels, team displays
@@ -20,6 +22,7 @@ Add all required shadcn/ui components to the project. These pre-built components
 - Run the add command for each component or all at once
 
 ## Files to Create/Modify
+
 - `src/components/ui/button.tsx` — button component
 - `src/components/ui/card.tsx` — card component
 - `src/components/ui/dialog.tsx` — dialog component
@@ -31,14 +34,17 @@ Add all required shadcn/ui components to the project. These pre-built components
 - `src/components/ui/separator.tsx` — separator component
 
 ## Checklist
+
 - [x] Implemented
 - [x] Verified
 
 ## Verification
+
 - **Check**: All components are installed
 - **Command**: `npx shadcn@latest add button card dialog input label slider badge toast separator`
 - **Check**: Component files exist in the ui directory
 - **Command**: `ls src/components/ui/`
 
 ## Commit
+
 `feat(ui): add shadcn/ui components (button, card, dialog, input, label, slider, badge, toast, separator)`

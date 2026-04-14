@@ -1,9 +1,11 @@
 # Step 073: Create ScoutGame Component Shell
 
 ## Description
+
 Create the ScoutGame client component that serves as the main wrapper for the scout's game experience. It connects to the socket, reads game state, and conditionally renders the appropriate UI based on game status.
 
 ## Requirements
+
 - Create `src/components/ScoutGame.tsx` as a `'use client'` component
 - Named export: `export function ScoutGame({ gameId }: { gameId: string })`
 - Wrap all content in `GameProvider` (from `@/components/providers/GameProvider` or similar)
@@ -18,13 +20,16 @@ Create the ScoutGame client component that serves as the main wrapper for the sc
 - Component should handle the case where game state is not yet loaded (loading state)
 
 ## Files to Create/Modify
+
 - `src/components/ScoutGame.tsx` — create the scout game shell component
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Component renders without errors
 - **Check**: GameProvider wraps the content
 - **Check**: useSocket is called to establish connection
@@ -32,4 +37,5 @@ Create the ScoutGame client component that serves as the main wrapper for the sc
 - **Check**: Loading state renders when game state is not yet available
 
 ## Commit
+
 `feat(scout): create ScoutGame component shell with status-based rendering`

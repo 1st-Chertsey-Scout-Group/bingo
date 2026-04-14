@@ -1,9 +1,11 @@
 # Step 142: Add Upload Failure UI on Bingo Square
 
 ## Description
+
 When all automatic upload retries fail, show an inline error message on the affected bingo square so the scout knows the photo did not send and can manually retry with a single tap.
 
 ## Requirements
+
 - After all 3 retries fail (from step 141), update the square's UI state to show an error
 - Display inline text on the square: "Photo didn't send — tap to try again"
 - Style the error text to be clearly visible on the square (e.g. red text, error icon)
@@ -18,14 +20,17 @@ When all automatic upload retries fail, show an inline error message on the affe
 - Only one square can be in the error state at a time — if a new photo fails, the previous error is cleared
 
 ## Files to Create/Modify
+
 - `src/components/BingoSquare.tsx` (or equivalent) — Add error state rendering with "Photo didn't send — tap to try again" message
 - `src/components/ScoutGame.tsx` — Track which square (if any) has a failed upload; handle tap-to-retry; manage compressed photo blob lifecycle
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: After all retries fail, the square shows "Photo didn't send — tap to try again"
 - **Check**: Tapping the error square triggers a new upload attempt with a fresh presigned URL
 - **Check**: If manual retry succeeds, error clears and square shows pending state
@@ -33,4 +38,5 @@ When all automatic upload retries fail, show an inline error message on the affe
 - **Check**: Compressed photo blob is not leaked — cleared on success or when replaced
 
 ## Commit
+
 `feat(ui): show inline upload failure message on bingo square with tap-to-retry`

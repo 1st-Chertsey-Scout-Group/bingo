@@ -88,6 +88,7 @@ On page load, if `localStorage` contains cached session data:
 6. Client is re-added to Socket.IO rooms
 
 If validation fails (game no longer exists, invalid team):
+
 - Clear `localStorage`
 - Redirect to `/` (enter PIN screen)
 
@@ -96,6 +97,7 @@ If validation fails (game no longer exists, invalid team):
 ## Device Sleep/Wake (Case 4)
 
 When a phone screen turns off:
+
 - Socket.IO connection may drop after OS suspends the WebSocket
 - On wake, Socket.IO auto-reconnect kicks in
 - Rejoin flow restores full state
@@ -131,18 +133,18 @@ When a leader reconnects, the board must be accurate. On rejoin:
 
 ## Edge Cases
 
-| Scenario | Behaviour |
-|----------|-----------|
-| Scout submits photo, disconnects before ack | Submission saved server-side with queue position, scout sees status on reconnect |
-| Leader approves while another leader is disconnected | Reconnecting leader gets updated board (claimed squares, cleared locks) |
-| All leaders disconnect mid-round | Submissions queue up per square, all locks release after 30s, reviewed when a leader reconnects |
-| Leader disconnects with lock held | Lock auto-releases after 30s timeout, square becomes available for other leaders |
-| Leader disconnects mid-review, reconnects within 30s | Lock already released or releasing — leader must re-open modal to re-lock |
-| Two leaders tap same square simultaneously | First lock wins, second gets rejection — must pick a different square |
-| Scout refreshes during lobby | Rejoin assigns same team (matched by teamId in localStorage) |
-| Scout refreshes between rounds | teamId cleared from localStorage by `game:lobby` event — scout re-joins lobby for fresh team assignment |
-| Game PIN collision | PIN generation checks for active games with same PIN, regenerates if needed |
-| Leader PIN collision | Same check — no active game/leader PIN overlap |
-| Leader joins with duplicate name | Server rejects join — leader must choose a different display name |
-| Scout loses connection while camera is open | Photo captured locally, upload attempted on reconnect |
-| Submission arrives while square is locked | Queued at next position — leader reviewing current submission is unaffected |
+| Scenario                                             | Behaviour                                                                                               |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Scout submits photo, disconnects before ack          | Submission saved server-side with queue position, scout sees status on reconnect                        |
+| Leader approves while another leader is disconnected | Reconnecting leader gets updated board (claimed squares, cleared locks)                                 |
+| All leaders disconnect mid-round                     | Submissions queue up per square, all locks release after 30s, reviewed when a leader reconnects         |
+| Leader disconnects with lock held                    | Lock auto-releases after 30s timeout, square becomes available for other leaders                        |
+| Leader disconnects mid-review, reconnects within 30s | Lock already released or releasing — leader must re-open modal to re-lock                               |
+| Two leaders tap same square simultaneously           | First lock wins, second gets rejection — must pick a different square                                   |
+| Scout refreshes during lobby                         | Rejoin assigns same team (matched by teamId in localStorage)                                            |
+| Scout refreshes between rounds                       | teamId cleared from localStorage by `game:lobby` event — scout re-joins lobby for fresh team assignment |
+| Game PIN collision                                   | PIN generation checks for active games with same PIN, regenerates if needed                             |
+| Leader PIN collision                                 | Same check — no active game/leader PIN overlap                                                          |
+| Leader joins with duplicate name                     | Server rejects join — leader must choose a different display name                                       |
+| Scout loses connection while camera is open          | Photo captured locally, upload attempted on reconnect                                                   |
+| Submission arrives while square is locked            | Queued at next position — leader reviewing current submission is unaffected                             |

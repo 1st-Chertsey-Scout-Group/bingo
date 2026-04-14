@@ -1,9 +1,11 @@
 # Step 043: Test Template Resolution
 
 ## Description
+
 Write unit tests for the template resolution module to verify placeholder substitution, deduplication, and exhaustion handling work correctly.
 
 ## Requirements
+
 - Create `src/lib/templates.test.ts`
 - Use Vitest as the test runner
 - Test cases:
@@ -17,15 +19,19 @@ Write unit tests for the template resolution module to verify placeholder substi
   - Run deduplication stress test: resolve the same template multiple times until exhaustion, verify all results are unique and final call returns `null`
 
 ## Files to Create/Modify
+
 - `src/lib/templates.test.ts` — create unit tests for template resolution
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: All tests pass
 - **Command**: `npx vitest run src/lib/templates.test.ts`
 
 ## Commit
+
 `test(templates): add unit tests for template resolution and deduplication`

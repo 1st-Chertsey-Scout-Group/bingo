@@ -1,9 +1,11 @@
 # Step 014: Add PWA Manifest
 
 ## Description
+
 Create the web app manifest file that enables Progressive Web App (PWA) features. This allows the app to be installed on mobile devices and provides metadata for the home screen icon, splash screen, and standalone display mode.
 
 ## Requirements
+
 - Create `public/manifest.json` at the project root's public directory
 - Set `name` to `"Scout Bingo"`
 - Set `short_name` to `"Bingo"`
@@ -17,6 +19,7 @@ Create the web app manifest file that enables Progressive Web App (PWA) features
 - Icons reference files in the `/` public path (actual icon files can be added later)
 
 ## Files to Create/Modify
+
 - `public/manifest.json` — create with the following content:
 
 ```json
@@ -43,13 +46,16 @@ Create the web app manifest file that enables Progressive Web App (PWA) features
 ```
 
 ## Checklist
+
 - [x] Implemented
 - [x] Verified
 
 ## Verification
+
 - **Check**: `public/manifest.json` exists and is valid JSON
 - **Command**: `cat public/manifest.json`
 - **Command**: `node -e "JSON.parse(require('fs').readFileSync('public/manifest.json', 'utf8'))"`
 
 ## Commit
+
 `feat(pwa): add web app manifest for standalone mobile experience`

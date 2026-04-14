@@ -1,9 +1,11 @@
 # Step 045: Test Board Generation
 
 ## Description
+
 Write unit tests for the board generation and PIN utility functions to verify correct item selection, template resolution, shuffling, and PIN generation.
 
 ## Requirements
+
 - Create `src/lib/game-logic.test.ts`
 - Use Vitest as the test runner
 - Test cases for `generateBoard`:
@@ -27,15 +29,19 @@ Write unit tests for the board generation and PIN utility functions to verify co
 - Use mock data for items and template values in tests
 
 ## Files to Create/Modify
+
 - `src/lib/game-logic.test.ts` — create unit tests for board generation and PIN utilities
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: All tests pass
 - **Command**: `npx vitest run src/lib/game-logic.test.ts`
 
 ## Commit
+
 `test(game): add unit tests for board generation and PIN utilities`

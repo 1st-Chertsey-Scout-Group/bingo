@@ -131,5 +131,6 @@ Team 1---* Submission
 ## Seeding
 
 `prisma/seed.ts` populates:
+
 - `Item` table with the default pool (~85 concrete items + 2 templates) from `docs/product/default-items.md`. All seeded items have `isDefault: true`. Templates have `isTemplate: true`.
 - `TemplateValue` table with colour values (Red, Blue, Green, Yellow, Orange, Brown, White, Black, Purple, Pink) and texture values (Smooth, Rough, Bumpy, Soft, Spiky, Fuzzy, Hard, Crumbly).

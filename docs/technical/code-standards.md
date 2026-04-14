@@ -40,17 +40,20 @@
 ## Component Patterns
 
 ### Server Components (pages)
+
 - Thin — validate route params, check game exists, render client component
 - No hooks, no state, no Socket.IO
 - Handle 404/redirect for invalid routes
 
 ### Client Components
+
 - `'use client'` directive at top
 - Own all interactivity, Socket.IO, and state
 - Use `useGameState` context for shared state
 - Keep components focused — extract when a component does two unrelated things
 
 ### Props
+
 - Destructure in function signature
 - No default exports for components — use named exports
 

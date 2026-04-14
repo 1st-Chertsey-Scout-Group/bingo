@@ -3,9 +3,11 @@
 > **MANUAL STEP** — requires human action.
 
 ## Description
+
 Install all development npm dependencies required for building, testing, linting, and formatting the Scout Bingo project. These packages are not included in the production bundle.
 
 ## Requirements
+
 - All packages must be installed as dev dependencies (`--save-dev`)
 - Install the following exact packages:
   - `typescript` — TypeScript compiler
@@ -22,13 +24,16 @@ Install all development npm dependencies required for building, testing, linting
   - `@types/react-dom` — React DOM type definitions
 
 ## Files to Create/Modify
+
 - `package.json` — updated with dev dependencies in the `devDependencies` section
 
 ## Checklist
+
 - [x] Implemented
 - [x] Verified
 
 ## Verification
+
 - **Check**: All dev packages are listed in `package.json` under `devDependencies`
 - **Command**: `npm install --save-dev typescript tsx prisma vitest @vitest/coverage-v8 eslint eslint-config-next prettier prettier-plugin-tailwindcss @types/node @types/react @types/react-dom`
 - **Check**: Prisma CLI is available
@@ -37,4 +42,5 @@ Install all development npm dependencies required for building, testing, linting
 - **Command**: `npx vitest --version`
 
 ## Commit
+
 `chore(deps): install dev dependencies`

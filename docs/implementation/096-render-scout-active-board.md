@@ -1,9 +1,11 @@
 # Step 096: Render Scout Active Board
 
 ## Description
+
 Wire the Board component into the ScoutGame active view. When the round is active, scouts see the bingo grid and can interact with unclaimed squares.
 
 ## Requirements
+
 - In `src/components/ScoutGame.tsx`, when `state.status === 'active'`:
   - Render the `<Board />` component
   - Pass props:
@@ -19,13 +21,16 @@ Wire the Board component into the ScoutGame active view. When the round is activ
   - Board should be the primary content with vertical scroll
 
 ## Files to Create/Modify
+
 - `src/components/ScoutGame.tsx` — render Board component during active status
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Board renders when game status is 'active'
 - **Check**: Board displays all items from state.board
 - **Check**: Tapping an unclaimed square calls handleSquareTap with correct roundItemId
@@ -33,4 +38,5 @@ Wire the Board component into the ScoutGame active view. When the round is activ
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): render scout board during active round`

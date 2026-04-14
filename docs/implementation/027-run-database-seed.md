@@ -3,9 +3,11 @@
 > **MANUAL STEP** — requires human action.
 
 ## Description
+
 Execute the seed script to populate the database with all default bingo items, template items, and template values. This provides the initial data needed for games to be created with a full set of bingo squares.
 
 ## Requirements
+
 - Run `npx prisma db seed` to execute the seed script
 - The seed script (`prisma/seed.ts`) is executed via `tsx` as configured in `package.json` under `"prisma": { "seed": "tsx prisma/seed.ts" }`
 - After seeding, the database should contain:
@@ -18,13 +20,16 @@ Execute the seed script to populate the database with all default bingo items, t
 - The seed must be idempotent — running it multiple times produces the same result
 
 ## Files to Create/Modify
+
 - No new files — this step executes existing files
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Seed script runs successfully
 - **Command**: `npx prisma db seed`
 - **Check**: Total item count is 87
@@ -39,4 +44,5 @@ Execute the seed script to populate the database with all default bingo items, t
 - **Command**: `npx prisma db seed` (run a second time, then re-check counts)
 
 ## Commit
+
 `feat(seed): populate database with default items and template values`

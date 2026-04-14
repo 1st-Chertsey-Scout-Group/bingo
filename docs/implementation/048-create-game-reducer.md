@@ -1,9 +1,11 @@
 # Step 048: Create Game Reducer
 
 ## Description
+
 Create the game state reducer that manages all client-side game state transitions. This reducer is the single source of truth for the game UI, processing actions dispatched from socket events and user interactions.
 
 ## Requirements
+
 - Create `src/hooks/useGameState.ts`
 - Import `GameState`, `GameAction`, and related types from `@/types`
 - Define the initial state:
@@ -39,13 +41,16 @@ Create the game state reducer that manages all client-side game state transition
 - Reducer must be a pure function (create new Map instances instead of mutating)
 
 ## Files to Create/Modify
+
 - `src/hooks/useGameState.ts` — create game state reducer and useGameState hook
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: File exports `useGameState` hook and `gameReducer` function
 - **Command**: `cat src/hooks/useGameState.ts`
 - **Check**: All action types are handled in the reducer
@@ -54,4 +59,5 @@ Create the game state reducer that manages all client-side game state transition
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(state): add game state reducer with all action type handlers`

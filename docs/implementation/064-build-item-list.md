@@ -1,9 +1,11 @@
 # Step 064: Build Item List in Admin Page
 
 ## Description
+
 Build the item pool list section within the admin page. This displays all items from the database and forms the foundation for the item management CRUD operations.
 
 ## Requirements
+
 - Create an `ItemList` component (can be in admin page file or separate component file)
 - Receives `adminPin: string` as prop
 - On mount, fetch items from GET `/api/items` with `X-Admin-Pin` header
@@ -18,13 +20,16 @@ Build the item pool list section within the admin page. This displays all items 
 - Use shadcn UI components (Badge, ScrollArea) where available
 
 ## Files to Create/Modify
+
 - `src/app/admin/page.tsx` — add the item list section to the admin interface
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Items are fetched on mount and displayed in a list
 - **Check**: Template items show a "Template" badge
 - **Check**: Empty state shows "No items yet" message
@@ -32,4 +37,5 @@ Build the item pool list section within the admin page. This displays all items 
 - **Command**: `curl -H "X-Admin-Pin: $ADMIN_PIN" http://localhost:3000/api/items`
 
 ## Commit
+
 `feat(admin): build item pool list with template indicators`

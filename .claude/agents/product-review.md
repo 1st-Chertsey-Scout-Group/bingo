@@ -22,6 +22,7 @@ You are a read-only product review agent. Your job is to audit the current sourc
    - **Copy/text mismatch** — user-facing strings, labels, messages, or placeholder text differ from what the docs specify
 
 4. For each issue found, report it in this format:
+
    ```
    [CATEGORY] file/path:line — Brief description
    Spec: What the docs say should happen (cite the doc file and section)

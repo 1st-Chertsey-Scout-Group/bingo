@@ -1,9 +1,11 @@
 # Step 081: Implement Leader Lobby Join Handler
 
 ## Description
+
 Add leader-specific handling to the `lobby:join` socket event. Leaders authenticate with the leader PIN and join additional rooms for leader-only events like review notifications.
 
 ## Requirements
+
 - In `src/server/socket/lobby.ts`, handle the leader variant of `lobby:join`
   - Payload: `{ gamePin, leaderPin, leaderName }`
   - Distinguish from scout join by the presence of `leaderPin` in the payload
@@ -16,17 +18,21 @@ Add leader-specific handling to the `lobby:join` socket event. Leaders authentic
 - Query all teams for the game's current round and emit `lobby:teams` to the joining socket with `{ teams: Team[] }`
 
 ## Files to Create/Modify
+
 - `src/server/socket/lobby.ts` — add leader join branch to `lobby:join` handler
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Leader joining with correct gamePin and leaderPin receives acknowledgement
 - **Check**: Leader joining with wrong leaderPin receives an error
 - **Check**: Leader socket is added to both `game:{gameId}` and `leaders:{gameId}` rooms
 - **Check**: Leader receives current team list on join
 
 ## Commit
+
 `feat(socket): implement leader lobby join with PIN validation`

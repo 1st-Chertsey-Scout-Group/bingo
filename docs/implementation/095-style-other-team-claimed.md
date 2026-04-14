@@ -1,9 +1,11 @@
 # Step 095: Style Other Team Claimed Square
 
 ## Description
+
 Add styling for squares claimed by another team. These show the claiming team's colour and an abbreviation of their team name so scouts can see who got there first.
 
 ## Requirements
+
 - In `src/components/Square.tsx`, add conditional styling when `!isOwnTeam && roundItem.claimedByTeamId !== null`
 - Other-team claimed styling:
   - Background: inline `style={{ backgroundColor: roundItem.claimedByTeamColour }}` with reduced opacity
@@ -18,13 +20,16 @@ Add styling for squares claimed by another team. These show the claiming team's 
   - Item display name still shown
 
 ## Files to Create/Modify
+
 - `src/components/Square.tsx` — add other-team claimed state styling with team abbreviation
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Other-team claimed squares show that team's colour at reduced opacity
 - **Check**: Team abbreviation (e.g., "Red R.") appears in the bottom-right corner
 - **Check**: Item name is still visible
@@ -32,4 +37,5 @@ Add styling for squares claimed by another team. These show the claiming team's 
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `style(ui): add other-team claimed square styling with abbreviation`

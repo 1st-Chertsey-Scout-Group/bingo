@@ -1,9 +1,11 @@
 # Step 019: Add Item Model
 
 ## Description
+
 Add the Item model to the Prisma schema. Items represent the bingo squares that can appear on a board — either concrete items (like "Oak leaf") or template items (like "Something [colour]") that get expanded with random values at game time.
 
 ## Requirements
+
 - Add the `Item` model to `prisma/schema.prisma`
 - The model must have the following fields:
   - `id` — String, primary key, default `cuid()`
@@ -13,6 +15,7 @@ Add the Item model to the Prisma schema. Items represent the bingo squares that 
   - `roundItems` — relation to RoundItem[] (one-to-many)
 
 ## Files to Create/Modify
+
 - `prisma/schema.prisma` — add the following model:
 
 ```prisma
@@ -26,14 +29,17 @@ model Item {
 ```
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: The Item model is present in `prisma/schema.prisma` with all specified fields
 - **Command**: `cat prisma/schema.prisma`
 - **Check**: Prisma validates the schema (note: may fail until RoundItem model is added in step 021)
 - **Command**: `npx prisma validate`
 
 ## Commit
+
 `feat(db): add Item model to Prisma schema`

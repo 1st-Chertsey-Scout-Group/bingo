@@ -1,9 +1,11 @@
 # Step 051: Create PIN Validation API Route
 
 ## Description
+
 Create the POST /api/validate endpoint that checks a 4-digit PIN against active games. This is the first API route scouts and leaders hit when joining a game from the landing page.
 
 ## Requirements
+
 - Create `src/app/api/validate/route.ts`
 - Export a named `POST` handler
 - Parse JSON request body for `pin` (string)
@@ -15,13 +17,16 @@ Create the POST /api/validate endpoint that checks a 4-digit PIN against active 
 - Use the Prisma client from `@/lib/prisma`
 
 ## Files to Create/Modify
+
 - `src/app/api/validate/route.ts` — create the PIN validation endpoint
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Route file exists and exports a POST function
 - **Command**: `npx ts-node -e "import('./src/app/api/validate/route').then(m => console.log(typeof m.POST))"`
 - **Check**: Returns `{ valid: false }` for a non-existent PIN
@@ -30,4 +35,5 @@ Create the POST /api/validate endpoint that checks a 4-digit PIN against active 
 - **Check**: Does not match games with status `'ended'`
 
 ## Commit
+
 `feat(api): create POST /api/validate PIN validation endpoint`

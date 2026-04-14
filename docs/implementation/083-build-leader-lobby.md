@@ -1,9 +1,11 @@
 # Step 083: Build Leader Lobby View
 
 ## Description
+
 Add the leader-specific lobby view showing both PINs prominently and a list of joined teams. This is screen L2 from the spec, giving leaders the information they need to onboard scouts.
 
 ## Requirements
+
 - Modify `src/components/Lobby.tsx` to handle `role === 'leader'`
 - Add props: `gamePin?: string`, `leaderPin?: string`
 - Leader view layout:
@@ -16,17 +18,21 @@ Add the leader-specific lobby view showing both PINs prominently and a list of j
 - When no teams have joined, show "Waiting for scouts to join..." in muted text
 
 ## Files to Create/Modify
+
 - `src/components/Lobby.tsx` — add leader view branch with PIN display and team list
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Leader lobby displays both Scout PIN and Leader PIN in large monospace font
 - **Check**: Team list updates as scouts join
 - **Check**: Empty state shows "Waiting for scouts to join..."
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): build leader lobby view with PIN display`

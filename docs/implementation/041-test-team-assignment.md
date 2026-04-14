@@ -1,9 +1,11 @@
 # Step 041: Test Team Assignment
 
 ## Description
+
 Write unit tests for the team data module to verify the team array integrity and assignment utility functions work correctly.
 
 ## Requirements
+
 - Create `src/lib/teams.test.ts`
 - Use Vitest as the test runner
 - Test cases:
@@ -24,15 +26,19 @@ Write unit tests for the team data module to verify the team array integrity and
   - All team colours are unique
 
 ## Files to Create/Modify
+
 - `src/lib/teams.test.ts` — create unit tests for team data and utilities
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: All tests pass
 - **Command**: `npx vitest run src/lib/teams.test.ts`
 
 ## Commit
+
 `test(teams): add unit tests for team data and assignment utilities`

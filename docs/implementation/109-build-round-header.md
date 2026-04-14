@@ -1,9 +1,11 @@
 # Step 109: Build RoundHeader Component
 
 ## Description
+
 Create the RoundHeader component that sits fixed at the top of the leader's board screen, showing the round timer, progress count, and an "End Round" button with confirmation dialog.
 
 ## Requirements
+
 - Create `src/components/RoundHeader.tsx`
 - Fixed/sticky top bar that doesn't scroll with the board
 - **Timer**: Display MM:SS elapsed since `roundStartedAt` (ISO string prop). Use `setInterval` (1-second tick) to update. Clean up interval on unmount.
@@ -13,17 +15,21 @@ Create the RoundHeader component that sits fixed at the top of the leader's boar
 - Responsive layout: timer on left, progress centered, End Round button on right
 
 ## Files to Create/Modify
+
 - `src/components/RoundHeader.tsx` — New component with timer, progress, and end round confirmation dialog
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Timer counts up from the round start time in MM:SS format
 - **Check**: Progress shows correct claimed/total count and updates when squares are claimed
 - **Check**: "End Round" button opens a confirmation dialog before triggering the callback
 - **Check**: Header stays fixed at top while board scrolls beneath
 
 ## Commit
+
 `feat(client): build RoundHeader with timer, progress, and end round confirmation`

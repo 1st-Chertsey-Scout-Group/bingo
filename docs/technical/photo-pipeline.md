@@ -91,12 +91,12 @@ Server-side on `submission:submit`:
 1. Begin Prisma transaction:
    a. Load submission + round item
    b. If `RoundItem.claimedByTeamId IS NOT NULL`: submission lost the race
-      - Set submission status to `discarded`
-      - Emit `submission:discarded` to team
-      - Return
-   c. Set `RoundItem.claimedByTeamId = submission.teamId`
-   d. Set submission status to `approved`, `reviewedBy = leaderName`
-   e. Clear lock fields (`lockedByLeader`, `lockedAt`)
+   - Set submission status to `discarded`
+   - Emit `submission:discarded` to team
+   - Return
+     c. Set `RoundItem.claimedByTeamId = submission.teamId`
+     d. Set submission status to `approved`, `reviewedBy = leaderName`
+     e. Clear lock fields (`lockedByLeader`, `lockedAt`)
 2. Emit `square:claimed` to `game:{gameId}` room (all clients)
 3. Emit `submission:approved` to `team:{teamId}` room
 4. Find all other pending submissions for this round item:
@@ -116,6 +116,7 @@ Server-side on `submission:submit`:
 ## 6. S3 Lifecycle
 
 Bucket lifecycle rule:
+
 - Prefix: `games/`
 - Expiration: 7 days
 - Handles cleanup automatically — no app-side deletion needed

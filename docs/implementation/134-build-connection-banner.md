@@ -1,9 +1,11 @@
 # Step 134: Build Connection Banner Component
 
 ## Description
+
 Create a non-dismissable banner that appears at the top of the screen when the socket connection is lost. This gives scouts and leaders clear feedback that the app is trying to reconnect, without exposing technical details.
 
 ## Requirements
+
 - Create a `ConnectionBanner` React component
 - Banner text: "No connection — trying to reconnect..."
 - Non-dismissable — no close button, no tap-to-dismiss
@@ -17,15 +19,18 @@ Create a non-dismissable banner that appears at the top of the screen when the s
 - No technical details (no error codes, no retry count, no delay timers)
 
 ## Files to Create/Modify
+
 - `src/components/ConnectionBanner.tsx` — Create the banner component with socket event listeners
 - `src/components/ScoutGame.tsx` — Add `<ConnectionBanner />` at the top of the component tree
 - `src/components/LeaderGame.tsx` — Add `<ConnectionBanner />` at the top of the component tree
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Banner is hidden when connected
 - **Check**: Disconnect network in DevTools — banner appears immediately with correct message
 - **Check**: Re-enable network — banner disappears when socket reconnects
@@ -33,4 +38,5 @@ Create a non-dismissable banner that appears at the top of the screen when the s
 - **Check**: Banner appears on both scout and leader views
 
 ## Commit
+
 `feat(ui): add non-dismissable connection banner for socket disconnect state`

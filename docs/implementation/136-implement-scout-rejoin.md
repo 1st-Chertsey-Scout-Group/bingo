@@ -1,9 +1,11 @@
 # Step 136: Implement Scout Rejoin on Server
 
 ## Description
+
 Add the server-side `rejoin` handler for scouts so they can reconnect to an in-progress game after a page refresh or signal loss. The server validates the session, rebuilds full game state from the database, and sends it back to the client.
 
 ## Requirements
+
 - Register a `rejoin` event handler in `src/server/socket/lobby.ts`
 - Receive payload: `{ gamePin: string, teamId: string }`
 - Determine this is a scout rejoin by the presence of `teamId` (no `leaderPin`)
@@ -24,13 +26,16 @@ Add the server-side `rejoin` handler for scouts so they can reconnect to an in-p
 - On any validation failure: emit `rejoin:error` with `{ message: string }`
 
 ## Files to Create/Modify
+
 - `src/server/socket/lobby.ts` — Add `rejoin` event handler with scout-specific validation and state reconstruction
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Scout refreshes page mid-game, emits rejoin, receives `rejoin:state` with correct board and team data
 - **Check**: Scout rejoining with invalid teamId receives `rejoin:error`
 - **Check**: Scout rejoining an ended game receives `rejoin:error`
@@ -38,4 +43,5 @@ Add the server-side `rejoin` handler for scouts so they can reconnect to an in-p
 - **Check**: After rejoin, scout socket is in the correct game and team rooms (receives subsequent broadcasts)
 
 ## Commit
+
 `feat(socket): implement server-side scout rejoin with full state reconstruction`

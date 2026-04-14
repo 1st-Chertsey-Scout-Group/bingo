@@ -1,9 +1,11 @@
 # Step 042: Create Template Resolution
 
 ## Description
+
 Create the template resolution module that substitutes placeholders in bingo item names with random values. For example, "Something [colour]" becomes "Something Red". This enables dynamic board variety across rounds.
 
 ## Requirements
+
 - Create `src/lib/templates.ts`
 - Export `resolveTemplate(templateName: string, category: string, values: string[], usedValues: Set<string>): string | null`
 - The function must:
@@ -18,17 +20,21 @@ Create the template resolution module that substitutes placeholders in bingo ite
 - The function should handle templates with exactly one placeholder
 
 ## Files to Create/Modify
+
 - `src/lib/templates.ts` — create template resolution function
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: File exports `resolveTemplate` function
 - **Command**: `cat src/lib/templates.ts`
 - **Check**: TypeScript compiles without errors
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(templates): add template resolution with placeholder substitution`

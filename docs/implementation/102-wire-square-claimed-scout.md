@@ -1,9 +1,11 @@
 # Step 102: Wire square:claimed Event in ScoutGame
 
 ## Description
+
 Listen for `square:claimed` events to update the board when any team claims a square. This keeps all scouts' boards in sync with the game state.
 
 ## Requirements
+
 - In `src/components/ScoutGame.tsx`, add a useEffect listener for `square:claimed`
   - Event payload: `{ roundItemId: string, teamId: string, teamName: string, teamColour: string }`
   - Dispatch `SQUARE_CLAIMED` action with the payload
@@ -19,14 +21,17 @@ Listen for `square:claimed` events to update the board when any team claims a sq
   - Other team claim: team colour + abbreviation (step 095)
 
 ## Files to Create/Modify
+
 - `src/components/ScoutGame.tsx` — add `square:claimed` socket listener
 - Game state reducer file — add `SQUARE_CLAIMED` action
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: When any square is claimed, the board updates to show the claim
 - **Check**: Own-team claims show team colour with checkmark
 - **Check**: Other-team claims show their colour with abbreviation
@@ -34,4 +39,5 @@ Listen for `square:claimed` events to update the board when any team claims a sq
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(socket): wire square:claimed event to scout board state`

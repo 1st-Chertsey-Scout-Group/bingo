@@ -7,9 +7,11 @@ All routes return JSON. Errors return `{ error: string }` with appropriate HTTP 
 ## PIN Validation
 
 ### `POST /api/validate`
+
 Validate a PIN and determine role. Used by the landing page (`/`).
 
 **Request:**
+
 ```json
 {
   "pin": "3847"
@@ -17,6 +19,7 @@ Validate a PIN and determine role. Used by the landing page (`/`).
 ```
 
 **Response (scout PIN):**
+
 ```json
 {
   "valid": true,
@@ -26,6 +29,7 @@ Validate a PIN and determine role. Used by the landing page (`/`).
 ```
 
 **Response (leader PIN):**
+
 ```json
 {
   "valid": true,
@@ -35,6 +39,7 @@ Validate a PIN and determine role. Used by the landing page (`/`).
 ```
 
 **Response (invalid):**
+
 ```json
 {
   "valid": false
@@ -42,6 +47,7 @@ Validate a PIN and determine role. Used by the landing page (`/`).
 ```
 
 **Notes:**
+
 - Checks both `Game.pin` and `Game.leaderPin` fields
 - Only matches active games (not ended/stale)
 - No collision between game PINs and leader PINs (enforced at creation time)
@@ -49,14 +55,17 @@ Validate a PIN and determine role. Used by the landing page (`/`).
 ## Game Management
 
 ### `POST /api/game`
+
 Create a new game session. Protected by `ADMIN_PIN` header.
 
 **Headers:**
+
 ```
 X-Admin-Pin: <ADMIN_PIN env var>
 ```
 
 **Request:**
+
 ```json
 {
   "leaderPin": "8472",
@@ -66,6 +75,7 @@ X-Admin-Pin: <ADMIN_PIN env var>
 ```
 
 **Response:**
+
 ```json
 {
   "gameId": "clx...",
@@ -78,6 +88,7 @@ X-Admin-Pin: <ADMIN_PIN env var>
 ```
 
 **Notes:**
+
 - Game PIN is randomly generated 4-digit string
 - Leader PIN is provided in the request
 - Both PINs checked for collision against active games
@@ -87,9 +98,11 @@ X-Admin-Pin: <ADMIN_PIN env var>
 ---
 
 ### `GET /api/game/[gameId]`
+
 Get current game state. Used on reconnect to hydrate full state.
 
 **Response:**
+
 ```json
 {
   "gameId": "clx...",
@@ -98,9 +111,7 @@ Get current game state. Used on reconnect to hydrate full state.
   "round": 2,
   "boardSize": 25,
   "templateCount": 5,
-  "teams": [
-    { "id": "clx...", "name": "Red Rabbits", "colour": "#E03131" }
-  ],
+  "teams": [{ "id": "clx...", "name": "Red Rabbits", "colour": "#E03131" }],
   "board": [
     {
       "roundItemId": "clx...",
@@ -117,6 +128,7 @@ Get current game state. Used on reconnect to hydrate full state.
 ```
 
 **Notes:**
+
 - Board only returned when status is `active`
 - Board uses `displayName` (resolved template names)
 - `boardSize` and `templateCount` included for client-side layout/display
@@ -124,9 +136,11 @@ Get current game state. Used on reconnect to hydrate full state.
 ## Photo Upload
 
 ### `POST /api/upload`
+
 Get a presigned S3 URL for direct photo upload.
 
 **Request:**
+
 ```json
 {
   "gameId": "clx...",
@@ -137,6 +151,7 @@ Get a presigned S3 URL for direct photo upload.
 ```
 
 **Response:**
+
 ```json
 {
   "uploadUrl": "https://s3.amazonaws.com/bucket/games/clx.../submissions/clx....webp?...",
@@ -145,6 +160,7 @@ Get a presigned S3 URL for direct photo upload.
 ```
 
 **Notes:**
+
 - `uploadUrl` is a presigned PUT URL (expires in 5 minutes)
 - `photoUrl` is the public read URL (no signing needed)
 - S3 key format: `games/{gameId}/submissions/{cuid}.webp`
@@ -155,9 +171,11 @@ Get a presigned S3 URL for direct photo upload.
 All item routes protected by `ADMIN_PIN` header.
 
 ### `GET /api/items`
+
 Get all items in the pool.
 
 **Response:**
+
 ```json
 {
   "items": [
@@ -170,9 +188,11 @@ Get all items in the pool.
 ---
 
 ### `POST /api/items`
+
 Add a new item to the pool.
 
 **Request:**
+
 ```json
 {
   "name": "Oak leaf"
@@ -182,9 +202,11 @@ Add a new item to the pool.
 ---
 
 ### `PUT /api/items/[itemId]`
+
 Update an item.
 
 **Request:**
+
 ```json
 {
   "name": "Oak tree leaf"
@@ -194,8 +216,10 @@ Update an item.
 ---
 
 ### `DELETE /api/items/[itemId]`
+
 Remove an item from the pool.
 
 **Notes:**
+
 - Cannot delete items that are currently in use in an active round
 - Default items can be deleted (they'll be re-created on next seed)

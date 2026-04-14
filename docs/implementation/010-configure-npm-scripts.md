@@ -1,9 +1,11 @@
 # Step 010: Configure npm Scripts
 
 ## Description
+
 Update package.json with all npm scripts needed for development, building, testing, and database management. Also add the Prisma seed configuration so that `prisma db seed` knows how to execute the seed file.
 
 ## Requirements
+
 - Replace the default `scripts` section in `package.json` with the following exact scripts:
   - `"dev": "tsx watch server.ts"` — run the custom server in dev mode with hot reload
   - `"build": "next build && tsc --project tsconfig.server.json"` — build Next.js and compile server
@@ -23,17 +25,21 @@ Update package.json with all npm scripts needed for development, building, testi
   ```
 
 ## Files to Create/Modify
+
 - `package.json` — update `scripts` section and add `prisma` seed config
 
 ## Checklist
+
 - [x] Implemented
 - [x] Verified
 
 ## Verification
+
 - **Check**: All scripts are present in package.json
 - **Command**: `node -e "const pkg = require('./package.json'); console.log(JSON.stringify(pkg.scripts, null, 2))"`
 - **Check**: Prisma seed config is present
 - **Command**: `node -e "const pkg = require('./package.json'); console.log(JSON.stringify(pkg.prisma, null, 2))"`
 
 ## Commit
+
 `chore(scripts): configure npm scripts and Prisma seed command`

@@ -1,9 +1,11 @@
 # Step 084: Build Landscape PIN Display Mode
 
 ## Description
+
 Add a fullscreen landscape PIN display to the leader lobby so the leader can hold up their device for scouts to see the join URL and PIN from a distance. Rotating to landscape triggers the display automatically.
 
 ## Requirements
+
 - In `src/components/Lobby.tsx` (leader view), add landscape detection and fullscreen PIN overlay
 - Use `window.matchMedia('(orientation: landscape)')` in a useEffect to detect orientation changes
   - Track orientation in local state: `const [isLandscape, setIsLandscape] = useState(false)`
@@ -18,13 +20,16 @@ Add a fullscreen landscape PIN display to the leader lobby so the leader can hol
 - When rotating back to portrait, overlay automatically hides via the matchMedia listener
 
 ## Files to Create/Modify
+
 - `src/components/Lobby.tsx` — add landscape orientation detection and fullscreen PIN overlay
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Rotating device to landscape shows fullscreen PIN display
 - **Check**: URL and PIN are visible from several metres away (very large text)
 - **Check**: Tapping the screen dismisses the overlay
@@ -32,4 +37,5 @@ Add a fullscreen landscape PIN display to the leader lobby so the leader can hol
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(ui): add landscape fullscreen PIN display for leader lobby`

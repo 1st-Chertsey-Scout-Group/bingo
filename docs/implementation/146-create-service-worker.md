@@ -1,9 +1,11 @@
 # Step 146: Create Service Worker
 
 ## Description
+
 Create a hand-written service worker that caches the app shell (HTML, CSS, JS bundles) so the app loads instantly from cache even in a dead zone. This is critical for the field environment — a scout who refreshes in a wooded area gets the cached UI immediately and reconnects when signal returns.
 
 ## Requirements
+
 - Create `public/sw.js` — hand-written, no libraries (no Workbox)
 - Cache name: `scout-bingo-shell-v1`
 - **Install event**:
@@ -29,13 +31,16 @@ Create a hand-written service worker that caches the app shell (HTML, CSS, JS bu
 - Version the cache name so updates can bust the old cache (change `v1` to `v2` on breaking changes)
 
 ## Files to Create/Modify
+
 - `public/sw.js` — Create the service worker with install, activate, and fetch handlers
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: After first load, service worker is registered and app shell is cached (DevTools > Application > Cache Storage)
 - **Check**: Go offline in DevTools, refresh the page — app shell loads from cache
 - **Check**: While offline, the ConnectionBanner appears (socket cannot connect) but the UI is usable
@@ -44,4 +49,5 @@ Create a hand-written service worker that caches the app shell (HTML, CSS, JS bu
 - **Command**: In DevTools > Application > Service Workers — verify status is "activated and running"
 
 ## Commit
+
 `feat(pwa): create hand-written service worker with network-first navigation and cache-first static assets`

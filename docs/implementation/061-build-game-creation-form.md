@@ -1,9 +1,11 @@
 # Step 061: Build Game Creation Form
 
 ## Description
+
 Build the game creation form within the admin page. This form collects all parameters needed to start a new game and provides visual feedback on slider values.
 
 ## Requirements
+
 - Create a `GameCreationForm` component (can be in admin page file or separate component file)
 - Receives `adminPin: string` as prop
 - Form fields:
@@ -18,13 +20,16 @@ Build the game creation form within the admin page. This form collects all param
 - Use shadcn UI components (Input, Button, Label) where available
 
 ## Files to Create/Modify
+
 - `src/app/admin/page.tsx` — add the game creation form to the admin interface
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Form renders with all four fields
 - **Check**: Board size slider shows current value and constrains to 9-25
 - **Check**: Template count slider shows current value and constrains to 0-10
@@ -32,4 +37,5 @@ Build the game creation form within the admin page. This form collects all param
 - **Check**: Create Game button is present and becomes disabled during submission
 
 ## Commit
+
 `feat(admin): build game creation form with sliders and validation`

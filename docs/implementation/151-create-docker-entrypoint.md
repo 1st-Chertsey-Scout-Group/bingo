@@ -1,9 +1,11 @@
 # Step 151: Create Docker Entrypoint Script
 
 ## Description
+
 Create the entrypoint script that runs before the main server process. It checks if the SQLite database exists and initializes it on first container start. This provides zero-config database setup for fresh deployments.
 
 ## Requirements
+
 - Create `docker-entrypoint.sh` at the project root
 - Exact contents:
   ```bash
@@ -26,13 +28,16 @@ Create the entrypoint script that runs before the main server process. It checks
 - The `/app/data` directory is backed by the Docker volume, so the database persists across container restarts
 
 ## Files to Create/Modify
+
 - `docker-entrypoint.sh` — Create the entrypoint script at the project root
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: On first container start (empty volume), database is created and seeded — check container logs for Prisma output
 - **Check**: On subsequent container starts (database exists), Prisma commands are skipped — container starts faster
 - **Check**: The server process starts successfully after the entrypoint script completes
@@ -41,4 +46,5 @@ Create the entrypoint script that runs before the main server process. It checks
 - **Command**: `docker compose restart` — watch logs to confirm Prisma commands are skipped
 
 ## Commit
+
 `feat(docker): create entrypoint script for automatic database initialization`

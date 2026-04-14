@@ -1,9 +1,11 @@
 # Step 044: Create Board Generation
 
 ## Description
+
 Create the game logic module with board generation and PIN utilities. Board generation selects a mix of concrete and template-resolved items, avoids recently used items where possible, and shuffles them into a random order.
 
 ## Requirements
+
 - Create `src/lib/game-logic.ts`
 - Export `generateBoard(options: { boardSize: number, templateCount: number, allItems: Item[], templateItems: Item[], templateValues: TemplateValue[], recentItemIds: string[] }): BoardItem[]` where:
   - `Item` has at least `{ id: string, name: string, category: string | null }`
@@ -20,17 +22,21 @@ Create the game logic module with board generation and PIN utilities. Board gene
 - Follow project code standards: named exports, no `any`, TypeScript strict
 
 ## Files to Create/Modify
+
 - `src/lib/game-logic.ts` — create board generation and PIN utility functions
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: File exports `generateBoard`, `generatePin`, and `validatePinUnique`
 - **Command**: `cat src/lib/game-logic.ts`
 - **Check**: TypeScript compiles without errors
 - **Command**: `npx tsc --noEmit`
 
 ## Commit
+
 `feat(game): add board generation, PIN generation, and validation utilities`

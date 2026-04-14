@@ -1,9 +1,11 @@
 # Step 075: Implement Scout Lobby Join Socket Handler
 
 ## Description
+
 Implement the lobby:join socket handler that assigns a scout to a team when they join the game lobby. This is the core multiplayer entry point where scouts are automatically assigned to the next available team.
 
 ## Requirements
+
 - Implement the `lobby:join` handler in `src/server/socket/lobby.ts`
 - Handler receives `{ gamePin: string }` payload from the client
 - Validate `gamePin` is a non-empty string; emit `error` event with `{ message: "gamePin is required" }` if invalid
@@ -26,13 +28,16 @@ Implement the lobby:join socket handler that assigns a scout to a team when they
 - Query all teams for the current round to build the teams list for the broadcast
 
 ## Files to Create/Modify
+
 - `src/server/socket/lobby.ts` — implement the lobby:join handler
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Connecting with a valid game PIN creates a Team record in the database
 - **Check**: Team is assigned the next available name and colour from getNextTeam
 - **Check**: Socket joins the correct game and team rooms
@@ -42,4 +47,5 @@ Implement the lobby:join socket handler that assigns a scout to a team when they
 - **Check**: Non-lobby game status emits an error event
 
 ## Commit
+
 `feat(socket): implement lobby:join handler with auto team assignment`

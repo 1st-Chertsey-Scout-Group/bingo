@@ -1,9 +1,11 @@
 # Step 087: Integrate Board Generation into Game Start
 
 ## Description
+
 Call the board generation algorithm during game start to select which nature items appear on this round's bingo board. The algorithm avoids repeating items from the last 2 rounds.
 
 ## Requirements
+
 - In `src/server/socket/game.ts`, within the `game:start` handler (after the status update from step 086):
   - Query all concrete Items from the database (`where: { isTemplate: false }`)
   - Query all template Items from the database (`where: { isTemplate: true }`)
@@ -20,17 +22,21 @@ Call the board generation algorithm during game start to select which nature ite
 - If `generateBoard` throws (not enough items), emit error to the leader socket and revert game status to 'lobby'
 
 ## Files to Create/Modify
+
 - `src/server/socket/game.ts` — add board generation call within game:start handler
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Board generation produces the correct number of items (matching game.boardSize)
 - **Check**: Items from the last 2 rounds are excluded where possible
 - **Check**: Template items are resolved to concrete display names
 - **Check**: Error during generation reverts game status and notifies the leader
 
 ## Commit
+
 `feat(socket): integrate board generation into game start flow`

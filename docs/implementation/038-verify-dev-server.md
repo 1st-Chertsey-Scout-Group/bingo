@@ -3,9 +3,11 @@
 > **MANUAL STEP** — requires human action.
 
 ## Description
+
 Manually verify that the custom server, page routes, and Socket.IO connection all work together in development mode. This confirms the foundation is solid before building features on top of it.
 
 ## Requirements
+
 - Run the dev server using `npm run dev` (which executes `tsx watch server.ts`)
 - Verify the server starts and logs "Server listening on http://localhost:3000"
 - Verify the landing page loads at `http://localhost:3000/`
@@ -16,13 +18,16 @@ Manually verify that the custom server, page routes, and Socket.IO connection al
 - Verify no TypeScript compilation errors appear in the terminal
 
 ## Files to Create/Modify
+
 - No files to create or modify
 
 ## Checklist
+
 - [ ] Implemented
 - [ ] Verified
 
 ## Verification
+
 - **Check**: Server starts without errors on port 3000
 - **Command**: `npm run dev`
 - **Check**: Landing page renders "Scout Bingo" heading at `/`
@@ -31,4 +36,5 @@ Manually verify that the custom server, page routes, and Socket.IO connection al
 - **Check**: Socket.IO WebSocket connection established in browser DevTools
 
 ## Commit
+
 No commit needed — manual verification step.
