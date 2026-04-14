@@ -46,8 +46,8 @@ Create the game state reducer that manages all client-side game state transition
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
