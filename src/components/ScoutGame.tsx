@@ -126,14 +126,15 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
             return
           }
 
-          // TODO: socket emit submission:submit (step 100)
-          console.log('Uploaded to S3', photoUrl, roundItemId)
+          socket?.emit('submission:submit', { roundItemId, photoUrl })
+          dispatch({ type: 'SUBMISSION_SENT', roundItemId })
+          toast('Submitted!')
         } catch {
           toast('Upload failed. Try again.')
         }
       })()
     },
-    [gameId, state.myTeam?.id],
+    [gameId, state.myTeam?.id, socket, dispatch],
   )
 
   const handleSquareTap = useCallback(

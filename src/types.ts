@@ -61,6 +61,7 @@ export type GameAction =
   | { type: 'SQUARE_PENDING'; roundItemId: string }
   | { type: 'SQUARE_LOCKED'; roundItemId: string; leaderName: string }
   | { type: 'SQUARE_UNLOCKED'; roundItemId: string }
+  | { type: 'SUBMISSION_SENT'; roundItemId: string }
   | { type: 'SUBMISSION_RECEIVED'; itemId: string }
   | { type: 'SUBMISSION_APPROVED'; itemId: string }
   | { type: 'SUBMISSION_REJECTED'; itemId: string }

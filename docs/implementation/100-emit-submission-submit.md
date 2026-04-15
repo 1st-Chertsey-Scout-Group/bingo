@@ -30,8 +30,8 @@ After a successful S3 upload, emit the `submission:submit` socket event to notif
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

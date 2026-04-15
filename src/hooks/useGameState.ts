@@ -72,6 +72,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ),
       }
 
+    case 'SUBMISSION_SENT': {
+      const newSubmissions = new Map(state.mySubmissions)
+      newSubmissions.set(action.roundItemId, 'pending')
+      return { ...state, mySubmissions: newSubmissions }
+    }
+
     case 'SUBMISSION_RECEIVED': {
       const newSubmissions = new Map(state.mySubmissions)
       newSubmissions.set(action.itemId, 'pending')
