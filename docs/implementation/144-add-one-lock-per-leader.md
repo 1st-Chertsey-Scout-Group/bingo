@@ -21,8 +21,8 @@ Ensure a leader can only hold one lock at a time. If a leader opens a review mod
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

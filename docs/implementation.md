@@ -241,7 +241,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[141 — Add Upload Retry Logic](implementation/141-add-upload-retry.md)~~ ✓
 - ~~[142 — Add Upload Failure UI](implementation/142-add-upload-failure-ui.md)~~ ✓
 - ~~[143 — Add Lock Timeout on Leader Disconnect](implementation/143-add-lock-timeout.md)~~ ✓
-- [144 — Add One-Lock-Per-Leader Enforcement](implementation/144-add-one-lock-per-leader.md)
+- ~~[144 — Add One-Lock-Per-Leader Enforcement](implementation/144-add-one-lock-per-leader.md)~~ ✓
 - [145 — Handle Between-Rounds Rejoin Edge Case](implementation/145-handle-between-rounds-rejoin.md)
 
 ## Phase 22: PWA Service Worker (146–148)
