@@ -33,8 +33,8 @@ Create the entrypoint script that runs before the main server process. It checks
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
