@@ -22,6 +22,9 @@ const unclaimedClasses =
 const pendingClasses =
   'bg-amber-50 border-2 border-dashed border-amber-400 text-gray-900 animate-pulse cursor-default pointer-events-none'
 
+const needsReviewClasses =
+  'bg-amber-50 border-2 border-amber-500 text-gray-900 animate-pulse-amber cursor-pointer'
+
 const claimedClasses = 'border-0 text-white cursor-default'
 
 function getTeamAbbreviation(name: string): string {
@@ -32,6 +35,7 @@ function getTeamAbbreviation(name: string): string {
 
 export function Square({
   roundItem,
+  role,
   isOwnTeam,
   isPending = false,
   onTap,
@@ -40,14 +44,20 @@ export function Square({
   const isClaimed = !isUnclaimed
   const isOwnTeamClaimed = isOwnTeam && isClaimed
   const isOtherTeamClaimed = !isOwnTeam && isClaimed
+  const needsReview =
+    role === 'leader' &&
+    roundItem.hasPendingSubmissions &&
+    isUnclaimed &&
+    roundItem.lockedByLeader === null
 
   return (
     <button
       onClick={onTap}
       className={cn(
         baseClasses,
-        isUnclaimed && !isPending && unclaimedClasses,
-        isUnclaimed && isPending && pendingClasses,
+        isUnclaimed && !isPending && !needsReview && unclaimedClasses,
+        isUnclaimed && isPending && !needsReview && pendingClasses,
+        needsReview && needsReviewClasses,
         isClaimed && claimedClasses,
       )}
       style={

@@ -20,8 +20,8 @@ Add visual styling to board squares that have pending submissions awaiting revie
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

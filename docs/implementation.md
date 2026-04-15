@@ -195,7 +195,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 - ~~[108 — Render Leader Board on Active Game](implementation/108-render-leader-active-board.md)~~ ✓
 - ~~[109 — Build RoundHeader Component](implementation/109-build-round-header.md)~~ ✓
-- [110 — Style Needs-Review Square](implementation/110-style-needs-review-square.md)
+- ~~[110 — Style Needs-Review Square](implementation/110-style-needs-review-square.md)~~ ✓
 - [111 — Style Locked Square](implementation/111-style-locked-square.md)
 - [112 — Wire square:pending to Leader Board](implementation/112-wire-pending-leader-board.md)
 

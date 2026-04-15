@@ -128,3 +128,19 @@
     @apply font-sans;
   }
 }
+
+@keyframes pulse-amber {
+  0%,
+  100% {
+    border-color: rgb(245 158 11);
+    box-shadow: 0 0 0 0 rgb(245 158 11 / 0.4);
+  }
+  50% {
+    border-color: rgb(217 119 6);
+    box-shadow: 0 0 8px 2px rgb(245 158 11 / 0.3);
+  }
+}
+
+@utility animate-pulse-amber {
+  animation: pulse-amber 2s ease-in-out infinite;
+}
