@@ -189,7 +189,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 - ~~[105 — Implement submission:submit Handler](implementation/105-implement-submission-handler.md)~~ ✓
 - ~~[106 — Emit square:pending to Game Room](implementation/106-emit-square-pending.md)~~ ✓
-- [107 — Emit submission:received to Team Room](implementation/107-emit-submission-received.md)
+- ~~[107 — Emit submission:received to Team Room](implementation/107-emit-submission-received.md)~~ ✓
 
 ## Phase 17: Leader Active Round (108–112)
 

@@ -17,8 +17,8 @@ After creating the submission record, emit `submission:received` to the submitti
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
