@@ -27,8 +27,8 @@ Call the board generation algorithm during game start to select which nature ite
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
