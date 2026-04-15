@@ -1,15 +1,29 @@
 'use client'
 
+import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 
-function LeaderGameInner() {
+type LeaderGameInnerProps = {
+  gamePin: string
+  leaderPin: string
+}
+
+function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
   const socket = useSocket()
   const { state } = useGame()
 
   switch (state.status) {
     case 'lobby':
-      return <div>Leader Lobby</div>
+      return (
+        <Lobby
+          role="leader"
+          myTeam={null}
+          teams={state.teams}
+          gamePin={gamePin}
+          leaderPin={leaderPin}
+        />
+      )
     case 'active':
       return <div>Leader Board</div>
     case 'ended':
@@ -19,10 +33,16 @@ function LeaderGameInner() {
   }
 }
 
-export function LeaderGame({ gameId }: { gameId: string }) {
+type LeaderGameProps = {
+  gameId: string
+  gamePin: string
+  leaderPin: string
+}
+
+export function LeaderGame({ gameId, gamePin, leaderPin }: LeaderGameProps) {
   return (
     <GameProvider>
-      <LeaderGameInner />
+      <LeaderGameInner gamePin={gamePin} leaderPin={leaderPin} />
     </GameProvider>
   )
 }

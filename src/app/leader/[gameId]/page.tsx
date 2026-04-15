@@ -12,12 +12,14 @@ export default async function LeaderPage({ params }: LeaderPageProps) {
 
   const game = await prisma.game.findUnique({
     where: { id: gameId },
-    select: { id: true },
+    select: { id: true, pin: true, leaderPin: true },
   })
 
   if (!game) {
     notFound()
   }
 
-  return <LeaderGame gameId={gameId} />
+  return (
+    <LeaderGame gameId={gameId} gamePin={game.pin} leaderPin={game.leaderPin} />
+  )
 }

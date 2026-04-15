@@ -7,9 +7,11 @@ type LobbyProps = {
   myTeam: { name: string; colour: string } | null
   teams: Team[]
   role: 'scout' | 'leader'
+  gamePin?: string
+  leaderPin?: string
 }
 
-export function Lobby({ myTeam, teams, role }: LobbyProps) {
+export function Lobby({ myTeam, teams, role, gamePin, leaderPin }: LobbyProps) {
   if (role === 'scout') {
     return (
       <div className="flex flex-col items-center gap-6 p-4">
@@ -36,5 +38,35 @@ export function Lobby({ myTeam, teams, role }: LobbyProps) {
     )
   }
 
-  return null
+  return (
+    <div className="flex flex-col items-center gap-6 p-4">
+      <div className="flex justify-center gap-4">
+        <div className="bg-muted rounded-xl p-4 text-center">
+          <p className="text-muted-foreground text-sm">Scout PIN</p>
+          <p className="font-mono text-4xl font-bold">{gamePin}</p>
+        </div>
+        <div className="bg-muted rounded-xl p-4 text-center">
+          <p className="text-muted-foreground text-sm">Leader PIN</p>
+          <p className="font-mono text-4xl font-bold">{leaderPin}</p>
+        </div>
+      </div>
+
+      <div className="w-full">
+        <h2 className="mb-2 text-lg font-semibold">
+          Teams Joined ({teams.length})
+        </h2>
+        {teams.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {teams.map((team) => (
+              <TeamBadge key={team.id} name={team.name} colour={team.colour} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted-foreground">Waiting for scouts to join...</p>
+        )}
+      </div>
+
+      <div id="start-round-slot" />
+    </div>
+  )
 }

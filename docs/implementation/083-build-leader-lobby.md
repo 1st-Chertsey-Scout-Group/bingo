@@ -23,8 +23,8 @@ Add the leader-specific lobby view showing both PINs prominently and a list of j
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
