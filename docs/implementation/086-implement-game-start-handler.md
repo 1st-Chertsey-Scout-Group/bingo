@@ -24,8 +24,8 @@ Handle the `game:start` event on the server to transition a game from lobby to a
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
