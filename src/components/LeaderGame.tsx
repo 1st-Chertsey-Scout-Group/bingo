@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect } from 'react'
 import { Board } from '@/components/Board'
+import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { Lobby } from '@/components/Lobby'
 import { Button } from '@/components/ui/button'
 import { ReviewModal } from '@/components/ReviewModal'
@@ -290,6 +291,7 @@ type LeaderGameProps = {
 export function LeaderGame({ gameId, gamePin, leaderPin }: LeaderGameProps) {
   return (
     <GameProvider>
+      <ConnectionBanner />
       <LeaderGameInner gamePin={gamePin} leaderPin={leaderPin} />
     </GameProvider>
   )

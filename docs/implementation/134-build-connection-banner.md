@@ -26,8 +26,8 @@ Create a non-dismissable banner that appears at the top of the screen when the s
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

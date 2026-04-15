@@ -10,6 +10,7 @@ import {
 import { toast } from 'sonner'
 
 import { Board } from '@/components/Board'
+import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
@@ -309,6 +310,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
 export function ScoutGame({ gameId }: { gameId: string }) {
   return (
     <GameProvider>
+      <ConnectionBanner />
       <ScoutGameInner gameId={gameId} />
     </GameProvider>
   )
