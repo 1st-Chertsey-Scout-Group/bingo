@@ -15,6 +15,7 @@ import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 import { compressImage } from '@/lib/image'
+import { clearTeamIdFromSession, loadSession, saveSession } from '@/lib/session'
 import type { RoundItem, Team, TeamSummary } from '@/types'
 
 function ScoutGameInner({ gameId }: { gameId: string }) {
@@ -52,6 +53,16 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
         teamName: payload.teamName,
         teamColour: payload.teamColour,
       })
+      if (gamePin) {
+        saveSession({
+          gamePin,
+          gameId,
+          teamId: payload.teamId,
+          teamName: payload.teamName,
+          teamColour: payload.teamColour,
+          role: 'scout',
+        })
+      }
     }
 
     const handleLobbyTeams = ({ teams }: { teams: Team[] }) => {
@@ -127,16 +138,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     }
 
     const handleGameLobby = () => {
-      try {
-        const session = localStorage.getItem('scout-bingo-session')
-        if (session) {
-          const parsed = JSON.parse(session) as Record<string, unknown>
-          delete parsed.teamId
-          localStorage.setItem('scout-bingo-session', JSON.stringify(parsed))
-        }
-      } catch {
-        // localStorage unavailable
-      }
+      clearTeamIdFromSession()
       dispatch({ type: 'GAME_LOBBY' })
       // Re-join lobby for fresh team assignment
       if (gamePin) {

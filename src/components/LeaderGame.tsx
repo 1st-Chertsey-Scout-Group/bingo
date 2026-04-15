@@ -9,6 +9,7 @@ import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
+import { clearTeamIdFromSession } from '@/lib/session'
 import type { RoundItem, SubmissionForReview, Team, TeamSummary } from '@/types'
 
 type LeaderGameInnerProps = {
@@ -118,16 +119,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     }
 
     const handleGameLobby = () => {
-      try {
-        const session = localStorage.getItem('scout-bingo-session')
-        if (session) {
-          const parsed = JSON.parse(session) as Record<string, unknown>
-          delete parsed.teamId
-          localStorage.setItem('scout-bingo-session', JSON.stringify(parsed))
-        }
-      } catch {
-        // localStorage unavailable
-      }
+      clearTeamIdFromSession()
       dispatch({ type: 'GAME_LOBBY' })
       // Re-join lobby
       if (leaderName) {

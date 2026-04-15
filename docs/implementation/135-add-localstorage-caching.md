@@ -42,8 +42,8 @@ Persist session data to localStorage so the app can rejoin a game after a page r
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
