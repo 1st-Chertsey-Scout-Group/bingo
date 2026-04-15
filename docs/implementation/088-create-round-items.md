@@ -27,8 +27,8 @@ Persist the generated board as RoundItem records in the database. Each RoundItem
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

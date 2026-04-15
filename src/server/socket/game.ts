@@ -52,8 +52,10 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
 
     const recentItemIds = [...new Set(recentRoundItems.map((ri) => ri.itemId))]
 
+    let boardItems: Array<{ itemId: string; displayName: string }>
+
     try {
-      generateBoard({
+      boardItems = generateBoard({
         boardSize: updatedGame.boardSize,
         templateCount: updatedGame.templateCount,
         allItems: concreteItems,
@@ -71,6 +73,15 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
       socket.emit('error', { message })
       return
     }
+
+    await prisma.roundItem.createMany({
+      data: boardItems.map((item) => ({
+        gameId: updatedGame.id,
+        itemId: item.itemId,
+        displayName: item.displayName,
+        round: updatedGame.round,
+      })),
+    })
   })
 
   socket.on('game:end', () => {
