@@ -19,8 +19,8 @@ Handle the case where after rejecting a submission, the server sends another `re
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
