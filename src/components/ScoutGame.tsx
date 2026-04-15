@@ -21,7 +21,13 @@ import {
   loadSession,
   saveSession,
 } from '@/lib/session'
-import type { RoundItem, Team, TeamSummary } from '@/types'
+import type {
+  GameState,
+  RoundItem,
+  SubmissionStatus,
+  Team,
+  TeamSummary,
+} from '@/types'
 
 function ScoutGameInner({ gameId }: { gameId: string }) {
   const socket = useSocket()
@@ -159,6 +165,20 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       }
     }
 
+    const handleRejoinState = (
+      payload: Omit<GameState, 'mySubmissions'> & {
+        mySubmissions: Array<[string, string]>
+      },
+    ) => {
+      const state: GameState = {
+        ...payload,
+        mySubmissions: new Map(
+          payload.mySubmissions.map(([k, v]) => [k, v as SubmissionStatus]),
+        ),
+      }
+      dispatch({ type: 'FULL_STATE', state })
+    }
+
     const handleRejoinError = () => {
       clearSession()
       // Fall back to normal join
@@ -178,6 +198,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket.on('submission:discarded', handleSubmissionDiscarded)
     socket.on('game:ended', handleGameEnded)
     socket.on('game:lobby', handleGameLobby)
+    socket.on('rejoin:state', handleRejoinState)
     socket.on('rejoin:error', handleRejoinError)
 
     return () => {
@@ -192,6 +213,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.off('submission:discarded', handleSubmissionDiscarded)
       socket.off('game:ended', handleGameEnded)
       socket.off('game:lobby', handleGameLobby)
+      socket.off('rejoin:state', handleRejoinState)
       socket.off('rejoin:error', handleRejoinError)
     }
   }, [socket, dispatch])

@@ -236,7 +236,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[136 — Implement Scout Rejoin Handler](implementation/136-implement-scout-rejoin.md)~~ ✓
 - ~~[137 — Implement Leader Rejoin Handler](implementation/137-implement-leader-rejoin.md)~~ ✓
 - ~~[138 — Wire Rejoin on Page Load](implementation/138-wire-rejoin-on-load.md)~~ ✓
-- [139 — Handle rejoin:state Hydration](implementation/139-handle-rejoin-state.md)
+- ~~[139 — Handle rejoin:state Hydration](implementation/139-handle-rejoin-state.md)~~ ✓
 - [140 — Handle rejoin:error Redirect](implementation/140-handle-rejoin-error.md)
 - [141 — Add Upload Retry Logic](implementation/141-add-upload-retry.md)
 - [142 — Add Upload Failure UI](implementation/142-add-upload-failure-ui.md)

@@ -31,8 +31,8 @@ Listen for the `rejoin:state` socket event and hydrate the entire client-side ga
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

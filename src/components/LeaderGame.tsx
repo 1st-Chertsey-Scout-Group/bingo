@@ -14,7 +14,14 @@ import {
   clearTeamIdFromSession,
   loadSession,
 } from '@/lib/session'
-import type { RoundItem, SubmissionForReview, Team, TeamSummary } from '@/types'
+import type {
+  GameState,
+  RoundItem,
+  SubmissionForReview,
+  SubmissionStatus,
+  Team,
+  TeamSummary,
+} from '@/types'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -146,6 +153,20 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       }
     }
 
+    const handleRejoinState = (
+      payload: Omit<GameState, 'mySubmissions'> & {
+        mySubmissions: Array<[string, string]>
+      },
+    ) => {
+      const fullState: GameState = {
+        ...payload,
+        mySubmissions: new Map(
+          payload.mySubmissions.map(([k, v]) => [k, v as SubmissionStatus]),
+        ),
+      }
+      dispatch({ type: 'FULL_STATE', state: fullState })
+    }
+
     const handleRejoinError = () => {
       clearSession()
       // Fall back to normal join
@@ -164,6 +185,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.on('square:claimed', handleSquareClaimed)
     socket.on('game:ended', handleGameEnded)
     socket.on('game:lobby', handleGameLobby)
+    socket.on('rejoin:state', handleRejoinState)
     socket.on('rejoin:error', handleRejoinError)
 
     return () => {
@@ -177,6 +199,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       socket.off('square:claimed', handleSquareClaimed)
       socket.off('game:ended', handleGameEnded)
       socket.off('game:lobby', handleGameLobby)
+      socket.off('rejoin:state', handleRejoinState)
       socket.off('rejoin:error', handleRejoinError)
     }
   }, [socket, dispatch, gamePin, leaderPin])
