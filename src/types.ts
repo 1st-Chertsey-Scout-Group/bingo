@@ -24,7 +24,7 @@ export type TeamSummary = {
 }
 
 export type SubmissionForReview = {
-  id: string
+  submissionId: string
   roundItemId: string
   displayName: string
   photoUrl: string

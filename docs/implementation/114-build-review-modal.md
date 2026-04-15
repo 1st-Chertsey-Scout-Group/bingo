@@ -26,8 +26,8 @@ Create the ReviewModal component that overlays the leader's board, showing the s
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
