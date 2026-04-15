@@ -1,5 +1,6 @@
 'use client'
 
+import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 
@@ -11,21 +12,30 @@ type ValidateResponse =
   | { valid: false }
   | { valid: true; role: 'scout' | 'leader'; gameId: string }
 
+type Phase = 'pin' | 'leader-name'
+
 export default function LandingPage() {
   const router = useRouter()
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [leaderData, setLeaderData] = useState<{
-    gameId: string
-    pin: string
-  } | null>(null)
+  const [phase, setPhase] = useState<Phase>('pin')
+  const [validatedPin, setValidatedPin] = useState('')
+  const [gameId, setGameId] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handlePinChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value.replace(/\D/g, '')
     setPin(value)
     if (error) setError('')
+  }
+
+  function handleBackToPin() {
+    setPhase('pin')
+    setValidatedPin('')
+    setGameId('')
+    setPin('')
+    setError('')
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -64,7 +74,9 @@ export default function LandingPage() {
       }
 
       if (data.role === 'leader') {
-        setLeaderData({ gameId: data.gameId, pin })
+        setValidatedPin(pin)
+        setGameId(data.gameId)
+        setPhase('leader-name')
       }
     } catch {
       setError('Something went wrong. Please try again.')
@@ -80,37 +92,58 @@ export default function LandingPage() {
           <h1 className="text-foreground text-4xl font-bold tracking-tight">
             Scout Bingo
           </h1>
-          <p className="text-muted-foreground">Enter your game PIN to join</p>
+          <p className="text-muted-foreground">
+            {phase === 'pin'
+              ? 'Enter your game PIN to join'
+              : 'Enter your name to continue as leader'}
+          </p>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <Input
-              ref={inputRef}
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={4}
-              value={pin}
-              onChange={handlePinChange}
-              placeholder="0000"
-              disabled={loading}
-              autoFocus
-              className="h-14 text-center text-3xl font-bold tracking-[0.5em]"
-              aria-label="Game PIN"
-            />
-            <Button
-              type="submit"
-              disabled={pin.length < 4 || loading}
-              className="h-12 w-full text-lg font-semibold"
-            >
-              {loading ? 'Joining...' : 'Join'}
-            </Button>
-            {error && (
-              <p className="text-destructive text-center text-sm font-medium">
-                {error}
+          {phase === 'pin' ? (
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <Input
+                ref={inputRef}
+                type="text"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
+                value={pin}
+                onChange={handlePinChange}
+                placeholder="0000"
+                disabled={loading}
+                autoFocus
+                className="h-14 text-center text-3xl font-bold tracking-[0.5em]"
+                aria-label="Game PIN"
+              />
+              <Button
+                type="submit"
+                disabled={pin.length < 4 || loading}
+                className="h-12 w-full text-lg font-semibold"
+              >
+                {loading ? 'Joining...' : 'Join'}
+              </Button>
+              {error && (
+                <p className="text-destructive text-center text-sm font-medium">
+                  {error}
+                </p>
+              )}
+            </form>
+          ) : (
+            <div className="flex flex-col gap-4">
+              <p className="text-muted-foreground text-center text-sm">
+                Enter your name to continue as leader
               </p>
-            )}
-          </form>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleBackToPin}
+                className="self-start"
+              >
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back
+              </Button>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
