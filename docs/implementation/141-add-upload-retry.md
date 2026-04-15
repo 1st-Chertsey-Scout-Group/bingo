@@ -24,8 +24,8 @@ Enhance the S3 photo upload flow to automatically retry on failure. In a field w
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
