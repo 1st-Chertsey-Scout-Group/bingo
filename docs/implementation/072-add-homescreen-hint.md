@@ -28,8 +28,8 @@ Add a dismissable "Add to Home Screen" banner to the landing page. This one-time
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

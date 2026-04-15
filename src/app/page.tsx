@@ -1,8 +1,8 @@
 'use client'
 
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -25,6 +25,26 @@ export default function LandingPage() {
   const [leaderName, setLeaderName] = useState('')
   const [nameError, setNameError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
+  const [showHint, setShowHint] = useState(false)
+
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('homescreen-hint-dismissed') !== 'true') {
+        setShowHint(true)
+      }
+    } catch {
+      // localStorage unavailable — don't show banner
+    }
+  }, [])
+
+  function dismissHint() {
+    setShowHint(false)
+    try {
+      localStorage.setItem('homescreen-hint-dismissed', 'true')
+    } catch {
+      // localStorage unavailable — already hidden via state
+    }
+  }
 
   function handlePinChange(e: React.ChangeEvent<HTMLInputElement>) {
     const value = e.target.value.replace(/\D/g, '')
@@ -122,6 +142,21 @@ export default function LandingPage() {
 
   return (
     <div className="bg-background flex min-h-screen flex-col items-center justify-center p-4">
+      {showHint && (
+        <div className="bg-muted/50 mb-4 flex w-full max-w-sm items-center justify-between rounded-md border px-4 py-2">
+          <p className="text-muted-foreground text-sm">
+            Add to Home Screen for the best experience
+          </p>
+          <button
+            type="button"
+            onClick={dismissHint}
+            className="text-muted-foreground hover:text-foreground ml-2 shrink-0"
+            aria-label="Dismiss"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center">
           <h1 className="text-foreground text-4xl font-bold tracking-tight">
