@@ -18,8 +18,8 @@ After successfully creating a submission record, emit the `square:pending` event
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

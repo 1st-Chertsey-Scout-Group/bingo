@@ -95,6 +95,8 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           position,
         },
       })
+
+      io.to(`game:${gameId}`).emit('square:pending', { roundItemId })
     },
   )
 
