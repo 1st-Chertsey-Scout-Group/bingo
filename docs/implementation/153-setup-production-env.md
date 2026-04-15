@@ -46,8 +46,8 @@ Configure the production environment variables and deploy the app via Coolify on
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
