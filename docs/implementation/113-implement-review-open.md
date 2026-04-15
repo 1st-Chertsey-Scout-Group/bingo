@@ -21,8 +21,8 @@ Implement the server-side `review:open` handler that locks a square for a leader
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
