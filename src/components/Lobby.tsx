@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import type { Team } from '@/types'
 import { TeamBadge } from '@/components/TeamBadge'
 
@@ -12,6 +13,37 @@ type LobbyProps = {
 }
 
 export function Lobby({ myTeam, teams, role, gamePin, leaderPin }: LobbyProps) {
+  const [isLandscape, setIsLandscape] = useState(false)
+  const [host, setHost] = useState('')
+
+  useEffect(() => {
+    const mql = window.matchMedia('(orientation: landscape)')
+    setIsLandscape(mql.matches)
+    setHost(window.location.host)
+
+    const handler = (e: MediaQueryListEvent) => {
+      setIsLandscape(e.matches)
+    }
+    mql.addEventListener('change', handler)
+    return () => mql.removeEventListener('change', handler)
+  }, [])
+  if (isLandscape && role === 'leader') {
+    return (
+      <div
+        className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white"
+        onClick={() => setIsLandscape(false)}
+      >
+        <p className="text-4xl font-bold">{host}</p>
+        <p className="font-mono text-[20vw] leading-none font-bold">
+          {gamePin}
+        </p>
+        <p className="text-muted-foreground text-sm">
+          Rotate to portrait to return
+        </p>
+      </div>
+    )
+  }
+
   if (role === 'scout') {
     return (
       <div className="flex flex-col items-center gap-6 p-4">

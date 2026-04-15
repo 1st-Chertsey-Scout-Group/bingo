@@ -25,8 +25,8 @@ Add a fullscreen landscape PIN display to the leader lobby so the leader can hol
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
