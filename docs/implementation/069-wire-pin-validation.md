@@ -26,8 +26,8 @@ Connect the landing page PIN form to the POST /api/validate endpoint. Handle sco
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

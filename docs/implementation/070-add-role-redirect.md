@@ -24,8 +24,8 @@ When a leader PIN is validated, transition the form to collect the leader's disp
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
