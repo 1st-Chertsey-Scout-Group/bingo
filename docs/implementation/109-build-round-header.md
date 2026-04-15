@@ -20,8 +20,8 @@ Create the RoundHeader component that sits fixed at the top of the leader's boar
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

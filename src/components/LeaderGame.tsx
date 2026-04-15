@@ -3,6 +3,7 @@
 import { useCallback, useEffect } from 'react'
 import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
+import { RoundHeader } from '@/components/RoundHeader'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 import type { RoundItem, Team } from '@/types'
@@ -85,6 +86,11 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     [socket],
   )
 
+  const handleEndRound = useCallback(() => {
+    if (!socket) return
+    socket.emit('game:end', {})
+  }, [socket])
+
   switch (state.status) {
     case 'lobby':
       return (
@@ -100,6 +106,11 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     case 'active':
       return (
         <div className="flex h-[calc(100dvh)] flex-col">
+          <RoundHeader
+            roundStartedAt={state.roundStartedAt ?? new Date().toISOString()}
+            board={state.board}
+            onEndRound={handleEndRound}
+          />
           <Board
             items={state.board}
             role="leader"
