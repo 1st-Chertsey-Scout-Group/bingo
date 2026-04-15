@@ -26,8 +26,8 @@ Register the service worker from the app layout so the browser installs it on fi
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

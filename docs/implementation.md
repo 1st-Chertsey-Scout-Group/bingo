@@ -247,7 +247,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 ## Phase 22: PWA Service Worker (146–148)
 
 - ~~[146 — Create Service Worker](implementation/146-create-service-worker.md)~~ ✓
-- [147 — Register Service Worker](implementation/147-register-service-worker.md)
+- ~~[147 — Register Service Worker](implementation/147-register-service-worker.md)~~ ✓
 - [148 — Create PWA Icons](implementation/148-create-pwa-icons.md)
 
 ## Phase 23: Docker & Deployment (149–153)
