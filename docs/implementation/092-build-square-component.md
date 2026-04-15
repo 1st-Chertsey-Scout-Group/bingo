@@ -31,8 +31,8 @@ Create the Square component that renders a single bingo board cell. This step es
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
