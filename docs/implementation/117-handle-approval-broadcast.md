@@ -19,8 +19,8 @@ After the approval transaction succeeds, broadcast the result to all relevant so
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

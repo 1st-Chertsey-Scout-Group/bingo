@@ -323,6 +323,67 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         io.to(`leaders:${gameId}`).emit('square:unlocked', {
           roundItemId: result.roundItemId,
         })
+
+        // Discard all other pending submissions for this round item
+        const competingSubmissions = await prisma.submission.findMany({
+          where: {
+            roundItemId: result.roundItemId,
+            status: 'pending',
+          },
+        })
+
+        for (const sub of competingSubmissions) {
+          await prisma.submission.update({
+            where: { id: sub.id },
+            data: { status: 'discarded' },
+          })
+          io.to(`team:${sub.teamId}`).emit('submission:discarded', {
+            roundItemId: result.roundItemId,
+            reason: 'already_claimed',
+          })
+        }
+
+        // Auto-end check: if all squares are claimed, end the game
+        const game = await prisma.game.findUnique({ where: { id: gameId } })
+        if (game && game.status === 'active') {
+          const unclaimedCount = await prisma.roundItem.count({
+            where: {
+              gameId,
+              round: game.round,
+              claimedByTeamId: null,
+            },
+          })
+
+          if (unclaimedCount === 0) {
+            await prisma.game.update({
+              where: { id: gameId },
+              data: { status: 'ended' },
+            })
+
+            const teams = await prisma.team.findMany({
+              where: { gameId, round: game.round },
+              orderBy: { createdAt: 'asc' },
+            })
+
+            const roundItems = await prisma.roundItem.findMany({
+              where: { gameId, round: game.round },
+              select: { claimedByTeamId: true },
+            })
+
+            const summary = teams
+              .map((t) => ({
+                teamId: t.id,
+                teamName: t.name,
+                teamColour: t.colour,
+                claimedCount: roundItems.filter(
+                  (ri) => ri.claimedByTeamId === t.id,
+                ).length,
+              }))
+              .sort((a, b) => b.claimedCount - a.claimedCount)
+
+            io.to(`game:${gameId}`).emit('game:ended', { summary })
+          }
+        }
       }
     },
   )
