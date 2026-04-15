@@ -116,6 +116,20 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       dispatch({ type: 'GAME_ENDED', summary: payload.summary })
     }
 
+    const handleGameLobby = () => {
+      try {
+        const session = localStorage.getItem('scout-bingo-session')
+        if (session) {
+          const parsed = JSON.parse(session) as Record<string, unknown>
+          delete parsed.teamId
+          localStorage.setItem('scout-bingo-session', JSON.stringify(parsed))
+        }
+      } catch {
+        // localStorage unavailable
+      }
+      dispatch({ type: 'GAME_LOBBY' })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -125,6 +139,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.on('square:unlocked', handleSquareUnlocked)
     socket.on('square:claimed', handleSquareClaimed)
     socket.on('game:ended', handleGameEnded)
+    socket.on('game:lobby', handleGameLobby)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -136,6 +151,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       socket.off('square:unlocked', handleSquareUnlocked)
       socket.off('square:claimed', handleSquareClaimed)
       socket.off('game:ended', handleGameEnded)
+      socket.off('game:lobby', handleGameLobby)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 

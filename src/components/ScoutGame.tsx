@@ -125,6 +125,20 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       dispatch({ type: 'GAME_ENDED', summary: payload.summary })
     }
 
+    const handleGameLobby = () => {
+      try {
+        const session = localStorage.getItem('scout-bingo-session')
+        if (session) {
+          const parsed = JSON.parse(session) as Record<string, unknown>
+          delete parsed.teamId
+          localStorage.setItem('scout-bingo-session', JSON.stringify(parsed))
+        }
+      } catch {
+        // localStorage unavailable
+      }
+      dispatch({ type: 'GAME_LOBBY' })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -135,6 +149,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket.on('submission:rejected', handleSubmissionRejected)
     socket.on('submission:discarded', handleSubmissionDiscarded)
     socket.on('game:ended', handleGameEnded)
+    socket.on('game:lobby', handleGameLobby)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -147,6 +162,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.off('submission:rejected', handleSubmissionRejected)
       socket.off('submission:discarded', handleSubmissionDiscarded)
       socket.off('game:ended', handleGameEnded)
+      socket.off('game:lobby', handleGameLobby)
     }
   }, [socket, dispatch])
 

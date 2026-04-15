@@ -19,8 +19,8 @@ When clients receive the `game:lobby` event, clear the stored teamId from localS
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
