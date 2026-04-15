@@ -36,8 +36,8 @@ Create a hand-written service worker that caches the app shell (HTML, CSS, JS bu
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
