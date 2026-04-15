@@ -1,6 +1,12 @@
 'use client'
 
-import { type ChangeEvent, useCallback, useEffect, useRef } from 'react'
+import {
+  type ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 import { toast } from 'sonner'
 
 import { Board } from '@/components/Board'
@@ -137,15 +143,26 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     [gameId, state.myTeam?.id, socket, dispatch],
   )
 
+  const pendingItems = useMemo(
+    () =>
+      new Set(
+        [...state.mySubmissions.entries()]
+          .filter(([, status]) => status === 'pending')
+          .map(([roundItemId]) => roundItemId),
+      ),
+    [state.mySubmissions],
+  )
+
   const handleSquareTap = useCallback(
     (roundItemId: string) => {
       const item = state.board.find((i) => i.roundItemId === roundItemId)
       if (!item) return
       if (item.claimedByTeamId !== null) return
+      if (pendingItems.has(roundItemId)) return
       pendingRoundItemIdRef.current = roundItemId
       fileInputRef.current?.click()
     },
-    [state.board],
+    [state.board, pendingItems],
   )
 
   switch (state.status) {
@@ -166,6 +183,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
             items={state.board}
             role="scout"
             myTeamId={state.myTeam?.id ?? null}
+            pendingItems={pendingItems}
             onSquareTap={handleSquareTap}
           />
         </div>

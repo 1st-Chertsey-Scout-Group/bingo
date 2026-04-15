@@ -39,8 +39,8 @@ Show a visual indicator on squares where the scout has submitted a photo that is
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

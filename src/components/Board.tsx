@@ -7,10 +7,17 @@ type BoardProps = {
   items: RoundItem[]
   role: 'scout' | 'leader'
   myTeamId: string | null
+  pendingItems?: Set<string>
   onSquareTap: (roundItemId: string) => void
 }
 
-export function Board({ items, role, myTeamId, onSquareTap }: BoardProps) {
+export function Board({
+  items,
+  role,
+  myTeamId,
+  pendingItems,
+  onSquareTap,
+}: BoardProps) {
   return (
     <div className="grid flex-1 grid-cols-3 gap-2 overflow-y-auto p-2">
       {items.map((item) => (
@@ -19,6 +26,7 @@ export function Board({ items, role, myTeamId, onSquareTap }: BoardProps) {
           roundItem={item}
           role={role}
           isOwnTeam={item.claimedByTeamId === myTeamId}
+          isPending={pendingItems?.has(item.roundItemId) ?? false}
           onTap={() => onSquareTap(item.roundItemId)}
         />
       ))}

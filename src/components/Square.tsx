@@ -9,6 +9,7 @@ type SquareProps = {
   roundItem: RoundItem
   role: 'scout' | 'leader'
   isOwnTeam: boolean
+  isPending?: boolean
   onTap: () => void
 }
 
@@ -18,6 +19,9 @@ const baseClasses =
 const unclaimedClasses =
   'bg-white border border-gray-200 text-gray-900 active:bg-gray-50 cursor-pointer'
 
+const pendingClasses =
+  'bg-amber-50 border-2 border-dashed border-amber-400 text-gray-900 animate-pulse cursor-default pointer-events-none'
+
 const claimedClasses = 'border-0 text-white cursor-default'
 
 function getTeamAbbreviation(name: string): string {
@@ -26,7 +30,12 @@ function getTeamAbbreviation(name: string): string {
   return `${parts[0]} ${parts[1][0]}.`
 }
 
-export function Square({ roundItem, isOwnTeam, onTap }: SquareProps) {
+export function Square({
+  roundItem,
+  isOwnTeam,
+  isPending = false,
+  onTap,
+}: SquareProps) {
   const isUnclaimed = roundItem.claimedByTeamId === null
   const isClaimed = !isUnclaimed
   const isOwnTeamClaimed = isOwnTeam && isClaimed
@@ -37,7 +46,8 @@ export function Square({ roundItem, isOwnTeam, onTap }: SquareProps) {
       onClick={onTap}
       className={cn(
         baseClasses,
-        isUnclaimed && unclaimedClasses,
+        isUnclaimed && !isPending && unclaimedClasses,
+        isUnclaimed && isPending && pendingClasses,
         isClaimed && claimedClasses,
       )}
       style={
