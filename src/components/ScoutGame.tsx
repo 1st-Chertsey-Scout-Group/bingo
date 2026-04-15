@@ -137,6 +137,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
         // localStorage unavailable
       }
       dispatch({ type: 'GAME_LOBBY' })
+      // Re-join lobby for fresh team assignment
+      if (gamePin) {
+        socket.emit('lobby:join', { gamePin })
+      }
     }
 
     socket.on('lobby:joined', handleLobbyJoined)

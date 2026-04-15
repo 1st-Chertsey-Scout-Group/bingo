@@ -26,8 +26,8 @@ When the `GAME_LOBBY` reducer action fires, reset all game state so components r
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

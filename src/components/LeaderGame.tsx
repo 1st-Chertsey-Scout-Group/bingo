@@ -128,6 +128,10 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
         // localStorage unavailable
       }
       dispatch({ type: 'GAME_LOBBY' })
+      // Re-join lobby
+      if (leaderName) {
+        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
+      }
     }
 
     socket.on('lobby:joined', handleLobbyJoined)

@@ -139,10 +139,7 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       }
 
     case 'GAME_LOBBY':
-      return {
-        ...initialState,
-        teams: state.teams,
-      }
+      return { ...initialState }
 
     case 'LOBBY_JOINED':
       return {
