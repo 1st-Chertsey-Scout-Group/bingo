@@ -22,8 +22,8 @@ Update the Socket.IO client configuration to enable aggressive reconnection with
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

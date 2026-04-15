@@ -230,7 +230,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 21: Resilience & Error Handling (133–145)
 
-- [133 — Configure Socket.IO Reconnection](implementation/133-configure-socket-reconnection.md)
+- ~~[133 — Configure Socket.IO Reconnection](implementation/133-configure-socket-reconnection.md)~~ ✓
 - [134 — Build Connection Status Banner](implementation/134-build-connection-banner.md)
 - [135 — Add localStorage Session Caching](implementation/135-add-localstorage-caching.md)
 - [136 — Implement Scout Rejoin Handler](implementation/136-implement-scout-rejoin.md)

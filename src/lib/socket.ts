@@ -6,7 +6,12 @@ export const getSocket = (): Socket | null => {
   if (typeof window === 'undefined') return null
 
   if (!socket) {
-    socket = io(window.location.origin)
+    socket = io(window.location.origin, {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 10000,
+    })
   }
 
   return socket
