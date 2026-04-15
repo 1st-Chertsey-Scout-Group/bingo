@@ -214,9 +214,45 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     },
   )
 
-  socket.on('review:close', () => {
-    // TODO: unlock submission
-  })
+  socket.on(
+    'review:close',
+    async (payload: { roundItemId: string } | undefined) => {
+      const roundItemId = payload?.roundItemId
+      if (typeof roundItemId !== 'string' || roundItemId.trim() === '') {
+        socket.emit('error', { message: 'roundItemId is required' })
+        return
+      }
+
+      const gameId = getGameIdFromSocket(socket)
+      const leaderName = socket.data.leaderName as string | undefined
+
+      if (!gameId || !leaderName) {
+        socket.emit('error', { message: 'Not connected as a leader' })
+        return
+      }
+
+      const roundItem = await prisma.roundItem.findUnique({
+        where: { id: roundItemId },
+      })
+
+      if (!roundItem) {
+        socket.emit('error', { message: 'Round item not found' })
+        return
+      }
+
+      if (roundItem.lockedByLeader !== leaderName) {
+        socket.emit('error', { message: 'You do not hold the lock' })
+        return
+      }
+
+      await prisma.roundItem.update({
+        where: { id: roundItemId },
+        data: { lockedByLeader: null, lockedAt: null },
+      })
+
+      io.to(`leaders:${gameId}`).emit('square:unlocked', { roundItemId })
+    },
+  )
 
   socket.on(
     'review:approve',

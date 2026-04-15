@@ -18,8 +18,8 @@ Implement the server-side `review:close` handler that releases a leader's lock o
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
