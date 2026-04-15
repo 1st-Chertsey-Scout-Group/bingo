@@ -187,7 +187,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 16: Submission Processing — Server (105–107)
 
-- [105 — Implement submission:submit Handler](implementation/105-implement-submission-handler.md)
+- ~~[105 — Implement submission:submit Handler](implementation/105-implement-submission-handler.md)~~ ✓
 - [106 — Emit square:pending to Game Room](implementation/106-emit-square-pending.md)
 - [107 — Emit submission:received to Team Room](implementation/107-emit-submission-received.md)
 

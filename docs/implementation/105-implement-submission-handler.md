@@ -21,8 +21,8 @@ Implement the `submission:submit` socket event handler in the server. This is th
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
