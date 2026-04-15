@@ -31,8 +31,8 @@ Add the server-side `rejoin` handler for leaders so they can reconnect after a p
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
