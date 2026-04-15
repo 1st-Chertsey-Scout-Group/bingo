@@ -216,7 +216,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 ## Phase 19: Round End (124–128)
 
 - ~~[124 — Implement game:end Handler](implementation/124-implement-game-end.md)~~ ✓
-- [125 — Emit game:ended with Summaries](implementation/125-emit-game-ended.md)
+- ~~[125 — Emit game:ended with Summaries](implementation/125-emit-game-ended.md)~~ ✓
 - [126 — Add Auto-End When All Squares Claimed](implementation/126-add-auto-end-all-claimed.md)
 - [127 — Build Scout Round Over Overlay](implementation/127-build-scout-round-over.md)
 - [128 — Build Leader Round Summary Screen](implementation/128-build-leader-summary.md)

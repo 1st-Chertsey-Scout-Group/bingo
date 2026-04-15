@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
+import { endGame } from '@/server/socket/game'
 
 function getTeamIdFromSocket(socket: Socket): string | undefined {
   for (const room of socket.rooms) {
@@ -391,33 +392,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           })
 
           if (unclaimedCount === 0) {
-            await prisma.game.update({
-              where: { id: gameId },
-              data: { status: 'ended' },
-            })
-
-            const teams = await prisma.team.findMany({
-              where: { gameId, round: game.round },
-              orderBy: { createdAt: 'asc' },
-            })
-
-            const roundItems = await prisma.roundItem.findMany({
-              where: { gameId, round: game.round },
-              select: { claimedByTeamId: true },
-            })
-
-            const summary = teams
-              .map((t) => ({
-                teamId: t.id,
-                teamName: t.name,
-                teamColour: t.colour,
-                claimedCount: roundItems.filter(
-                  (ri) => ri.claimedByTeamId === t.id,
-                ).length,
-              }))
-              .sort((a, b) => b.claimedCount - a.claimedCount)
-
-            io.to(`game:${gameId}`).emit('game:ended', { summary })
+            await endGame(io, gameId, game.round)
           }
         }
       }

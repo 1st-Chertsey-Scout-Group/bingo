@@ -2,6 +2,39 @@ import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
 import { generateBoard } from '@/lib/game-logic'
 
+export async function endGame(
+  io: Server,
+  gameId: string,
+  round: number,
+): Promise<void> {
+  await prisma.game.update({
+    where: { id: gameId },
+    data: { status: 'ended' },
+  })
+
+  const teams = await prisma.team.findMany({
+    where: { gameId, round },
+    orderBy: { createdAt: 'asc' },
+  })
+
+  const roundItems = await prisma.roundItem.findMany({
+    where: { gameId, round },
+    select: { claimedByTeamId: true },
+  })
+
+  const summary = teams
+    .map((t) => ({
+      teamId: t.id,
+      teamName: t.name,
+      teamColour: t.colour,
+      claimedCount: roundItems.filter((ri) => ri.claimedByTeamId === t.id)
+        .length,
+    }))
+    .sort((a, b) => b.claimedCount - a.claimedCount)
+
+  io.to(`game:${gameId}`).emit('game:ended', { summary })
+}
+
 export function registerGameHandlers(io: Server, socket: Socket): void {
   socket.on('game:start', async () => {
     const gameId = socket.data.gameId as string | undefined
@@ -121,32 +154,7 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
       return
     }
 
-    await prisma.game.update({
-      where: { id: gameId },
-      data: { status: 'ended' },
-    })
-
-    const teams = await prisma.team.findMany({
-      where: { gameId, round: game.round },
-      orderBy: { createdAt: 'asc' },
-    })
-
-    const roundItems = await prisma.roundItem.findMany({
-      where: { gameId, round: game.round },
-      select: { claimedByTeamId: true },
-    })
-
-    const summary = teams
-      .map((t) => ({
-        teamId: t.id,
-        teamName: t.name,
-        teamColour: t.colour,
-        claimedCount: roundItems.filter((ri) => ri.claimedByTeamId === t.id)
-          .length,
-      }))
-      .sort((a, b) => b.claimedCount - a.claimedCount)
-
-    io.to(`game:${gameId}`).emit('game:ended', { summary })
+    await endGame(io, gameId, game.round)
   })
 
   socket.on('game:newround', () => {

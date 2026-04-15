@@ -19,8 +19,8 @@ After calculating team summaries in the game:end handler, emit the `game:ended` 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
