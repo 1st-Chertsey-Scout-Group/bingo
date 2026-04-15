@@ -252,7 +252,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 23: Docker & Deployment (149–153)
 
-- [149 — Create Dockerfile](implementation/149-create-dockerfile.md)
+- ~~[149 — Create Dockerfile](implementation/149-create-dockerfile.md)~~ ✓
 - [150 — Create docker-compose.yml](implementation/150-create-docker-compose.md)
 - [151 — Create docker-entrypoint.sh](implementation/151-create-docker-entrypoint.md)
 - [152 — Configure S3 Bucket Lifecycle Rule](implementation/152-configure-s3-lifecycle.md)

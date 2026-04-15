@@ -58,8 +58,8 @@ CMD ["node", "dist/server.js"]
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
