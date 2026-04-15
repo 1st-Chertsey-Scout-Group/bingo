@@ -23,8 +23,8 @@ When the game ends, scouts see an overlay on top of their board with a friendly 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

@@ -14,7 +14,7 @@ import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 import { compressImage } from '@/lib/image'
-import type { RoundItem, Team } from '@/types'
+import type { RoundItem, Team, TeamSummary } from '@/types'
 
 function ScoutGameInner({ gameId }: { gameId: string }) {
   const socket = useSocket()
@@ -121,6 +121,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       })
     }
 
+    const handleGameEnded = (payload: { summary: TeamSummary[] }) => {
+      dispatch({ type: 'GAME_ENDED', summary: payload.summary })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -130,6 +134,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket.on('submission:approved', handleSubmissionApproved)
     socket.on('submission:rejected', handleSubmissionRejected)
     socket.on('submission:discarded', handleSubmissionDiscarded)
+    socket.on('game:ended', handleGameEnded)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -141,6 +146,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.off('submission:approved', handleSubmissionApproved)
       socket.off('submission:rejected', handleSubmissionRejected)
       socket.off('submission:discarded', handleSubmissionDiscarded)
+      socket.off('game:ended', handleGameEnded)
     }
   }, [socket, dispatch])
 
@@ -252,8 +258,29 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
           />
         </div>
       )
-    case 'ended':
-      return <div>Round over</div>
+    case 'ended': {
+      const myScore =
+        state.summary?.find((t) => t.teamId === state.myTeam?.id)
+          ?.claimedCount ?? 0
+      return (
+        <div className="relative flex h-[calc(100dvh)] flex-col">
+          <Board
+            items={state.board}
+            role="scout"
+            myTeamId={state.myTeam?.id ?? null}
+            onSquareTap={() => {}}
+          />
+          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/60">
+            <h1 className="mb-4 text-center text-3xl font-bold text-white">
+              Head back to base!
+            </h1>
+            <p className="text-center text-lg text-white/90">
+              Your team claimed {myScore} {myScore === 1 ? 'square' : 'squares'}
+            </p>
+          </div>
+        </div>
+      )
+    }
     default:
       return <div>Loading...</div>
   }
