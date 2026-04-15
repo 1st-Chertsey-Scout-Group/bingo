@@ -54,6 +54,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
     await socket.join(`team:${team.id}`)
 
     socket.emit('lobby:joined', {
+      gameId: game.id,
       teamId: team.id,
       teamName: team.name,
       teamColour: team.colour,

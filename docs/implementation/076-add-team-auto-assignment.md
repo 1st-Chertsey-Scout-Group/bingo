@@ -22,8 +22,8 @@ When a scout joins via `lobby:join`, automatically assign them to the next avail
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
