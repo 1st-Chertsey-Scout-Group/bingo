@@ -218,9 +218,114 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     // TODO: unlock submission
   })
 
-  socket.on('review:approve', () => {
-    // TODO: mark approved, update board, notify team
-  })
+  socket.on(
+    'review:approve',
+    async (payload: { submissionId: string } | undefined) => {
+      const submissionId = payload?.submissionId
+      if (typeof submissionId !== 'string' || submissionId.trim() === '') {
+        socket.emit('error', { message: 'submissionId is required' })
+        return
+      }
+
+      const gameId = getGameIdFromSocket(socket)
+      const leaderName = socket.data.leaderName as string | undefined
+
+      if (!gameId || !leaderName) {
+        socket.emit('error', { message: 'Not connected as a leader' })
+        return
+      }
+
+      const result = await prisma.$transaction(async (tx) => {
+        const submission = await tx.submission.findUnique({
+          where: { id: submissionId },
+          include: { roundItem: true, team: true },
+        })
+
+        if (!submission) {
+          return { error: 'Submission not found' } as const
+        }
+
+        // Re-check claim status inside the transaction
+        const roundItem = await tx.roundItem.findUnique({
+          where: { id: submission.roundItemId },
+        })
+
+        if (!roundItem) {
+          return { error: 'Round item not found' } as const
+        }
+
+        if (roundItem.claimedByTeamId !== null) {
+          // Race lost: square already claimed
+          await tx.submission.update({
+            where: { id: submissionId },
+            data: { status: 'discarded' },
+          })
+          return {
+            discarded: true,
+            roundItemId: roundItem.id,
+            teamId: submission.teamId,
+          } as const
+        }
+
+        // Claim the square
+        await tx.roundItem.update({
+          where: { id: roundItem.id },
+          data: {
+            claimedByTeamId: submission.teamId,
+            lockedByLeader: null,
+            lockedAt: null,
+          },
+        })
+
+        // Approve the submission
+        await tx.submission.update({
+          where: { id: submissionId },
+          data: { status: 'approved', reviewedBy: leaderName },
+        })
+
+        return {
+          approved: true,
+          roundItemId: roundItem.id,
+          teamId: submission.teamId,
+          teamName: submission.team.name,
+          teamColour: submission.team.colour,
+        } as const
+      })
+
+      if ('error' in result) {
+        socket.emit('error', { message: result.error })
+        return
+      }
+
+      if ('discarded' in result) {
+        io.to(`team:${result.teamId}`).emit('submission:discarded', {
+          roundItemId: result.roundItemId,
+          reason: 'already_claimed',
+        })
+        return
+      }
+
+      if ('approved' in result) {
+        // Broadcast square:claimed to all clients
+        io.to(`game:${gameId}`).emit('square:claimed', {
+          roundItemId: result.roundItemId,
+          teamId: result.teamId,
+          teamName: result.teamName,
+          teamColour: result.teamColour,
+        })
+
+        // Notify the team
+        io.to(`team:${result.teamId}`).emit('submission:approved', {
+          roundItemId: result.roundItemId,
+        })
+
+        // Notify leaders that the lock is released
+        io.to(`leaders:${gameId}`).emit('square:unlocked', {
+          roundItemId: result.roundItemId,
+        })
+      }
+    },
+  )
 
   socket.on('review:reject', () => {
     // TODO: mark rejected, notify team

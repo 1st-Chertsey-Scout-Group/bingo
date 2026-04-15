@@ -21,8 +21,8 @@ Implement the server-side `review:approve` handler that claims a square for the 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
