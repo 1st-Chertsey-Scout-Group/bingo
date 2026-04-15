@@ -21,8 +21,8 @@ Handle the edge case where a scout tries to rejoin between rounds. When the game
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

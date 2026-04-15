@@ -185,6 +185,13 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
 
       if (!isLeader) {
         // Scout rejoin
+        if (game.status === 'lobby') {
+          socket.emit('rejoin:error', {
+            message: 'Round has ended — please rejoin',
+          })
+          return
+        }
+
         const teamId = payload?.teamId
         if (typeof teamId !== 'string' || teamId.trim() === '') {
           socket.emit('rejoin:error', { message: 'teamId is required' })
