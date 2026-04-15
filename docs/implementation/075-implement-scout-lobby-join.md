@@ -33,8 +33,8 @@ Implement the lobby:join socket handler that assigns a scout to a team when they
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
