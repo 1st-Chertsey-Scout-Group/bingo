@@ -25,8 +25,8 @@ Create the required PWA icon files so the app is installable on mobile devices. 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
