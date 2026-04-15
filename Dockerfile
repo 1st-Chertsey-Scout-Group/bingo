@@ -1,13 +1,13 @@
-FROM node:22-alpine AS builder
+FROM node:24-alpine AS builder
 RUN apk add --no-cache python3 make g++
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --loglevel verbose 2>&1 || (cat /root/.npm/_logs/*.log 2>/dev/null; exit 1)
 COPY . .
 RUN npx prisma generate
 RUN npm run build
 
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 WORKDIR /app
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/dist ./dist
