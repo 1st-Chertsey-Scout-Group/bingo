@@ -23,8 +23,8 @@ Add leader-specific handling to the `lobby:join` socket event. Leaders authentic
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
