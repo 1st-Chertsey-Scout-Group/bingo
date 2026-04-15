@@ -28,8 +28,8 @@ Add the "Start Round" button to the leader lobby. The button is only enabled whe
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

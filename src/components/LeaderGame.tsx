@@ -1,5 +1,6 @@
 'use client'
 
+import { useCallback } from 'react'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
@@ -13,6 +14,11 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
   const socket = useSocket()
   const { state } = useGame()
 
+  const handleStartRound = useCallback(() => {
+    if (!socket) return
+    socket.emit('game:start', {})
+  }, [socket])
+
   switch (state.status) {
     case 'lobby':
       return (
@@ -22,6 +28,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
           teams={state.teams}
           gamePin={gamePin}
           leaderPin={leaderPin}
+          onStartRound={handleStartRound}
         />
       )
     case 'active':

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import type { Team } from '@/types'
+import { Button } from '@/components/ui/button'
 import { TeamBadge } from '@/components/TeamBadge'
 
 type LobbyProps = {
@@ -10,9 +11,17 @@ type LobbyProps = {
   role: 'scout' | 'leader'
   gamePin?: string
   leaderPin?: string
+  onStartRound?: () => void
 }
 
-export function Lobby({ myTeam, teams, role, gamePin, leaderPin }: LobbyProps) {
+export function Lobby({
+  myTeam,
+  teams,
+  role,
+  gamePin,
+  leaderPin,
+  onStartRound,
+}: LobbyProps) {
   const [isLandscape, setIsLandscape] = useState(false)
   const [host, setHost] = useState('')
 
@@ -98,7 +107,19 @@ export function Lobby({ myTeam, teams, role, gamePin, leaderPin }: LobbyProps) {
         )}
       </div>
 
-      <div id="start-round-slot" />
+      <Button
+        size="lg"
+        className="mt-6 h-14 w-full text-lg"
+        disabled={teams.length < 2}
+        onClick={onStartRound}
+      >
+        Start Round
+      </Button>
+      {teams.length < 2 && (
+        <p className="text-muted-foreground text-sm">
+          Need at least 2 teams to start
+        </p>
+      )}
     </div>
   )
 }
