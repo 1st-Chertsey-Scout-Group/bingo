@@ -1,14 +1,25 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 
+type ValidateResponse =
+  | { valid: false }
+  | { valid: true; role: 'scout' | 'leader'; gameId: string }
+
 export default function LandingPage() {
+  const router = useRouter()
   const [pin, setPin] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [leaderData, setLeaderData] = useState<{
+    gameId: string
+    pin: string
+  } | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handlePinChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -17,10 +28,49 @@ export default function LandingPage() {
     if (error) setError('')
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (pin.length < 4) return
-    // TODO: navigate to game with PIN
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/validate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin }),
+      })
+
+      const data: ValidateResponse = await res.json()
+
+      if (!data.valid) {
+        setError('Invalid PIN')
+        setPin('')
+        return
+      }
+
+      if (data.role === 'scout') {
+        localStorage.setItem(
+          'scout-bingo-session',
+          JSON.stringify({
+            gamePin: pin,
+            gameId: data.gameId,
+            role: 'scout',
+          }),
+        )
+        router.push(`/play/${data.gameId}`)
+        return
+      }
+
+      if (data.role === 'leader') {
+        setLeaderData({ gameId: data.gameId, pin })
+      }
+    } catch {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -43,16 +93,17 @@ export default function LandingPage() {
               value={pin}
               onChange={handlePinChange}
               placeholder="0000"
+              disabled={loading}
               autoFocus
               className="h-14 text-center text-3xl font-bold tracking-[0.5em]"
               aria-label="Game PIN"
             />
             <Button
               type="submit"
-              disabled={pin.length < 4}
+              disabled={pin.length < 4 || loading}
               className="h-12 w-full text-lg font-semibold"
             >
-              Join
+              {loading ? 'Joining...' : 'Join'}
             </Button>
             {error && (
               <p className="text-destructive text-center text-sm font-medium">
