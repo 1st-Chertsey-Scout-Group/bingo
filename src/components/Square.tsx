@@ -25,6 +25,9 @@ const pendingClasses =
 const needsReviewClasses =
   'bg-amber-50 border-2 border-amber-500 text-gray-900 animate-pulse-amber cursor-pointer'
 
+const lockedClasses =
+  'bg-gray-100 border border-gray-300 text-gray-400 opacity-60 cursor-default pointer-events-none'
+
 const claimedClasses = 'border-0 text-white cursor-default'
 
 function getTeamAbbreviation(name: string): string {
@@ -44,6 +47,8 @@ export function Square({
   const isClaimed = !isUnclaimed
   const isOwnTeamClaimed = isOwnTeam && isClaimed
   const isOtherTeamClaimed = !isOwnTeam && isClaimed
+  const isLocked =
+    role === 'leader' && isUnclaimed && roundItem.lockedByLeader !== null
   const needsReview =
     role === 'leader' &&
     roundItem.hasPendingSubmissions &&
@@ -55,9 +60,14 @@ export function Square({
       onClick={onTap}
       className={cn(
         baseClasses,
-        isUnclaimed && !isPending && !needsReview && unclaimedClasses,
-        isUnclaimed && isPending && !needsReview && pendingClasses,
+        isUnclaimed &&
+          !isPending &&
+          !needsReview &&
+          !isLocked &&
+          unclaimedClasses,
+        isUnclaimed && isPending && !needsReview && !isLocked && pendingClasses,
         needsReview && needsReviewClasses,
+        isLocked && lockedClasses,
         isClaimed && claimedClasses,
       )}
       style={
@@ -75,6 +85,11 @@ export function Square({
       {isOtherTeamClaimed && roundItem.claimedByTeamName && (
         <span className="absolute right-1 bottom-1 text-[10px] font-bold">
           {getTeamAbbreviation(roundItem.claimedByTeamName)}
+        </span>
+      )}
+      {isLocked && roundItem.lockedByLeader && (
+        <span className="absolute right-1 bottom-1 text-[10px] font-semibold text-gray-400">
+          {roundItem.lockedByLeader}
         </span>
       )}
       <span className="line-clamp-3 break-words">{roundItem.displayName}</span>

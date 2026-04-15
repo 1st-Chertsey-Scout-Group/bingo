@@ -19,8 +19,8 @@ Add visual styling to board squares that are currently locked by a leader for re
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
