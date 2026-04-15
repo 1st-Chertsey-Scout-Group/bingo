@@ -157,7 +157,29 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
     await endGame(io, gameId, game.round)
   })
 
-  socket.on('game:newround', () => {
-    // TODO: generate new board, increment round, emit to game room
+  socket.on('game:newround', async () => {
+    const gameId = socket.data.gameId as string | undefined
+    if (!gameId) {
+      socket.emit('error', { message: 'Not connected to a game' })
+      return
+    }
+
+    if (socket.data.role !== 'leader') {
+      socket.emit('error', { message: 'Only leaders can start a new round' })
+      return
+    }
+
+    const game = await prisma.game.findUnique({ where: { id: gameId } })
+    if (!game || game.status !== 'ended') {
+      socket.emit('error', { message: 'Game is not ended' })
+      return
+    }
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: { status: 'lobby' },
+    })
+
+    io.to(`game:${gameId}`).emit('game:lobby', {})
   })
 }

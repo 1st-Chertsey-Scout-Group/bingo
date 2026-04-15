@@ -223,7 +223,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 20: New Round (129–132)
 
-- [129 — Implement game:newround Handler](implementation/129-implement-game-newround.md)
+- ~~[129 — Implement game:newround Handler](implementation/129-implement-game-newround.md)~~ ✓
 - [130 — Emit game:lobby to All Clients](implementation/130-emit-game-lobby.md)
 - [131 — Clear localStorage teamId on game:lobby](implementation/131-clear-localstorage-teamid.md)
 - [132 — Return All Clients to Lobby View](implementation/132-return-clients-to-lobby.md)

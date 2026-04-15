@@ -18,8 +18,8 @@ Implement the server-side `game:newround` handler that resets the game to lobby 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
