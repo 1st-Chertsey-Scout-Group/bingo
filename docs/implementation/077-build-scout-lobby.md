@@ -30,8 +30,8 @@ Create the scout lobby UI that shows the assigned team identity and a live list 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
