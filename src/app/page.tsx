@@ -22,6 +22,8 @@ export default function LandingPage() {
   const [phase, setPhase] = useState<Phase>('pin')
   const [validatedPin, setValidatedPin] = useState('')
   const [gameId, setGameId] = useState('')
+  const [leaderName, setLeaderName] = useState('')
+  const [nameError, setNameError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
 
   function handlePinChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -36,6 +38,39 @@ export default function LandingPage() {
     setGameId('')
     setPin('')
     setError('')
+    setLeaderName('')
+    setNameError('')
+  }
+
+  function handleLeaderNameChange(e: React.ChangeEvent<HTMLInputElement>) {
+    setLeaderName(e.target.value)
+    if (nameError) setNameError('')
+  }
+
+  function handleLeaderJoin(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = leaderName.trim()
+    if (!trimmed) {
+      setNameError('Please enter your name')
+      return
+    }
+
+    try {
+      localStorage.setItem(
+        'scout-bingo-session',
+        JSON.stringify({
+          gamePin: validatedPin,
+          leaderPin: validatedPin,
+          gameId,
+          leaderName: trimmed,
+          role: 'leader',
+        }),
+      )
+    } catch {
+      // If localStorage write fails, still attempt the redirect
+    }
+
+    router.push(`/leader/${gameId}`)
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -129,11 +164,9 @@ export default function LandingPage() {
               )}
             </form>
           ) : (
-            <div className="flex flex-col gap-4">
-              <p className="text-muted-foreground text-center text-sm">
-                Enter your name to continue as leader
-              </p>
+            <form onSubmit={handleLeaderJoin} className="flex flex-col gap-4">
               <Button
+                type="button"
                 variant="ghost"
                 size="sm"
                 onClick={handleBackToPin}
@@ -142,7 +175,31 @@ export default function LandingPage() {
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back
               </Button>
-            </div>
+              <h2 className="text-foreground text-center text-xl font-semibold">
+                Welcome, Leader
+              </h2>
+              <Input
+                type="text"
+                value={leaderName}
+                onChange={handleLeaderNameChange}
+                placeholder="Your name"
+                autoFocus
+                className="h-14 text-center text-lg"
+                aria-label="Leader display name"
+              />
+              <Button
+                type="submit"
+                disabled={leaderName.trim().length === 0}
+                className="h-12 w-full text-lg font-semibold"
+              >
+                Join as Leader
+              </Button>
+              {nameError && (
+                <p className="text-destructive text-center text-sm font-medium">
+                  {nameError}
+                </p>
+              )}
+            </form>
           )}
         </CardContent>
       </Card>

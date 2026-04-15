@@ -32,8 +32,8 @@ Complete the leader join flow by showing a display name input after PIN validati
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
