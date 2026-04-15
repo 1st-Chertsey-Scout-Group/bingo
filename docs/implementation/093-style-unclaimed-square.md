@@ -29,8 +29,8 @@ Define the visual styling for unclaimed squares — the default state when no te
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
