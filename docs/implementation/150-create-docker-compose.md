@@ -42,8 +42,8 @@ Create a `docker-compose.yml` that defines the single-service deployment with a 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
