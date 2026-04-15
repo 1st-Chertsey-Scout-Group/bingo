@@ -22,8 +22,8 @@ After every successful approval, check if all squares on the board are claimed. 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
