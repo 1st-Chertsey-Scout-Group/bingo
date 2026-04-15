@@ -28,8 +28,8 @@ On component mount, check localStorage for a cached session and emit the appropr
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

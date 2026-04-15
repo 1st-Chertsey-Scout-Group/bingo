@@ -15,7 +15,12 @@ import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 import { compressImage } from '@/lib/image'
-import { clearTeamIdFromSession, loadSession, saveSession } from '@/lib/session'
+import {
+  clearSession,
+  clearTeamIdFromSession,
+  loadSession,
+  saveSession,
+} from '@/lib/session'
 import type { RoundItem, Team, TeamSummary } from '@/types'
 
 function ScoutGameInner({ gameId }: { gameId: string }) {
@@ -27,19 +32,27 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
   useEffect(() => {
     if (!socket) return
 
+    const session = loadSession()
     let gamePin: string | undefined
-    try {
-      const session = localStorage.getItem('scout-bingo-session')
-      if (session) {
-        const parsed = JSON.parse(session) as { gamePin?: string }
-        gamePin = parsed.gamePin
-      }
-    } catch {
-      // localStorage unavailable
-    }
 
-    if (gamePin) {
-      socket.emit('lobby:join', { gamePin })
+    if (
+      session &&
+      session.role === 'scout' &&
+      'teamId' in session &&
+      session.gameId === gameId
+    ) {
+      // Rejoin with cached session
+      gamePin = session.gamePin
+      socket.emit('rejoin', {
+        gamePin: session.gamePin,
+        teamId: session.teamId,
+      })
+    } else {
+      // Normal join flow
+      gamePin = session?.gamePin
+      if (gamePin) {
+        socket.emit('lobby:join', { gamePin })
+      }
     }
 
     const handleLobbyJoined = (payload: {
@@ -146,6 +159,14 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       }
     }
 
+    const handleRejoinError = () => {
+      clearSession()
+      // Fall back to normal join
+      if (gamePin) {
+        socket.emit('lobby:join', { gamePin })
+      }
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -157,6 +178,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket.on('submission:discarded', handleSubmissionDiscarded)
     socket.on('game:ended', handleGameEnded)
     socket.on('game:lobby', handleGameLobby)
+    socket.on('rejoin:error', handleRejoinError)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -170,6 +192,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.off('submission:discarded', handleSubmissionDiscarded)
       socket.off('game:ended', handleGameEnded)
       socket.off('game:lobby', handleGameLobby)
+      socket.off('rejoin:error', handleRejoinError)
     }
   }, [socket, dispatch])
 

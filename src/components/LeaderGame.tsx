@@ -9,7 +9,11 @@ import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
-import { clearTeamIdFromSession } from '@/lib/session'
+import {
+  clearSession,
+  clearTeamIdFromSession,
+  loadSession,
+} from '@/lib/session'
 import type { RoundItem, SubmissionForReview, Team, TeamSummary } from '@/types'
 
 type LeaderGameInnerProps = {
@@ -24,19 +28,34 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
   useEffect(() => {
     if (!socket) return
 
+    const session = loadSession()
     let leaderName: string | undefined
-    try {
-      const session = localStorage.getItem('scout-bingo-session')
-      if (session) {
-        const parsed = JSON.parse(session) as { leaderName?: string }
-        leaderName = parsed.leaderName
-      }
-    } catch {
-      // localStorage unavailable
-    }
 
-    if (leaderName) {
-      socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
+    if (
+      session &&
+      session.role === 'leader' &&
+      'leaderName' in session &&
+      session.gamePin === gamePin
+    ) {
+      leaderName = session.leaderName
+      socket.emit('rejoin', {
+        gamePin: session.gamePin,
+        leaderPin: session.leaderPin,
+        leaderName: session.leaderName,
+      })
+    } else {
+      try {
+        const raw = localStorage.getItem('scout-bingo-session')
+        if (raw) {
+          const parsed = JSON.parse(raw) as { leaderName?: string }
+          leaderName = parsed.leaderName
+        }
+      } catch {
+        // localStorage unavailable
+      }
+      if (leaderName) {
+        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
+      }
     }
 
     const handleLobbyJoined = (payload: {
@@ -127,6 +146,14 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       }
     }
 
+    const handleRejoinError = () => {
+      clearSession()
+      // Fall back to normal join
+      if (leaderName) {
+        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
+      }
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -137,6 +164,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.on('square:claimed', handleSquareClaimed)
     socket.on('game:ended', handleGameEnded)
     socket.on('game:lobby', handleGameLobby)
+    socket.on('rejoin:error', handleRejoinError)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -149,6 +177,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       socket.off('square:claimed', handleSquareClaimed)
       socket.off('game:ended', handleGameEnded)
       socket.off('game:lobby', handleGameLobby)
+      socket.off('rejoin:error', handleRejoinError)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 
