@@ -388,7 +388,78 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     },
   )
 
-  socket.on('review:reject', () => {
-    // TODO: mark rejected, notify team
-  })
+  socket.on(
+    'review:reject',
+    async (payload: { submissionId: string } | undefined) => {
+      const submissionId = payload?.submissionId
+      if (typeof submissionId !== 'string' || submissionId.trim() === '') {
+        socket.emit('error', { message: 'submissionId is required' })
+        return
+      }
+
+      const gameId = getGameIdFromSocket(socket)
+      const leaderName = socket.data.leaderName as string | undefined
+
+      if (!gameId || !leaderName) {
+        socket.emit('error', { message: 'Not connected as a leader' })
+        return
+      }
+
+      const submission = await prisma.submission.findUnique({
+        where: { id: submissionId },
+        include: { roundItem: true, team: true },
+      })
+
+      if (!submission) {
+        socket.emit('error', { message: 'Submission not found' })
+        return
+      }
+
+      // Reject the submission
+      await prisma.submission.update({
+        where: { id: submissionId },
+        data: { status: 'rejected', reviewedBy: leaderName },
+      })
+
+      // Notify the team
+      io.to(`team:${submission.teamId}`).emit('submission:rejected', {
+        roundItemId: submission.roundItemId,
+      })
+
+      // Find the next pending submission in the queue
+      const nextSubmission = await prisma.submission.findFirst({
+        where: {
+          roundItemId: submission.roundItemId,
+          status: 'pending',
+        },
+        orderBy: { position: 'asc' },
+        include: { team: true, roundItem: true },
+      })
+
+      if (nextSubmission) {
+        // Auto-promote: send the next submission to the reviewing leader
+        socket.emit('review:submission', {
+          submissionId: nextSubmission.id,
+          roundItemId: nextSubmission.roundItemId,
+          displayName: nextSubmission.roundItem.displayName,
+          teamName: nextSubmission.team.name,
+          teamColour: nextSubmission.team.colour,
+          photoUrl: nextSubmission.photoUrl,
+        })
+      } else {
+        // No more submissions: release the lock
+        await prisma.roundItem.update({
+          where: { id: submission.roundItemId },
+          data: {
+            lockedByLeader: null,
+            lockedAt: null,
+          },
+        })
+
+        io.to(`leaders:${gameId}`).emit('square:unlocked', {
+          roundItemId: submission.roundItemId,
+        })
+      }
+    },
+  )
 }

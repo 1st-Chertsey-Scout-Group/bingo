@@ -20,8 +20,8 @@ Implement the server-side `review:reject` handler that rejects a submission and 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

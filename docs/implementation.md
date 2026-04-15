@@ -206,7 +206,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[115 — Wire review:open to Display ReviewModal](implementation/115-wire-review-open-client.md)~~ ✓
 - ~~[116 — Implement review:approve Handler](implementation/116-implement-review-approve.md)~~ ✓
 - ~~[117 — Handle Approval Broadcast](implementation/117-handle-approval-broadcast.md)~~ ✓
-- [118 — Implement review:reject Handler](implementation/118-implement-review-reject.md)
+- ~~[118 — Implement review:reject Handler](implementation/118-implement-review-reject.md)~~ ✓
 - [119 — Wire Reject with Auto-Promote](implementation/119-wire-reject-auto-promote.md)
 - [120 — Wire Reject with Empty Queue](implementation/120-wire-reject-empty-queue.md)
 - [121 — Implement review:close Handler](implementation/121-implement-review-close.md)
