@@ -19,8 +19,8 @@ When the game status is 'active', the LeaderGame component renders the Board com
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

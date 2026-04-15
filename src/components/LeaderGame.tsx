@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
+import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
@@ -76,6 +77,14 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.emit('game:start', {})
   }, [socket])
 
+  const handleSquareTap = useCallback(
+    (roundItemId: string) => {
+      if (!socket) return
+      console.log('Leader tapped square:', roundItemId)
+    },
+    [socket],
+  )
+
   switch (state.status) {
     case 'lobby':
       return (
@@ -89,7 +98,16 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
         />
       )
     case 'active':
-      return <div>Leader Board</div>
+      return (
+        <div className="flex h-[calc(100dvh)] flex-col">
+          <Board
+            items={state.board}
+            role="leader"
+            myTeamId={null}
+            onSquareTap={handleSquareTap}
+          />
+        </div>
+      )
     case 'ended':
       return <div>Game Summary</div>
     default:
