@@ -90,11 +90,46 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       })
     }
 
+    const handleSubmissionReceived = (_payload: { roundItemId: string }) => {
+      toast('Submitted!')
+    }
+
+    const handleSubmissionApproved = (payload: { roundItemId: string }) => {
+      toast.success('Approved!')
+      dispatch({
+        type: 'SUBMISSION_RESOLVED',
+        roundItemId: payload.roundItemId,
+      })
+    }
+
+    const handleSubmissionRejected = (payload: { roundItemId: string }) => {
+      toast('Rejected — try again!')
+      dispatch({
+        type: 'SUBMISSION_RESOLVED',
+        roundItemId: payload.roundItemId,
+      })
+    }
+
+    const handleSubmissionDiscarded = (payload: {
+      roundItemId: string
+      reason: string
+    }) => {
+      toast('Already claimed!')
+      dispatch({
+        type: 'SUBMISSION_RESOLVED',
+        roundItemId: payload.roundItemId,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
     socket.on('square:claimed', handleSquareClaimed)
     socket.on('square:pending', handleSquarePending)
+    socket.on('submission:received', handleSubmissionReceived)
+    socket.on('submission:approved', handleSubmissionApproved)
+    socket.on('submission:rejected', handleSubmissionRejected)
+    socket.on('submission:discarded', handleSubmissionDiscarded)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -102,6 +137,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.off('game:started', handleGameStarted)
       socket.off('square:claimed', handleSquareClaimed)
       socket.off('square:pending', handleSquarePending)
+      socket.off('submission:received', handleSubmissionReceived)
+      socket.off('submission:approved', handleSubmissionApproved)
+      socket.off('submission:rejected', handleSubmissionRejected)
+      socket.off('submission:discarded', handleSubmissionDiscarded)
     }
   }, [socket, dispatch])
 
@@ -160,7 +199,6 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
 
           socket?.emit('submission:submit', { roundItemId, photoUrl })
           dispatch({ type: 'SUBMISSION_SENT', roundItemId })
-          toast('Submitted!')
         } catch {
           toast('Upload failed. Try again.')
         }

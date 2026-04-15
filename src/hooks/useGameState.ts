@@ -106,6 +106,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return { ...state, mySubmissions: newSubmissions }
     }
 
+    case 'SUBMISSION_RESOLVED': {
+      const newSubmissions = new Map(state.mySubmissions)
+      newSubmissions.delete(action.roundItemId)
+      return { ...state, mySubmissions: newSubmissions }
+    }
+
     case 'REVIEW_PROMOTED':
       return {
         ...state,

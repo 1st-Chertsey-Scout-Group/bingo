@@ -66,6 +66,7 @@ export type GameAction =
   | { type: 'SUBMISSION_APPROVED'; itemId: string }
   | { type: 'SUBMISSION_REJECTED'; itemId: string }
   | { type: 'SUBMISSION_DISCARDED'; itemId: string }
+  | { type: 'SUBMISSION_RESOLVED'; roundItemId: string }
   | {
       type: 'REVIEW_PROMOTED'
       roundItemId: string

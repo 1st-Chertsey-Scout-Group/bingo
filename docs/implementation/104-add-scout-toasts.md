@@ -34,8 +34,8 @@ Add toast notifications for submission lifecycle events so scouts get clear feed
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

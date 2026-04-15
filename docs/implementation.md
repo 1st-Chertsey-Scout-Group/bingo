@@ -183,7 +183,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[101 — Add Pending Submission Indicator](implementation/101-add-pending-indicator.md)~~ ✓
 - ~~[102 — Wire square:claimed to Scout Board](implementation/102-wire-square-claimed-scout.md)~~ ✓
 - ~~[103 — Wire square:pending to Scout Board](implementation/103-wire-square-pending-scout.md)~~ ✓
-- [104 — Add Scout Toast Notifications](implementation/104-add-scout-toasts.md)
+- ~~[104 — Add Scout Toast Notifications](implementation/104-add-scout-toasts.md)~~ ✓
 
 ## Phase 16: Submission Processing — Server (105–107)
 
