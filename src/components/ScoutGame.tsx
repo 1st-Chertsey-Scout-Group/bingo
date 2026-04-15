@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 
+import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
@@ -68,11 +69,30 @@ function ScoutGameInner() {
     }
   }, [socket, dispatch])
 
+  const handleSquareTap = useCallback(
+    (roundItemId: string) => {
+      const item = state.board.find((i) => i.roundItemId === roundItemId)
+      if (!item) return
+      if (item.claimedByTeamId !== null) return
+      // Camera capture will be wired in step 097
+    },
+    [state.board],
+  )
+
   switch (state.status) {
     case 'lobby':
       return <Lobby myTeam={state.myTeam} teams={state.teams} role="scout" />
     case 'active':
-      return <div>Game is active - Board goes here</div>
+      return (
+        <div className="flex h-[calc(100dvh)] flex-col">
+          <Board
+            items={state.board}
+            role="scout"
+            myTeamId={state.myTeam?.id ?? null}
+            onSquareTap={handleSquareTap}
+          />
+        </div>
+      )
     case 'ended':
       return <div>Round over</div>
     default:

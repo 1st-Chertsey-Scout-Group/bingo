@@ -172,7 +172,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[093 — Style Unclaimed Square State](implementation/093-style-unclaimed-square.md)~~ ✓
 - ~~[094 — Style Own-Team Claimed Square](implementation/094-style-own-team-claimed.md)~~ ✓
 - ~~[095 — Style Other-Team Claimed Square](implementation/095-style-other-team-claimed.md)~~ ✓
-- [096 — Render Scout Board on Active Game](implementation/096-render-scout-active-board.md)
+- ~~[096 — Render Scout Board on Active Game](implementation/096-render-scout-active-board.md)~~ ✓
 
 ## Phase 15: Scout Active Round (097–104)
 

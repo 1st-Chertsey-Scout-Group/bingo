@@ -26,8 +26,8 @@ Wire the Board component into the ScoutGame active view. When the round is activ
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
