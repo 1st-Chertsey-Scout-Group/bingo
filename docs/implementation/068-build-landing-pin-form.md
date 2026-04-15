@@ -23,8 +23,8 @@ Replace the landing page placeholder with a functional PIN entry form. This is t
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
