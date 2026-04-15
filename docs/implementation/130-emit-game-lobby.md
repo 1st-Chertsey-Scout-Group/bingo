@@ -18,8 +18,8 @@ After setting the game back to lobby status, emit `game:lobby` to all clients so
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
