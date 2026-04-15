@@ -25,8 +25,8 @@ Create the ScoutGame client component that serves as the main wrapper for the sc
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
