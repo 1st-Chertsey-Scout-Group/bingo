@@ -24,8 +24,8 @@ Add celebratory styling for squares claimed by the scout's own team. These squar
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
