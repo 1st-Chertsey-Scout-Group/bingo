@@ -23,8 +23,8 @@ Connect the `lobby:teams` socket event to the ScoutGame component so the lobby u
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
