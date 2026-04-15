@@ -26,8 +26,8 @@ When all automatic upload retries fail, show an inline error message on the affe
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

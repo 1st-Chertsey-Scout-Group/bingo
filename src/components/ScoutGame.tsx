@@ -6,6 +6,7 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react'
 import { toast } from 'sonner'
 
@@ -15,6 +16,7 @@ import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
 import { compressImage } from '@/lib/image'
+import { uploadWithRetry } from '@/lib/upload'
 import {
   clearSession,
   clearTeamIdFromSession,
@@ -34,6 +36,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
   const { state, dispatch } = useGame()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const pendingRoundItemIdRef = useRef<string | null>(null)
+  const [failedUpload, setFailedUpload] = useState<{
+    roundItemId: string
+    blob: Blob
+  } | null>(null)
 
   useEffect(() => {
     if (!socket) return
@@ -216,6 +222,42 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     }
   }, [socket, dispatch])
 
+  const doUpload = useCallback(
+    async (blob: Blob, roundItemId: string) => {
+      const teamId = state.myTeam?.id
+      if (!teamId) return
+
+      const getPresignedUrl = async () => {
+        const res = await fetch('/api/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            gameId,
+            teamId,
+            roundItemId,
+            contentType: 'image/webp',
+          }),
+        })
+        if (!res.ok) throw new Error('Failed to get upload URL')
+        return (await res.json()) as { uploadUrl: string; photoUrl: string }
+      }
+
+      const result = await uploadWithRetry(blob, getPresignedUrl)
+
+      if (result.success) {
+        setFailedUpload(null)
+        socket?.emit('submission:submit', {
+          roundItemId,
+          photoUrl: result.photoUrl,
+        })
+        dispatch({ type: 'SUBMISSION_SENT', roundItemId })
+      } else {
+        setFailedUpload({ roundItemId, blob: result.blob })
+      }
+    },
+    [gameId, state.myTeam?.id, socket, dispatch],
+  )
+
   const handleFileSelected = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
@@ -223,6 +265,9 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       e.target.value = ''
       if (!file || !roundItemId) return
       pendingRoundItemIdRef.current = null
+
+      // Clear any previous failed upload
+      setFailedUpload(null)
 
       void (async () => {
         let compressed: Blob
@@ -233,50 +278,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
           return
         }
 
-        try {
-          const teamId = state.myTeam?.id
-          if (!teamId) return
-
-          const res = await fetch('/api/upload', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              gameId,
-              teamId,
-              roundItemId,
-              contentType: 'image/webp',
-            }),
-          })
-
-          if (!res.ok) {
-            toast('Upload failed. Try again.')
-            return
-          }
-
-          const { uploadUrl, photoUrl } = (await res.json()) as {
-            uploadUrl: string
-            photoUrl: string
-          }
-
-          const putRes = await fetch(uploadUrl, {
-            method: 'PUT',
-            body: compressed,
-            headers: { 'Content-Type': 'image/webp' },
-          })
-
-          if (!putRes.ok) {
-            toast('Upload failed. Try again.')
-            return
-          }
-
-          socket?.emit('submission:submit', { roundItemId, photoUrl })
-          dispatch({ type: 'SUBMISSION_SENT', roundItemId })
-        } catch {
-          toast('Upload failed. Try again.')
-        }
+        await doUpload(compressed, roundItemId)
       })()
     },
-    [gameId, state.myTeam?.id, socket, dispatch],
+    [doUpload],
   )
 
   const pendingItems = useMemo(
@@ -291,6 +296,13 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
 
   const handleSquareTap = useCallback(
     (roundItemId: string) => {
+      // Retry failed upload
+      if (failedUpload && failedUpload.roundItemId === roundItemId) {
+        setFailedUpload(null)
+        void doUpload(failedUpload.blob, roundItemId)
+        return
+      }
+
       const item = state.board.find((i) => i.roundItemId === roundItemId)
       if (!item) return
       if (item.claimedByTeamId !== null) return
@@ -320,6 +332,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
             role="scout"
             myTeamId={state.myTeam?.id ?? null}
             pendingItems={pendingItems}
+            failedItemId={failedUpload?.roundItemId ?? null}
             onSquareTap={handleSquareTap}
           />
         </div>

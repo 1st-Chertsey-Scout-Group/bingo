@@ -8,6 +8,7 @@ type BoardProps = {
   role: 'scout' | 'leader'
   myTeamId: string | null
   pendingItems?: Set<string>
+  failedItemId?: string | null
   onSquareTap: (roundItemId: string) => void
 }
 
@@ -16,6 +17,7 @@ export function Board({
   role,
   myTeamId,
   pendingItems,
+  failedItemId,
   onSquareTap,
 }: BoardProps) {
   return (
@@ -27,6 +29,7 @@ export function Board({
           role={role}
           isOwnTeam={item.claimedByTeamId === myTeamId}
           isPending={pendingItems?.has(item.roundItemId) ?? false}
+          isFailed={item.roundItemId === failedItemId}
           onTap={() => onSquareTap(item.roundItemId)}
         />
       ))}

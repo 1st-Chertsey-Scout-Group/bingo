@@ -10,6 +10,7 @@ type SquareProps = {
   role: 'scout' | 'leader'
   isOwnTeam: boolean
   isPending?: boolean
+  isFailed?: boolean
   onTap: () => void
 }
 
@@ -28,6 +29,9 @@ const needsReviewClasses =
 const lockedClasses =
   'bg-gray-100 border border-gray-300 text-gray-400 opacity-60 cursor-default pointer-events-none'
 
+const failedClasses =
+  'bg-red-50 border-2 border-red-400 text-red-600 cursor-pointer'
+
 const claimedClasses = 'border-0 text-white cursor-default'
 
 function getTeamAbbreviation(name: string): string {
@@ -41,6 +45,7 @@ export function Square({
   role,
   isOwnTeam,
   isPending = false,
+  isFailed = false,
   onTap,
 }: SquareProps) {
   const isUnclaimed = roundItem.claimedByTeamId === null
@@ -64,10 +69,17 @@ export function Square({
           !isPending &&
           !needsReview &&
           !isLocked &&
+          !isFailed &&
           unclaimedClasses,
-        isUnclaimed && isPending && !needsReview && !isLocked && pendingClasses,
+        isUnclaimed &&
+          isPending &&
+          !needsReview &&
+          !isLocked &&
+          !isFailed &&
+          pendingClasses,
         needsReview && needsReviewClasses,
         isLocked && lockedClasses,
+        isFailed && failedClasses,
         isClaimed && claimedClasses,
       )}
       style={
@@ -92,7 +104,15 @@ export function Square({
           {roundItem.lockedByLeader}
         </span>
       )}
-      <span className="line-clamp-3 break-words">{roundItem.displayName}</span>
+      {isFailed ? (
+        <span className="text-[10px] leading-tight">
+          Photo didn&apos;t send — tap to try again
+        </span>
+      ) : (
+        <span className="line-clamp-3 break-words">
+          {roundItem.displayName}
+        </span>
+      )}
     </button>
   )
 }
