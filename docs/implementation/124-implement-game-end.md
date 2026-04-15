@@ -20,8 +20,8 @@ Implement the server-side `game:end` handler that allows a leader to manually en
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

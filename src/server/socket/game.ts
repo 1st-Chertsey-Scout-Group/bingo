@@ -103,8 +103,50 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
     })
   })
 
-  socket.on('game:end', () => {
-    // TODO: calculate summary, update game status, emit results
+  socket.on('game:end', async () => {
+    const gameId = socket.data.gameId as string | undefined
+    if (!gameId) {
+      socket.emit('error', { message: 'Not connected to a game' })
+      return
+    }
+
+    if (socket.data.role !== 'leader') {
+      socket.emit('error', { message: 'Only leaders can end the game' })
+      return
+    }
+
+    const game = await prisma.game.findUnique({ where: { id: gameId } })
+    if (!game || game.status !== 'active') {
+      socket.emit('error', { message: 'Game is not active' })
+      return
+    }
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: { status: 'ended' },
+    })
+
+    const teams = await prisma.team.findMany({
+      where: { gameId, round: game.round },
+      orderBy: { createdAt: 'asc' },
+    })
+
+    const roundItems = await prisma.roundItem.findMany({
+      where: { gameId, round: game.round },
+      select: { claimedByTeamId: true },
+    })
+
+    const summary = teams
+      .map((t) => ({
+        teamId: t.id,
+        teamName: t.name,
+        teamColour: t.colour,
+        claimedCount: roundItems.filter((ri) => ri.claimedByTeamId === t.id)
+          .length,
+      }))
+      .sort((a, b) => b.claimedCount - a.claimedCount)
+
+    io.to(`game:${gameId}`).emit('game:ended', { summary })
   })
 
   socket.on('game:newround', () => {
