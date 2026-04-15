@@ -179,12 +179,10 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       dispatch({ type: 'FULL_STATE', state })
     }
 
-    const handleRejoinError = () => {
+    const handleRejoinError = (payload: { message: string }) => {
       clearSession()
-      // Fall back to normal join
-      if (gamePin) {
-        socket.emit('lobby:join', { gamePin })
-      }
+      toast(payload.message)
+      window.location.href = '/'
     }
 
     socket.on('lobby:joined', handleLobbyJoined)

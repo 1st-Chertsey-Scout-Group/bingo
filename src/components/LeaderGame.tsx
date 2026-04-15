@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect } from 'react'
+import { toast } from 'sonner'
 import { Board } from '@/components/Board'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { Lobby } from '@/components/Lobby'
@@ -167,12 +168,10 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       dispatch({ type: 'FULL_STATE', state: fullState })
     }
 
-    const handleRejoinError = () => {
+    const handleRejoinError = (payload: { message: string }) => {
       clearSession()
-      // Fall back to normal join
-      if (leaderName) {
-        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
-      }
+      toast(payload.message)
+      window.location.href = '/'
     }
 
     socket.on('lobby:joined', handleLobbyJoined)

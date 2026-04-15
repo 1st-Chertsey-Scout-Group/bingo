@@ -22,8 +22,8 @@ Listen for the `rejoin:error` socket event and gracefully recover by clearing th
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
