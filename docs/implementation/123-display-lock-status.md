@@ -21,8 +21,8 @@ Listen for `square:locked` and `square:unlocked` socket events on the leader cli
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
