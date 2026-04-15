@@ -20,8 +20,8 @@ Connect the ReviewModal's dismiss action (X button or tap outside) to emit `revi
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
