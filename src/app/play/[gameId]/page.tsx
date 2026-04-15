@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 
+import { ScoutGame } from '@/components/ScoutGame'
 import { prisma } from '@/lib/prisma'
 
 type ScoutPageProps = {
@@ -18,9 +19,5 @@ export default async function ScoutPage({ params }: ScoutPageProps) {
     notFound()
   }
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <p className="text-lg">Scout View - {gameId}</p>
-    </div>
-  )
+  return <ScoutGame gameId={gameId} />
 }

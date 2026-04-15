@@ -36,8 +36,8 @@ Update the /play/[gameId] page to validate the game exists on the server and ren
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
