@@ -22,8 +22,8 @@ When the game ends, leaders see a scoreboard ranking all teams by their claimed 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

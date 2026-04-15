@@ -3,11 +3,12 @@
 import { useCallback, useEffect } from 'react'
 import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
+import { Button } from '@/components/ui/button'
 import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
-import type { RoundItem, SubmissionForReview, Team } from '@/types'
+import type { RoundItem, SubmissionForReview, Team, TeamSummary } from '@/types'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -96,6 +97,25 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       })
     }
 
+    const handleSquareClaimed = (payload: {
+      roundItemId: string
+      teamId: string
+      teamName: string
+      teamColour: string
+    }) => {
+      dispatch({
+        type: 'SQUARE_CLAIMED',
+        roundItemId: payload.roundItemId,
+        teamId: payload.teamId,
+        teamName: payload.teamName,
+        teamColour: payload.teamColour,
+      })
+    }
+
+    const handleGameEnded = (payload: { summary: TeamSummary[] }) => {
+      dispatch({ type: 'GAME_ENDED', summary: payload.summary })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -103,6 +123,8 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.on('review:submission', handleReviewSubmission)
     socket.on('square:locked', handleSquareLocked)
     socket.on('square:unlocked', handleSquareUnlocked)
+    socket.on('square:claimed', handleSquareClaimed)
+    socket.on('game:ended', handleGameEnded)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -112,6 +134,8 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       socket.off('review:submission', handleReviewSubmission)
       socket.off('square:locked', handleSquareLocked)
       socket.off('square:unlocked', handleSquareUnlocked)
+      socket.off('square:claimed', handleSquareClaimed)
+      socket.off('game:ended', handleGameEnded)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 
@@ -160,6 +184,11 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     dispatch({ type: 'REVIEW_CLOSED' })
   }, [socket, state.reviewingRoundItemId, dispatch])
 
+  const handleNewRound = useCallback(() => {
+    if (!socket) return
+    socket.emit('game:newround', {})
+  }, [socket])
+
   switch (state.status) {
     case 'lobby':
       return (
@@ -198,7 +227,35 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
         </div>
       )
     case 'ended':
-      return <div>Game Summary</div>
+      return (
+        <div className="flex h-[calc(100dvh)] flex-col items-center justify-center p-6">
+          <h1 className="mb-6 text-2xl font-bold">Round Over</h1>
+          <div className="w-full max-w-md space-y-3">
+            {(state.summary ?? []).map((team, index) => (
+              <div
+                key={team.teamId}
+                className="flex items-center gap-3 rounded-lg border p-3"
+              >
+                <span className="text-muted-foreground w-6 text-right text-lg font-bold">
+                  {index + 1}
+                </span>
+                <span
+                  className="h-4 w-4 shrink-0 rounded-full"
+                  style={{ backgroundColor: team.teamColour }}
+                />
+                <span className="flex-1 font-medium">{team.teamName}</span>
+                <span className="text-muted-foreground text-sm">
+                  {team.claimedCount}{' '}
+                  {team.claimedCount === 1 ? 'square' : 'squares'}
+                </span>
+              </div>
+            ))}
+          </div>
+          <Button className="mt-8" size="lg" onClick={handleNewRound}>
+            New Round
+          </Button>
+        </div>
+      )
     default:
       return <div>Loading...</div>
   }

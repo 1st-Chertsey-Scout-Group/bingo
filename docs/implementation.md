@@ -219,7 +219,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[125 — Emit game:ended with Summaries](implementation/125-emit-game-ended.md)~~ ✓
 - ~~[126 — Add Auto-End When All Squares Claimed](implementation/126-add-auto-end-all-claimed.md)~~ ✓
 - ~~[127 — Build Scout Round Over Overlay](implementation/127-build-scout-round-over.md)~~ ✓
-- [128 — Build Leader Round Summary Screen](implementation/128-build-leader-summary.md)
+- ~~[128 — Build Leader Round Summary Screen](implementation/128-build-leader-summary.md)~~ ✓
 
 ## Phase 20: New Round (129–132)
 
