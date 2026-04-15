@@ -18,11 +18,19 @@ const baseClasses =
 const unclaimedClasses =
   'bg-white border border-gray-200 text-gray-900 active:bg-gray-50 cursor-pointer'
 
-const ownTeamClaimedClasses = 'border-0 text-white cursor-default'
+const claimedClasses = 'border-0 text-white cursor-default'
+
+function getTeamAbbreviation(name: string): string {
+  const parts = name.split(' ')
+  if (parts.length < 2 || !parts[1]) return name
+  return `${parts[0]} ${parts[1][0]}.`
+}
 
 export function Square({ roundItem, isOwnTeam, onTap }: SquareProps) {
   const isUnclaimed = roundItem.claimedByTeamId === null
-  const isOwnTeamClaimed = isOwnTeam && !isUnclaimed
+  const isClaimed = !isUnclaimed
+  const isOwnTeamClaimed = isOwnTeam && isClaimed
+  const isOtherTeamClaimed = !isOwnTeam && isClaimed
 
   return (
     <button
@@ -30,16 +38,24 @@ export function Square({ roundItem, isOwnTeam, onTap }: SquareProps) {
       className={cn(
         baseClasses,
         isUnclaimed && unclaimedClasses,
-        isOwnTeamClaimed && ownTeamClaimedClasses,
+        isClaimed && claimedClasses,
       )}
       style={
-        isOwnTeamClaimed
-          ? { backgroundColor: roundItem.claimedByTeamColour ?? undefined }
+        isClaimed
+          ? {
+              backgroundColor: roundItem.claimedByTeamColour ?? undefined,
+              opacity: isOtherTeamClaimed ? 0.7 : undefined,
+            }
           : undefined
       }
     >
       {isOwnTeamClaimed && (
         <Check className="absolute top-1 right-1 h-4 w-4 text-white" />
+      )}
+      {isOtherTeamClaimed && roundItem.claimedByTeamName && (
+        <span className="absolute right-1 bottom-1 text-[10px] font-bold">
+          {getTeamAbbreviation(roundItem.claimedByTeamName)}
+        </span>
       )}
       <span className="line-clamp-3 break-words">{roundItem.displayName}</span>
     </button>

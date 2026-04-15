@@ -25,8 +25,8 @@ Add styling for squares claimed by another team. These show the claiming team's 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
