@@ -35,8 +35,8 @@ After creating RoundItems, broadcast the `game:started` event to all clients in 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

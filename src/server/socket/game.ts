@@ -82,6 +82,25 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
         round: updatedGame.round,
       })),
     })
+
+    const roundItems = await prisma.roundItem.findMany({
+      where: { gameId: updatedGame.id, round: updatedGame.round },
+    })
+
+    const board = roundItems.map((roundItem) => ({
+      roundItemId: roundItem.id,
+      displayName: roundItem.displayName,
+      claimedByTeamId: null,
+      claimedByTeamName: null,
+      claimedByTeamColour: null,
+      hasPendingSubmissions: false,
+      lockedByLeader: null,
+    }))
+
+    io.to(`game:${updatedGame.id}`).emit('game:started', {
+      board,
+      roundStartedAt: (updatedGame.roundStartedAt ?? new Date()).toISOString(),
+    })
   })
 
   socket.on('game:end', () => {
