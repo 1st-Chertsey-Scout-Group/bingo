@@ -28,8 +28,8 @@ Listen for the `game:started` socket event in both ScoutGame and LeaderGame comp
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

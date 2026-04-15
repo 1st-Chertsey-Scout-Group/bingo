@@ -4,7 +4,7 @@ import { useCallback, useEffect } from 'react'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
-import type { Team } from '@/types'
+import type { RoundItem, Team } from '@/types'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -49,12 +49,25 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       dispatch({ type: 'LOBBY_TEAMS', teams })
     }
 
+    const handleGameStarted = (payload: {
+      board: RoundItem[]
+      roundStartedAt: string
+    }) => {
+      dispatch({
+        type: 'GAME_STARTED',
+        items: payload.board,
+        roundStartedAt: payload.roundStartedAt,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
+    socket.on('game:started', handleGameStarted)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
+      socket.off('game:started', handleGameStarted)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 
