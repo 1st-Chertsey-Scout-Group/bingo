@@ -24,8 +24,8 @@ Create the top-level LeaderGame client component that manages leader-side socket
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
