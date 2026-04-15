@@ -148,7 +148,209 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
     },
   )
 
-  socket.on('rejoin', () => {
-    // TODO: validate teamId, rejoin rooms, send full state
-  })
+  socket.on(
+    'rejoin',
+    async (
+      payload:
+        | {
+            gamePin: string
+            teamId?: string
+            leaderPin?: string
+            leaderName?: string
+          }
+        | undefined,
+    ) => {
+      const gamePin = payload?.gamePin
+      if (typeof gamePin !== 'string' || gamePin.trim() === '') {
+        socket.emit('rejoin:error', { message: 'gamePin is required' })
+        return
+      }
+
+      const game = await prisma.game.findFirst({
+        where: { pin: gamePin },
+      })
+
+      if (!game) {
+        socket.emit('rejoin:error', { message: 'Game not found' })
+        return
+      }
+
+      if (game.status === 'ended') {
+        socket.emit('rejoin:error', { message: 'Game has ended' })
+        return
+      }
+
+      const isLeader = 'leaderPin' in (payload ?? {})
+
+      if (!isLeader) {
+        // Scout rejoin
+        const teamId = payload?.teamId
+        if (typeof teamId !== 'string' || teamId.trim() === '') {
+          socket.emit('rejoin:error', { message: 'teamId is required' })
+          return
+        }
+
+        const team = await prisma.team.findUnique({
+          where: { id: teamId },
+        })
+
+        if (!team) {
+          socket.emit('rejoin:error', { message: 'Team not found' })
+          return
+        }
+
+        if (team.gameId !== game.id || team.round !== game.round) {
+          socket.emit('rejoin:error', {
+            message: 'Team not in current round',
+          })
+          return
+        }
+
+        // Update socket ID
+        await prisma.team.update({
+          where: { id: teamId },
+          data: { socketId: socket.id },
+        })
+
+        // Join rooms
+        await socket.join(`game:${game.id}`)
+        await socket.join(`team:${teamId}`)
+
+        // Build full state
+        const allTeams = await prisma.team.findMany({
+          where: { gameId: game.id, round: game.round },
+          select: { id: true, name: true, colour: true },
+          orderBy: { createdAt: 'asc' },
+        })
+
+        const roundItems = await prisma.roundItem.findMany({
+          where: { gameId: game.id, round: game.round },
+          include: {
+            submissions: {
+              where: { status: 'pending' },
+              select: { id: true },
+            },
+          },
+        })
+
+        const claimTeams = await prisma.team.findMany({
+          where: { gameId: game.id },
+          select: { id: true, name: true, colour: true },
+        })
+
+        const teamMap = new Map(claimTeams.map((t) => [t.id, t]))
+
+        const board = roundItems.map((ri) => {
+          const claimTeam = ri.claimedByTeamId
+            ? teamMap.get(ri.claimedByTeamId)
+            : null
+          return {
+            roundItemId: ri.id,
+            displayName: ri.displayName,
+            claimedByTeamId: ri.claimedByTeamId,
+            claimedByTeamName: claimTeam?.name ?? null,
+            claimedByTeamColour: claimTeam?.colour ?? null,
+            hasPendingSubmissions: ri.submissions.length > 0,
+            lockedByLeader: ri.lockedByLeader,
+          }
+        })
+
+        const mySubmissions = await prisma.submission.findMany({
+          where: { teamId, roundItem: { gameId: game.id, round: game.round } },
+          select: { roundItemId: true, status: true },
+        })
+
+        const submissionMap: Array<[string, string]> = mySubmissions.map(
+          (s) => [s.roundItemId, s.status],
+        )
+
+        socket.emit('rejoin:state', {
+          status: game.status,
+          teams: allTeams,
+          board,
+          myTeam: { id: team.id, name: team.name, colour: team.colour },
+          mySubmissions: submissionMap,
+          summary: null,
+          roundStartedAt: game.roundStartedAt
+            ? game.roundStartedAt.toISOString()
+            : null,
+          reviewingRoundItemId: null,
+          currentSubmission: null,
+        })
+      } else {
+        // Leader rejoin — implemented in step 137
+        const leaderPin = payload?.leaderPin
+        const leaderName = payload?.leaderName
+
+        if (typeof leaderPin !== 'string' || leaderPin !== game.leaderPin) {
+          socket.emit('rejoin:error', { message: 'Invalid leader PIN' })
+          return
+        }
+
+        if (typeof leaderName !== 'string' || leaderName.trim() === '') {
+          socket.emit('rejoin:error', { message: 'leaderName is required' })
+          return
+        }
+
+        await socket.join(`game:${game.id}`)
+        await socket.join(`leaders:${game.id}`)
+
+        socket.data.gameId = game.id
+        socket.data.leaderName = leaderName
+        socket.data.role = 'leader'
+
+        const allTeams = await prisma.team.findMany({
+          where: { gameId: game.id, round: game.round },
+          select: { id: true, name: true, colour: true },
+          orderBy: { createdAt: 'asc' },
+        })
+
+        const roundItems = await prisma.roundItem.findMany({
+          where: { gameId: game.id, round: game.round },
+          include: {
+            submissions: {
+              where: { status: 'pending' },
+              select: { id: true },
+            },
+          },
+        })
+
+        const claimTeams = await prisma.team.findMany({
+          where: { gameId: game.id },
+          select: { id: true, name: true, colour: true },
+        })
+
+        const teamMap = new Map(claimTeams.map((t) => [t.id, t]))
+
+        const board = roundItems.map((ri) => {
+          const claimTeam = ri.claimedByTeamId
+            ? teamMap.get(ri.claimedByTeamId)
+            : null
+          return {
+            roundItemId: ri.id,
+            displayName: ri.displayName,
+            claimedByTeamId: ri.claimedByTeamId,
+            claimedByTeamName: claimTeam?.name ?? null,
+            claimedByTeamColour: claimTeam?.colour ?? null,
+            hasPendingSubmissions: ri.submissions.length > 0,
+            lockedByLeader: ri.lockedByLeader,
+          }
+        })
+
+        socket.emit('rejoin:state', {
+          status: game.status,
+          teams: allTeams,
+          board,
+          myTeam: null,
+          mySubmissions: [],
+          summary: null,
+          roundStartedAt: game.roundStartedAt
+            ? game.roundStartedAt.toISOString()
+            : null,
+          reviewingRoundItemId: null,
+          currentSubmission: null,
+        })
+      }
+    },
+  )
 }

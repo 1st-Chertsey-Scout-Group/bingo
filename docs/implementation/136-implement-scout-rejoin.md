@@ -31,8 +31,8 @@ Add the server-side `rejoin` handler for scouts so they can reconnect to an in-p
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
