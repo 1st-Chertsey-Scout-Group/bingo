@@ -167,7 +167,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 14: Board UI (091–096)
 
-- [091 — Build Board Component](implementation/091-build-board-component.md)
+- ~~[091 — Build Board Component](implementation/091-build-board-component.md)~~ ✓
 - [092 — Build Square Component](implementation/092-build-square-component.md)
 - [093 — Style Unclaimed Square State](implementation/093-style-unclaimed-square.md)
 - [094 — Style Own-Team Claimed Square](implementation/094-style-own-team-claimed.md)

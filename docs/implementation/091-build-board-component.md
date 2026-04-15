@@ -35,8 +35,8 @@ Create the Board component that renders the bingo grid. This is the core visual 
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
