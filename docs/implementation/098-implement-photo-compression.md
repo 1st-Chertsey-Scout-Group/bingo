@@ -25,8 +25,8 @@ Compress the captured photo to WebP format before uploading. This reduces file s
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

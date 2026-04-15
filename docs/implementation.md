@@ -177,8 +177,8 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 ## Phase 15: Scout Active Round (097–104)
 
 - ~~[097 — Add Camera Trigger on Square Tap](implementation/097-add-camera-trigger.md)~~ ✓
-- [098 — Implement Photo Compression on Capture](implementation/098-implement-photo-compression.md)
-- [099 — Implement Presigned URL Request and S3 Upload](implementation/099-implement-s3-upload.md)
+- ~~[098 — Implement Photo Compression on Capture](implementation/098-implement-photo-compression.md)~~ ✓
+- ~~[099 — Implement Presigned URL Request and S3 Upload](implementation/099-implement-s3-upload.md)~~ ✓
 - [100 — Emit submission:submit After Upload](implementation/100-emit-submission-submit.md)
 - [101 — Add Pending Submission Indicator](implementation/101-add-pending-indicator.md)
 - [102 — Wire square:claimed to Scout Board](implementation/102-wire-square-claimed-scout.md)

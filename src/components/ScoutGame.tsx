@@ -1,14 +1,16 @@
 'use client'
 
 import { type ChangeEvent, useCallback, useEffect, useRef } from 'react'
+import { toast } from 'sonner'
 
 import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
+import { compressImage } from '@/lib/image'
 import type { RoundItem, Team } from '@/types'
 
-function ScoutGameInner() {
+function ScoutGameInner({ gameId }: { gameId: string }) {
   const socket = useSocket()
   const { state, dispatch } = useGame()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -71,14 +73,68 @@ function ScoutGameInner() {
     }
   }, [socket, dispatch])
 
-  const handleFileSelected = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    const roundItemId = pendingRoundItemIdRef.current
-    e.target.value = ''
-    if (!file || !roundItemId) return
-    pendingRoundItemIdRef.current = null
-    // Compression and upload will be wired in steps 098-100
-  }, [])
+  const handleFileSelected = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      const roundItemId = pendingRoundItemIdRef.current
+      e.target.value = ''
+      if (!file || !roundItemId) return
+      pendingRoundItemIdRef.current = null
+
+      void (async () => {
+        let compressed: Blob
+        try {
+          compressed = await compressImage(file)
+        } catch {
+          toast('Something went wrong. Try again.')
+          return
+        }
+
+        try {
+          const teamId = state.myTeam?.id
+          if (!teamId) return
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              gameId,
+              teamId,
+              roundItemId,
+              contentType: 'image/webp',
+            }),
+          })
+
+          if (!res.ok) {
+            toast('Upload failed. Try again.')
+            return
+          }
+
+          const { uploadUrl, photoUrl } = (await res.json()) as {
+            uploadUrl: string
+            photoUrl: string
+          }
+
+          const putRes = await fetch(uploadUrl, {
+            method: 'PUT',
+            body: compressed,
+            headers: { 'Content-Type': 'image/webp' },
+          })
+
+          if (!putRes.ok) {
+            toast('Upload failed. Try again.')
+            return
+          }
+
+          // TODO: socket emit submission:submit (step 100)
+          console.log('Uploaded to S3', photoUrl, roundItemId)
+        } catch {
+          toast('Upload failed. Try again.')
+        }
+      })()
+    },
+    [gameId, state.myTeam?.id],
+  )
 
   const handleSquareTap = useCallback(
     (roundItemId: string) => {
@@ -123,7 +179,7 @@ function ScoutGameInner() {
 export function ScoutGame({ gameId }: { gameId: string }) {
   return (
     <GameProvider>
-      <ScoutGameInner />
+      <ScoutGameInner gameId={gameId} />
     </GameProvider>
   )
 }

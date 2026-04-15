@@ -41,8 +41,8 @@ Upload the compressed photo to S3 using the presigned URL from the upload API. T
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
