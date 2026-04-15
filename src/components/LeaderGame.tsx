@@ -3,10 +3,11 @@
 import { useCallback, useEffect } from 'react'
 import { Board } from '@/components/Board'
 import { Lobby } from '@/components/Lobby'
+import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useSocket } from '@/hooks/useSocket'
-import type { RoundItem, Team } from '@/types'
+import type { RoundItem, SubmissionForReview, Team } from '@/types'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -69,16 +70,26 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       })
     }
 
+    const handleReviewSubmission = (payload: SubmissionForReview) => {
+      dispatch({
+        type: 'REVIEW_PROMOTED',
+        roundItemId: payload.roundItemId,
+        submission: payload,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
     socket.on('square:pending', handleSquarePending)
+    socket.on('review:submission', handleReviewSubmission)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
       socket.off('game:started', handleGameStarted)
       socket.off('square:pending', handleSquarePending)
+      socket.off('review:submission', handleReviewSubmission)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 
@@ -90,15 +101,42 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
   const handleSquareTap = useCallback(
     (roundItemId: string) => {
       if (!socket) return
-      console.log('Leader tapped square:', roundItemId)
+      const item = state.board.find((i) => i.roundItemId === roundItemId)
+      if (!item) return
+      if (item.claimedByTeamId !== null) return
+      if (!item.hasPendingSubmissions) return
+      if (item.lockedByLeader !== null) return
+      socket.emit('review:open', { roundItemId })
     },
-    [socket],
+    [socket, state.board],
   )
 
   const handleEndRound = useCallback(() => {
     if (!socket) return
     socket.emit('game:end', {})
   }, [socket])
+
+  const handleApprove = useCallback(
+    (submissionId: string) => {
+      if (!socket) return
+      socket.emit('review:approve', { submissionId })
+    },
+    [socket],
+  )
+
+  const handleReject = useCallback(
+    (submissionId: string) => {
+      if (!socket) return
+      socket.emit('review:reject', { submissionId })
+    },
+    [socket],
+  )
+
+  const handleDismiss = useCallback(() => {
+    if (!socket || !state.reviewingRoundItemId) return
+    socket.emit('review:close', { roundItemId: state.reviewingRoundItemId })
+    dispatch({ type: 'REVIEW_CLOSED' })
+  }, [socket, state.reviewingRoundItemId, dispatch])
 
   switch (state.status) {
     case 'lobby':
@@ -126,6 +164,15 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
             myTeamId={null}
             onSquareTap={handleSquareTap}
           />
+          {state.currentSubmission && (
+            <ReviewModal
+              submission={state.currentSubmission}
+              open={state.reviewingRoundItemId !== null}
+              onApprove={handleApprove}
+              onReject={handleReject}
+              onDismiss={handleDismiss}
+            />
+          )}
         </div>
       )
     case 'ended':

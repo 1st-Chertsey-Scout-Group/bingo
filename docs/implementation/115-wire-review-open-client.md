@@ -21,8 +21,8 @@ Connect the leader's square tap to the review:open socket event and handle the s
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

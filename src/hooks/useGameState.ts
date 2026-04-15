@@ -13,6 +13,7 @@ const initialState: GameState = {
   summary: null,
   roundStartedAt: null,
   reviewingRoundItemId: null,
+  currentSubmission: null,
 }
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -116,6 +117,14 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         reviewingRoundItemId: action.roundItemId,
+        currentSubmission: action.submission,
+      }
+
+    case 'REVIEW_CLOSED':
+      return {
+        ...state,
+        reviewingRoundItemId: null,
+        currentSubmission: null,
       }
 
     case 'GAME_ENDED':

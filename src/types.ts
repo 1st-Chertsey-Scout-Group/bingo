@@ -47,6 +47,7 @@ export type GameState = {
   summary: TeamSummary[] | null
   roundStartedAt: string | null
   reviewingRoundItemId: string | null
+  currentSubmission: SubmissionForReview | null
 }
 
 export type GameAction =
@@ -72,6 +73,7 @@ export type GameAction =
       roundItemId: string
       submission: SubmissionForReview
     }
+  | { type: 'REVIEW_CLOSED' }
   | { type: 'GAME_ENDED'; summary: TeamSummary[] }
   | { type: 'GAME_LOBBY' }
   | {

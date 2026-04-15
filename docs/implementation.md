@@ -203,7 +203,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 - ~~[113 — Implement review:open Handler](implementation/113-implement-review-open.md)~~ ✓
 - ~~[114 — Build ReviewModal Component](implementation/114-build-review-modal.md)~~ ✓
-- [115 — Wire review:open to Display ReviewModal](implementation/115-wire-review-open-client.md)
+- ~~[115 — Wire review:open to Display ReviewModal](implementation/115-wire-review-open-client.md)~~ ✓
 - [116 — Implement review:approve Handler](implementation/116-implement-review-approve.md)
 - [117 — Handle Approval Broadcast](implementation/117-handle-approval-broadcast.md)
 - [118 — Implement review:reject Handler](implementation/118-implement-review-reject.md)
