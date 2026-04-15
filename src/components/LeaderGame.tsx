@@ -78,11 +78,31 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       })
     }
 
+    const handleSquareLocked = (payload: {
+      roundItemId: string
+      leaderName: string
+    }) => {
+      dispatch({
+        type: 'SQUARE_LOCKED',
+        roundItemId: payload.roundItemId,
+        leaderName: payload.leaderName,
+      })
+    }
+
+    const handleSquareUnlocked = (payload: { roundItemId: string }) => {
+      dispatch({
+        type: 'SQUARE_UNLOCKED',
+        roundItemId: payload.roundItemId,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
     socket.on('square:pending', handleSquarePending)
     socket.on('review:submission', handleReviewSubmission)
+    socket.on('square:locked', handleSquareLocked)
+    socket.on('square:unlocked', handleSquareUnlocked)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
@@ -90,6 +110,8 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
       socket.off('game:started', handleGameStarted)
       socket.off('square:pending', handleSquarePending)
       socket.off('review:submission', handleReviewSubmission)
+      socket.off('square:locked', handleSquareLocked)
+      socket.off('square:unlocked', handleSquareUnlocked)
     }
   }, [socket, dispatch, gamePin, leaderPin])
 

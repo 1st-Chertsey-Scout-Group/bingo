@@ -19,8 +19,8 @@ Handle the case where after rejecting, the server finds no more queued submissio
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

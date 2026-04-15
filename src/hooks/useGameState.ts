@@ -67,7 +67,8 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ),
       }
 
-    case 'SQUARE_UNLOCKED':
+    case 'SQUARE_UNLOCKED': {
+      const clearReview = state.reviewingRoundItemId === action.roundItemId
       return {
         ...state,
         board: state.board.map((item) =>
@@ -75,7 +76,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
             ? { ...item, lockedByLeader: null }
             : item,
         ),
+        reviewingRoundItemId: clearReview ? null : state.reviewingRoundItemId,
+        currentSubmission: clearReview ? null : state.currentSubmission,
       }
+    }
 
     case 'SUBMISSION_SENT': {
       const newSubmissions = new Map(state.mySubmissions)
