@@ -41,8 +41,8 @@ Configure an S3 lifecycle rule to automatically delete uploaded photos after 7 d
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
