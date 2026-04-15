@@ -14,13 +14,43 @@ function ScoutGameInner() {
   useEffect(() => {
     if (!socket) return
 
+    let gamePin: string | undefined
+    try {
+      const session = localStorage.getItem('scout-bingo-session')
+      if (session) {
+        const parsed = JSON.parse(session) as { gamePin?: string }
+        gamePin = parsed.gamePin
+      }
+    } catch {
+      // localStorage unavailable
+    }
+
+    if (gamePin) {
+      socket.emit('lobby:join', { gamePin })
+    }
+
+    const handleLobbyJoined = (payload: {
+      teamId: string
+      teamName: string
+      teamColour: string
+    }) => {
+      dispatch({
+        type: 'LOBBY_JOINED',
+        teamId: payload.teamId,
+        teamName: payload.teamName,
+        teamColour: payload.teamColour,
+      })
+    }
+
     const handleLobbyTeams = ({ teams }: { teams: Team[] }) => {
       dispatch({ type: 'LOBBY_TEAMS', teams })
     }
 
+    socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
 
     return () => {
+      socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
     }
   }, [socket, dispatch])

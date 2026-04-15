@@ -31,5 +31,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ valid: true, role: 'scout', gameId: game.id })
   }
 
-  return NextResponse.json({ valid: true, role: 'leader', gameId: game.id })
+  return NextResponse.json({
+    valid: true,
+    role: 'leader',
+    gameId: game.id,
+    gamePin: game.pin,
+  })
 }

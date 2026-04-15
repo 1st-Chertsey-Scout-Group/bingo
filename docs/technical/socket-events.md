@@ -51,6 +51,12 @@ type SubmissionForReview = {
 }
 ```
 
+## Server -> Joining Scout Only (direct emit)
+
+| Event          | Payload                            | Description                                          |
+| -------------- | ---------------------------------- | ---------------------------------------------------- |
+| `lobby:joined` | `{ teamId, teamName, teamColour }` | Confirms team assignment after scout joins the lobby |
+
 ## Server -> Submitting Scout Only (room: `team:{teamId}`)
 
 | Event                  | Payload                                      | Description                                                                                               |

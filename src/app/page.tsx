@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input'
 
 type ValidateResponse =
   | { valid: false }
-  | { valid: true; role: 'scout' | 'leader'; gameId: string }
+  | { valid: true; role: 'scout'; gameId: string }
+  | { valid: true; role: 'leader'; gameId: string; gamePin: string }
 
 type Phase = 'pin' | 'leader-name'
 
@@ -22,6 +23,7 @@ export default function LandingPage() {
   const [phase, setPhase] = useState<Phase>('pin')
   const [validatedPin, setValidatedPin] = useState('')
   const [gameId, setGameId] = useState('')
+  const [gamePin, setGamePin] = useState('')
   const [leaderName, setLeaderName] = useState('')
   const [nameError, setNameError] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
@@ -56,6 +58,7 @@ export default function LandingPage() {
     setPhase('pin')
     setValidatedPin('')
     setGameId('')
+    setGamePin('')
     setPin('')
     setError('')
     setLeaderName('')
@@ -79,7 +82,7 @@ export default function LandingPage() {
       localStorage.setItem(
         'scout-bingo-session',
         JSON.stringify({
-          gamePin: validatedPin,
+          gamePin,
           leaderPin: validatedPin,
           gameId,
           leaderName: trimmed,
@@ -131,6 +134,7 @@ export default function LandingPage() {
       if (data.role === 'leader') {
         setValidatedPin(pin)
         setGameId(data.gameId)
+        setGamePin(data.gamePin)
         setPhase('leader-name')
       }
     } catch {

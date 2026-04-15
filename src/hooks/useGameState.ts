@@ -12,7 +12,6 @@ const initialState: GameState = {
   mySubmissions: new Map(),
   summary: null,
   roundStartedAt: null,
-  locks: new Map(),
   reviewingRoundItemId: null,
 }
 
@@ -25,17 +24,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         board: action.items,
         roundStartedAt: action.roundStartedAt,
         mySubmissions: new Map(),
-        locks: new Map(),
       }
 
     case 'SQUARE_CLAIMED':
       return {
         ...state,
         board: state.board.map((item) =>
-          item.id === action.roundItemId
+          item.roundItemId === action.roundItemId
             ? {
                 ...item,
-                status: 'claimed' as const,
+                hasPendingSubmissions: false,
                 claimedByTeamId: action.teamId,
                 claimedByTeamName: action.teamName,
                 claimedByTeamColour: action.teamColour,
@@ -48,23 +46,31 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         board: state.board.map((item) =>
-          item.id === action.roundItemId
-            ? { ...item, status: 'pending' as const }
+          item.roundItemId === action.roundItemId
+            ? { ...item, hasPendingSubmissions: true }
             : item,
         ),
       }
 
-    case 'SQUARE_LOCKED': {
-      const newLocks = new Map(state.locks)
-      newLocks.set(action.roundItemId, action.leaderName)
-      return { ...state, locks: newLocks }
-    }
+    case 'SQUARE_LOCKED':
+      return {
+        ...state,
+        board: state.board.map((item) =>
+          item.roundItemId === action.roundItemId
+            ? { ...item, lockedByLeader: action.leaderName }
+            : item,
+        ),
+      }
 
-    case 'SQUARE_UNLOCKED': {
-      const newLocks = new Map(state.locks)
-      newLocks.delete(action.roundItemId)
-      return { ...state, locks: newLocks }
-    }
+    case 'SQUARE_UNLOCKED':
+      return {
+        ...state,
+        board: state.board.map((item) =>
+          item.roundItemId === action.roundItemId
+            ? { ...item, lockedByLeader: null }
+            : item,
+        ),
+      }
 
     case 'SUBMISSION_RECEIVED': {
       const newSubmissions = new Map(state.mySubmissions)
@@ -107,6 +113,16 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...initialState,
         teams: state.teams,
+      }
+
+    case 'LOBBY_JOINED':
+      return {
+        ...state,
+        myTeam: {
+          id: action.teamId,
+          name: action.teamName,
+          colour: action.teamColour,
+        },
       }
 
     case 'LOBBY_TEAMS':

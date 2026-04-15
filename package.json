@@ -11,7 +11,7 @@
     "db:studio": "prisma studio",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
-    "lint": "next lint",
+    "lint": "next lint .",
     "format": "prettier --write ."
   },
   "prisma": {

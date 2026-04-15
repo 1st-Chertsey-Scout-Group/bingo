@@ -110,7 +110,6 @@ export async function POST(request: Request) {
       boardSize,
       templateCount,
       status: 'lobby',
-      round: 1,
     },
   })
 

@@ -132,20 +132,20 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 
 ## Phase 10: Landing Page (068–072)
 
-- [068 — Build Landing Page PIN Entry Form](implementation/068-build-landing-pin-form.md)
-- [069 — Wire PIN Validation to API](implementation/069-wire-pin-validation.md)
-- [070 — Add Role-Based Redirect Logic](implementation/070-add-role-redirect.md)
-- [071 — Add Leader Display Name Input](implementation/071-add-leader-name-input.md)
-- [072 — Add "Add to Home Screen" Hint Banner](implementation/072-add-homescreen-hint.md)
+- ~~[068 — Build Landing Page PIN Entry Form](implementation/068-build-landing-pin-form.md)~~ ✓
+- ~~[069 — Wire PIN Validation to API](implementation/069-wire-pin-validation.md)~~ ✓
+- ~~[070 — Add Role-Based Redirect Logic](implementation/070-add-role-redirect.md)~~ ✓
+- ~~[071 — Add Leader Display Name Input](implementation/071-add-leader-name-input.md)~~ ✓
+- ~~[072 — Add "Add to Home Screen" Hint Banner](implementation/072-add-homescreen-hint.md)~~ ✓
 
 ## Phase 11: Scout Join & Lobby (073–078)
 
-- [073 — Create ScoutGame Client Component Shell](implementation/073-create-scout-game-shell.md)
-- [074 — Wire ScoutGame to Scout Page](implementation/074-wire-scout-game-page.md)
-- [075 — Implement Scout lobby:join Handler](implementation/075-implement-scout-lobby-join.md)
-- [076 — Add Team Auto-Assignment Logic](implementation/076-add-team-auto-assignment.md)
-- [077 — Build Scout Lobby Component](implementation/077-build-scout-lobby.md)
-- [078 — Wire lobby:teams Event to Update Team List](implementation/078-wire-lobby-teams-event.md)
+- ~~[073 — Create ScoutGame Client Component Shell](implementation/073-create-scout-game-shell.md)~~ ✓
+- ~~[074 — Wire ScoutGame to Scout Page](implementation/074-wire-scout-game-page.md)~~ ✓
+- ~~[075 — Implement Scout lobby:join Handler](implementation/075-implement-scout-lobby-join.md)~~ ✓
+- ~~[076 — Add Team Auto-Assignment Logic](implementation/076-add-team-auto-assignment.md)~~ ✓
+- ~~[077 — Build Scout Lobby Component](implementation/077-build-scout-lobby.md)~~ ✓
+- ~~[078 — Wire lobby:teams Event to Update Team List](implementation/078-wire-lobby-teams-event.md)~~ ✓
 
 ## Phase 12: Leader Join & Lobby (079–085)
 

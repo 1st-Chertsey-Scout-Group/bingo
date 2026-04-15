@@ -1,19 +1,17 @@
 export type Team = {
   id: string
-  index: number
   name: string
   colour: string
-  gameId: string
 }
 
 export type RoundItem = {
-  id: string
-  itemId: string
+  roundItemId: string
   displayName: string
   claimedByTeamId: string | null
   claimedByTeamName: string | null
   claimedByTeamColour: string | null
-  status: 'open' | 'pending' | 'claimed'
+  hasPendingSubmissions: boolean
+  lockedByLeader: string | null
 }
 
 export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'discarded'
@@ -48,7 +46,6 @@ export type GameState = {
   mySubmissions: Map<string, SubmissionStatus>
   summary: TeamSummary[] | null
   roundStartedAt: string | null
-  locks: Map<string, string>
   reviewingRoundItemId: string | null
 }
 
@@ -75,5 +72,11 @@ export type GameAction =
     }
   | { type: 'GAME_ENDED'; summary: TeamSummary[] }
   | { type: 'GAME_LOBBY' }
+  | {
+      type: 'LOBBY_JOINED'
+      teamId: string
+      teamName: string
+      teamColour: string
+    }
   | { type: 'LOBBY_TEAMS'; teams: Team[] }
   | { type: 'FULL_STATE'; state: GameState }
