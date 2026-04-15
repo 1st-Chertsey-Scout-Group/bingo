@@ -24,8 +24,8 @@ Listen for `square:pending` events to track which squares have pending submissio
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

@@ -83,16 +83,25 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       })
     }
 
+    const handleSquarePending = (payload: { roundItemId: string }) => {
+      dispatch({
+        type: 'SQUARE_PENDING',
+        roundItemId: payload.roundItemId,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
     socket.on('square:claimed', handleSquareClaimed)
+    socket.on('square:pending', handleSquarePending)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
       socket.off('game:started', handleGameStarted)
       socket.off('square:claimed', handleSquareClaimed)
+      socket.off('square:pending', handleSquarePending)
     }
   }, [socket, dispatch])
 
