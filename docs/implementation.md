@@ -197,7 +197,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[109 — Build RoundHeader Component](implementation/109-build-round-header.md)~~ ✓
 - ~~[110 — Style Needs-Review Square](implementation/110-style-needs-review-square.md)~~ ✓
 - ~~[111 — Style Locked Square](implementation/111-style-locked-square.md)~~ ✓
-- [112 — Wire square:pending to Leader Board](implementation/112-wire-pending-leader-board.md)
+- ~~[112 — Wire square:pending to Leader Board](implementation/112-wire-pending-leader-board.md)~~ ✓
 
 ## Phase 18: Leader Review Flow (113–123)
 

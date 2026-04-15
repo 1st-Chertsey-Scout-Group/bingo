@@ -19,8 +19,8 @@ Connect the `square:pending` socket event to the leader's game state so the boar
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
