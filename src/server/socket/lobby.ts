@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
+import { cancelLockTimeout } from '@/server/socket-handler'
 import { getNextTeam } from '@/lib/teams'
 
 export function registerLobbyHandlers(io: Server, socket: Socket): void {
@@ -312,6 +313,9 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         socket.data.gameId = game.id
         socket.data.leaderName = leaderName
         socket.data.role = 'leader'
+
+        // Cancel any pending lock timeout from a previous disconnect
+        cancelLockTimeout(leaderName)
 
         const allTeams = await prisma.team.findMany({
           where: { gameId: game.id, round: game.round },

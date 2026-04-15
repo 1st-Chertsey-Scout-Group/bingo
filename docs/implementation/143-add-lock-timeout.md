@@ -29,8 +29,8 @@ When a leader disconnects (signal loss, page close, etc.), start a 30-second tim
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
