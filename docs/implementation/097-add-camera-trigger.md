@@ -37,8 +37,8 @@ Wire the device camera to square taps using a hidden file input. When a scout ta
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
