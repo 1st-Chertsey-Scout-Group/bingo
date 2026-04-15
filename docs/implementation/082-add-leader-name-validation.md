@@ -19,8 +19,8 @@ Prevent two leaders from joining with the same display name. This avoids confusi
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

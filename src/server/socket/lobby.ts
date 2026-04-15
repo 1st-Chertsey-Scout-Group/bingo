@@ -51,6 +51,21 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        const connectedLeaders = await io
+          .in(`leaders:${game.id}`)
+          .fetchSockets()
+        const isDuplicate = connectedLeaders.some(
+          (remote) =>
+            typeof remote.data.leaderName === 'string' &&
+            remote.data.leaderName.toLowerCase() === leaderName.toLowerCase(),
+        )
+        if (isDuplicate) {
+          socket.emit('error', {
+            error: 'That leader name is already in use',
+          })
+          return
+        }
+
         await socket.join(`game:${game.id}`)
         await socket.join(`leaders:${game.id}`)
 

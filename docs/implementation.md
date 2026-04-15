@@ -152,7 +152,7 @@ Step-by-step implementation docs for building Scout Nature Bingo from scratch. E
 - ~~[079 — Create LeaderGame Client Component Shell](implementation/079-create-leader-game-shell.md)~~ ✓
 - ~~[080 — Wire LeaderGame to Leader Page](implementation/080-wire-leader-game-page.md)~~ ✓
 - ~~[081 — Implement Leader lobby:join Handler](implementation/081-implement-leader-lobby-join.md)~~ ✓
-- [082 — Add Leader Display Name Uniqueness Validation](implementation/082-add-leader-name-validation.md)
+- ~~[082 — Add Leader Display Name Uniqueness Validation](implementation/082-add-leader-name-validation.md)~~ ✓
 - [083 — Build Leader Lobby Component with PIN Display](implementation/083-build-leader-lobby.md)
 - [084 — Build Landscape PIN Display Mode](implementation/084-build-landscape-pin-display.md)
 - [085 — Add Start Round Button with Team Count Gate](implementation/085-add-start-round-button.md)
