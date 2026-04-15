@@ -20,8 +20,8 @@ Update the leader game page route to validate the gameId and render the LeaderGa
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 

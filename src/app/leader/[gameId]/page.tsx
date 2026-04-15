@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 
+import { LeaderGame } from '@/components/LeaderGame'
 import { prisma } from '@/lib/prisma'
 
 type LeaderPageProps = {
@@ -18,9 +19,5 @@ export default async function LeaderPage({ params }: LeaderPageProps) {
     notFound()
   }
 
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center">
-      <p className="text-lg">Leader View - {gameId}</p>
-    </div>
-  )
+  return <LeaderGame gameId={gameId} />
 }
