@@ -68,14 +68,31 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       })
     }
 
+    const handleSquareClaimed = (payload: {
+      roundItemId: string
+      teamId: string
+      teamName: string
+      teamColour: string
+    }) => {
+      dispatch({
+        type: 'SQUARE_CLAIMED',
+        roundItemId: payload.roundItemId,
+        teamId: payload.teamId,
+        teamName: payload.teamName,
+        teamColour: payload.teamColour,
+      })
+    }
+
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
+    socket.on('square:claimed', handleSquareClaimed)
 
     return () => {
       socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
       socket.off('game:started', handleGameStarted)
+      socket.off('square:claimed', handleSquareClaimed)
     }
   }, [socket, dispatch])
 

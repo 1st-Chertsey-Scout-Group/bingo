@@ -26,7 +26,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         mySubmissions: new Map(),
       }
 
-    case 'SQUARE_CLAIMED':
+    case 'SQUARE_CLAIMED': {
+      const updatedSubmissions = new Map(state.mySubmissions)
+      updatedSubmissions.delete(action.roundItemId)
       return {
         ...state,
         board: state.board.map((item) =>
@@ -40,7 +42,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
               }
             : item,
         ),
+        mySubmissions: updatedSubmissions,
       }
+    }
 
     case 'SQUARE_PENDING':
       return {

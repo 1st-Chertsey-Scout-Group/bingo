@@ -27,8 +27,8 @@ Listen for `square:claimed` events to update the board when any team claims a sq
 
 ## Checklist
 
-- [ ] Implemented
-- [ ] Verified
+- [x] Implemented
+- [x] Verified
 
 ## Verification
 
