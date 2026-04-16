@@ -59,14 +59,6 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
       return
     }
 
-    const updatedGame = await prisma.game.update({
-      where: { id: gameId },
-      data: {
-        status: 'active',
-        roundStartedAt: new Date(),
-      },
-    })
-
     // Query items and template values for board generation
     const [concreteItems, templateItems, templateValues, recentRoundItems] =
       await Promise.all([
@@ -75,8 +67,8 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
         prisma.templateValue.findMany(),
         prisma.roundItem.findMany({
           where: {
-            gameId: updatedGame.id,
-            round: { gte: updatedGame.round - 2 },
+            gameId: game.id,
+            round: { gte: game.round - 2 },
           },
           select: { itemId: true },
         }),
@@ -88,8 +80,8 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
 
     try {
       boardItems = generateBoard({
-        boardSize: updatedGame.boardSize,
-        templateCount: updatedGame.templateCount,
+        boardSize: game.boardSize,
+        templateCount: game.templateCount,
         allItems: concreteItems,
         templateItems,
         templateValues,
@@ -98,26 +90,48 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
     } catch (err) {
       const message =
         err instanceof Error ? err.message : 'Board generation failed'
-      await prisma.game.update({
-        where: { id: gameId },
-        data: { status: 'lobby', roundStartedAt: null },
-      })
       socket.emit('error', { message })
       return
     }
 
-    await prisma.roundItem.createMany({
-      data: boardItems.map((item) => ({
-        gameId: updatedGame.id,
-        itemId: item.itemId,
-        displayName: item.displayName,
-        round: updatedGame.round,
-      })),
-    })
+    let startResult: {
+      updatedGame: { id: string; round: number; roundStartedAt: Date | null }
+      roundItems: Array<{ id: string; displayName: string }>
+    }
+    try {
+      startResult = await prisma.$transaction(async (tx) => {
+        const updatedGame = await tx.game.update({
+          where: { id: gameId },
+          data: {
+            status: 'active',
+            roundStartedAt: new Date(),
+          },
+        })
 
-    const roundItems = await prisma.roundItem.findMany({
-      where: { gameId: updatedGame.id, round: updatedGame.round },
-    })
+        await tx.roundItem.createMany({
+          data: boardItems.map((item) => ({
+            gameId: updatedGame.id,
+            itemId: item.itemId,
+            displayName: item.displayName,
+            round: updatedGame.round,
+          })),
+        })
+
+        const roundItems = await tx.roundItem.findMany({
+          where: { gameId: updatedGame.id, round: updatedGame.round },
+          select: { id: true, displayName: true },
+        })
+
+        return { updatedGame, roundItems }
+      })
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : 'Failed to start round'
+      socket.emit('error', { message })
+      return
+    }
+
+    const { updatedGame, roundItems } = startResult
 
     const board = roundItems.map((roundItem) => ({
       roundItemId: roundItem.id,
