@@ -89,30 +89,48 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      if (roundItem.claimedByTeamId !== null) {
+      const createResult = await prisma.$transaction(async (tx) => {
+        const current = await tx.roundItem.findUnique({
+          where: { id: roundItemId },
+        })
+        if (!current) {
+          return { kind: 'invalid' as const }
+        }
+        if (current.claimedByTeamId !== null) {
+          return { kind: 'claimed' as const }
+        }
+
+        const maxPosition = await tx.submission.aggregate({
+          where: { roundItemId },
+          _max: { position: true },
+        })
+
+        const position = (maxPosition._max.position ?? 0) + 1
+
+        await tx.submission.create({
+          data: {
+            roundItemId,
+            teamId,
+            photoUrl,
+            status: 'pending',
+            position,
+          },
+        })
+
+        return { kind: 'ok' as const }
+      })
+
+      if (createResult.kind === 'invalid') {
+        socket.emit('error', { message: 'Invalid round item' })
+        return
+      }
+      if (createResult.kind === 'claimed') {
         io.to(`team:${teamId}`).emit('submission:discarded', {
           roundItemId,
           reason: 'already_claimed',
         })
         return
       }
-
-      const maxPosition = await prisma.submission.aggregate({
-        where: { roundItemId },
-        _max: { position: true },
-      })
-
-      const position = (maxPosition._max.position ?? 0) + 1
-
-      await prisma.submission.create({
-        data: {
-          roundItemId,
-          teamId,
-          photoUrl,
-          status: 'pending',
-          position,
-        },
-      })
 
       io.to(`game:${gameId}`).emit('square:pending', { roundItemId })
       io.to(`team:${teamId}`).emit('submission:received', { roundItemId })
@@ -337,12 +355,31 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           data: { status: 'approved', reviewedBy: leaderName },
         })
 
+        // Discard all other pending submissions atomically so no
+        // concurrent submission:submit can slip a new pending row in.
+        const competing = await tx.submission.findMany({
+          where: {
+            roundItemId: roundItem.id,
+            status: 'pending',
+          },
+          select: { id: true, teamId: true },
+        })
+
+        await tx.submission.updateMany({
+          where: {
+            roundItemId: roundItem.id,
+            status: 'pending',
+          },
+          data: { status: 'discarded' },
+        })
+
         return {
           approved: true,
           roundItemId: roundItem.id,
           teamId: submission.teamId,
           teamName: submission.team.name,
           teamColour: submission.team.colour,
+          discardedTeamIds: competing.map((s) => s.teamId),
         } as const
       })
 
@@ -378,20 +415,8 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           roundItemId: result.roundItemId,
         })
 
-        // Discard all other pending submissions for this round item
-        const competingSubmissions = await prisma.submission.findMany({
-          where: {
-            roundItemId: result.roundItemId,
-            status: 'pending',
-          },
-        })
-
-        for (const sub of competingSubmissions) {
-          await prisma.submission.update({
-            where: { id: sub.id },
-            data: { status: 'discarded' },
-          })
-          io.to(`team:${sub.teamId}`).emit('submission:discarded', {
+        for (const teamId of result.discardedTeamIds) {
+          io.to(`team:${teamId}`).emit('submission:discarded', {
             roundItemId: result.roundItemId,
             reason: 'already_claimed',
           })
