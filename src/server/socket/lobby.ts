@@ -9,6 +9,18 @@ import {
 } from '@/lib/session-token'
 import { getNextTeam } from '@/lib/teams'
 
+async function leaveGameRooms(socket: Socket): Promise<void> {
+  for (const room of Array.from(socket.rooms)) {
+    if (
+      room.startsWith('game:') ||
+      room.startsWith('team:') ||
+      room.startsWith('leaders:')
+    ) {
+      await socket.leave(room)
+    }
+  }
+}
+
 export function registerLobbyHandlers(io: Server, socket: Socket): void {
   socket.on(
     'lobby:join',
@@ -73,6 +85,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        await leaveGameRooms(socket)
         await socket.join(`game:${game.id}`)
         await socket.join(`leaders:${game.id}`)
 
@@ -140,6 +153,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
 
       const team = assigned.team
 
+      await leaveGameRooms(socket)
       await socket.join(`game:${game.id}`)
       await socket.join(`team:${team.id}`)
 
@@ -263,6 +277,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         })
 
         // Join rooms
+        await leaveGameRooms(socket)
         await socket.join(`game:${game.id}`)
         await socket.join(`team:${teamId}`)
 
@@ -360,6 +375,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        await leaveGameRooms(socket)
         await socket.join(`game:${game.id}`)
         await socket.join(`leaders:${game.id}`)
 

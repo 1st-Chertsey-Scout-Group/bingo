@@ -4,21 +4,13 @@ import { getPhotoUrlPrefix } from '@/lib/s3'
 import { endGame } from '@/server/socket/game'
 
 function getTeamIdFromSocket(socket: Socket): string | undefined {
-  for (const room of socket.rooms) {
-    if (room.startsWith('team:')) {
-      return room.slice(5)
-    }
-  }
-  return undefined
+  const teamId = socket.data.teamId
+  return typeof teamId === 'string' ? teamId : undefined
 }
 
 function getGameIdFromSocket(socket: Socket): string | undefined {
-  for (const room of socket.rooms) {
-    if (room.startsWith('game:')) {
-      return room.slice(5)
-    }
-  }
-  return undefined
+  const gameId = socket.data.gameId
+  return typeof gameId === 'string' ? gameId : undefined
 }
 
 export function registerSubmissionHandlers(io: Server, socket: Socket): void {
