@@ -1,5 +1,6 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
+import { getPhotoUrlPrefix } from '@/lib/s3'
 import { endGame } from '@/server/socket/game'
 
 function getTeamIdFromSocket(socket: Socket): string | undefined {
@@ -79,6 +80,12 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
 
       if (team.socketId !== socket.id) {
         socket.emit('error', { message: 'Team session is not yours' })
+        return
+      }
+
+      const expectedPrefix = getPhotoUrlPrefix(gameId)
+      if (!photoUrl.startsWith(expectedPrefix)) {
+        socket.emit('error', { message: 'Invalid photo URL' })
         return
       }
 

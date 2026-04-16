@@ -24,6 +24,18 @@ function createS3Client(): S3Client {
   })
 }
 
+export function getPhotoUrlPrefix(gameId: string): string {
+  const bucket = getEnvVar('S3_BUCKET')
+  const region = getEnvVar('S3_REGION')
+  const endpoint = process.env['S3_ENDPOINT']
+
+  const base = endpoint
+    ? `${endpoint}/${bucket}`
+    : `https://${bucket}.s3.${region}.amazonaws.com`
+
+  return `${base}/games/${gameId}/submissions/`
+}
+
 export async function getPresignedUploadUrl(
   gameId: string,
   contentType: string,
