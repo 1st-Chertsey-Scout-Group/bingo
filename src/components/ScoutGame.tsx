@@ -169,9 +169,11 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     const handleGameLobby = () => {
       clearTeamIdFromSession()
       dispatch({ type: 'GAME_LOBBY' })
-      // Re-join lobby for fresh team assignment
       if (gamePin) {
-        socket.emit('lobby:join', { gamePin })
+        const delayMs = Math.floor(Math.random() * 500)
+        setTimeout(() => {
+          socket.emit('lobby:join', { gamePin })
+        }, delayMs)
       }
     }
 
