@@ -190,9 +190,34 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     }
 
     const handleRejoinError = (payload: { message: string }) => {
-      clearSession()
-      toast(payload.message)
-      window.location.href = '/'
+      const message = payload.message
+      const fatal = new Set([
+        'Invalid leader PIN',
+        'Game not found',
+        'Game has ended',
+        'Team not found',
+        'Invalid session token',
+      ])
+      const recoverable = new Set([
+        'Round has ended — please rejoin',
+        'Team not in current round',
+      ])
+
+      if (fatal.has(message)) {
+        clearSession()
+        toast(message)
+        window.location.href = '/'
+        return
+      }
+
+      if (recoverable.has(message) && gamePin) {
+        clearTeamIdFromSession()
+        toast(message)
+        socket.emit('lobby:join', { gamePin })
+        return
+      }
+
+      toast(message)
     }
 
     const handleServerError = (payload: { message?: string } | undefined) => {
