@@ -59,6 +59,14 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
       return
     }
 
+    const teamCount = await prisma.team.count({
+      where: { gameId, round: game.round },
+    })
+    if (teamCount < 2) {
+      socket.emit('error', { message: 'At least two teams required' })
+      return
+    }
+
     // Query items and template values for board generation
     const [concreteItems, templateItems, templateValues, recentRoundItems] =
       await Promise.all([
