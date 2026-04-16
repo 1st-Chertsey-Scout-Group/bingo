@@ -177,6 +177,31 @@ describe('generateBoard', () => {
     }
   })
 
+  it('backfills concrete items when templateCount exceeds available templates', () => {
+    const board = generateBoard({
+      boardSize: 9,
+      templateCount: 8,
+      allItems: mockConcreteItems,
+      templateItems: mockTemplateItems,
+      templateValues: mockTemplateValues,
+      recentItemIds: [],
+    })
+
+    expect(board).toHaveLength(9)
+
+    const templateItemsOnBoard = board.filter((b) =>
+      mockTemplateItems.some((t) => t.id === b.itemId),
+    )
+    expect(templateItemsOnBoard.length).toBeLessThanOrEqual(
+      mockTemplateItems.length,
+    )
+
+    const concreteItemsOnBoard = board.filter((b) =>
+      mockConcreteItems.some((c) => c.id === b.itemId),
+    )
+    expect(templateItemsOnBoard.length + concreteItemsOnBoard.length).toBe(9)
+  })
+
   it('works correctly with an empty recentItemIds array', () => {
     const board = generateBoard({
       boardSize: 9,

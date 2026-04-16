@@ -47,8 +47,37 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
     recentItemIds,
   } = options
 
-  const concreteCount = boardSize - templateCount
   const boardItems: BoardItem[] = []
+
+  // Fill template slots first so we know how many concrete slots remain
+  const usedValues = new Set<string>()
+  const shuffledTemplates = fisherYatesShuffle(templateItems)
+  let templateSlotsFilled = 0
+
+  for (const template of shuffledTemplates) {
+    if (templateSlotsFilled >= templateCount) break
+
+    const match = template.name.match(/\[(\w+)]/)
+    if (!match) continue
+    const category = match[1]
+
+    const values = templateValues
+      .filter((tv) => tv.category === category)
+      .map((tv) => tv.value)
+
+    const resolved = resolveTemplate(
+      template.name,
+      category,
+      values,
+      usedValues,
+    )
+    if (resolved !== null) {
+      boardItems.push({ itemId: template.id, displayName: resolved })
+      templateSlotsFilled++
+    }
+  }
+
+  const concreteCount = boardSize - boardItems.length
 
   // Select concrete items, avoiding recent where possible
   const recentSet = new Set(recentItemIds)
@@ -77,34 +106,6 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
 
   for (const item of selectedConcrete) {
     boardItems.push({ itemId: item.id, displayName: item.name })
-  }
-
-  // Fill template slots
-  const usedValues = new Set<string>()
-  const shuffledTemplates = fisherYatesShuffle(templateItems)
-  let templateSlotsFilled = 0
-
-  for (const template of shuffledTemplates) {
-    if (templateSlotsFilled >= templateCount) break
-
-    const match = template.name.match(/\[(\w+)]/)
-    if (!match) continue
-    const category = match[1]
-
-    const values = templateValues
-      .filter((tv) => tv.category === category)
-      .map((tv) => tv.value)
-
-    const resolved = resolveTemplate(
-      template.name,
-      category,
-      values,
-      usedValues,
-    )
-    if (resolved !== null) {
-      boardItems.push({ itemId: template.id, displayName: resolved })
-      templateSlotsFilled++
-    }
   }
 
   return fisherYatesShuffle(boardItems)
