@@ -100,6 +100,14 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           return { kind: 'claimed' as const }
         }
 
+        const existingPending = await tx.submission.findFirst({
+          where: { roundItemId, teamId, status: 'pending' },
+          select: { id: true },
+        })
+        if (existingPending) {
+          return { kind: 'duplicate' as const }
+        }
+
         const maxPosition = await tx.submission.aggregate({
           where: { roundItemId },
           _max: { position: true },
@@ -122,6 +130,12 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
 
       if (createResult.kind === 'invalid') {
         socket.emit('error', { message: 'Invalid round item' })
+        return
+      }
+      if (createResult.kind === 'duplicate') {
+        socket.emit('error', {
+          message: 'You already have a pending submission for this square',
+        })
         return
       }
       if (createResult.kind === 'claimed') {
