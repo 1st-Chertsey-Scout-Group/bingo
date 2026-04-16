@@ -228,7 +228,10 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
-        if (team.gameId !== game.id || team.round !== game.round) {
+        const roundMatches =
+          team.round === game.round ||
+          (game.status === 'active' && team.round === game.round - 1)
+        if (team.gameId !== game.id || !roundMatches) {
           socket.emit('rejoin:error', {
             message: 'Team not in current round',
           })
