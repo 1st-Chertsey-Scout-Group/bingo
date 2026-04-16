@@ -44,3 +44,11 @@ export function getTeamByIndex(index: number): Team | undefined {
 export function getNextTeam(currentTeamCount: number): Team | null {
   return TEAMS[currentTeamCount] ?? null
 }
+
+export function pickRandomUnusedTeam(usedNames: string[]): Team | null {
+  const used = new Set(usedNames)
+  const available = TEAMS.filter((t) => !used.has(t.name))
+  if (available.length === 0) return null
+  const index = Math.floor(Math.random() * available.length)
+  return available[index]
+}

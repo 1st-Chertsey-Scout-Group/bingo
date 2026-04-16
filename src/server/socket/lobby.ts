@@ -7,7 +7,7 @@ import {
   hashSessionToken,
   verifySessionToken,
 } from '@/lib/session-token'
-import { getNextTeam } from '@/lib/teams'
+import { pickRandomUnusedTeam } from '@/lib/teams'
 
 async function leaveGameRooms(socket: Socket): Promise<void> {
   for (const room of Array.from(socket.rooms)) {
@@ -121,14 +121,15 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
       const sessionTokenHash = hashSessionToken(sessionToken)
 
       const assigned = await withGameMutex(game.id, async () => {
-        const teamCount = await prisma.team.count({
+        const existing = await prisma.team.findMany({
           where: {
             gameId: game.id,
             round: game.round,
           },
+          select: { name: true },
         })
 
-        const nextTeam = getNextTeam(teamCount)
+        const nextTeam = pickRandomUnusedTeam(existing.map((t) => t.name))
         if (!nextTeam) {
           return { kind: 'full' as const }
         }

@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { TEAMS, getTeamByIndex, getNextTeam } from './teams'
+import {
+  TEAMS,
+  getTeamByIndex,
+  getNextTeam,
+  pickRandomUnusedTeam,
+} from './teams'
 
 describe('TEAMS', () => {
   it('has exactly 30 entries', () => {
@@ -95,5 +100,32 @@ describe('getNextTeam', () => {
 
   it('returns null when current count is 30', () => {
     expect(getNextTeam(30)).toBeNull()
+  })
+})
+
+describe('pickRandomUnusedTeam', () => {
+  it('returns a team not in the used list', () => {
+    const used = TEAMS.slice(0, 5).map((t) => t.name)
+    for (let i = 0; i < 10; i++) {
+      const picked = pickRandomUnusedTeam(used)
+      expect(picked).not.toBeNull()
+      if (picked) {
+        expect(used).not.toContain(picked.name)
+      }
+    }
+  })
+
+  it('returns null when every team is used', () => {
+    const used = TEAMS.map((t) => t.name)
+    expect(pickRandomUnusedTeam(used)).toBeNull()
+  })
+
+  it('is non-deterministic across calls for an empty used list', () => {
+    const picks = new Set<string>()
+    for (let i = 0; i < 50; i++) {
+      const picked = pickRandomUnusedTeam([])
+      if (picked) picks.add(picked.name)
+    }
+    expect(picks.size).toBeGreaterThan(1)
   })
 })
