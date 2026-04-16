@@ -1,6 +1,27 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
 import { generateBoard } from '@/lib/game-logic'
+import { deleteObjects } from '@/lib/s3'
+
+async function sweepOrphanUploads(gameId: string): Promise<void> {
+  const orphans = await prisma.pendingUpload.findMany({
+    where: { gameId, consumedAt: null },
+    select: { id: true, photoKey: true },
+  })
+  if (orphans.length === 0) return
+
+  try {
+    await deleteObjects(orphans.map((o) => o.photoKey))
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`Failed to delete orphan S3 uploads: ${message}`)
+    return
+  }
+
+  await prisma.pendingUpload.deleteMany({
+    where: { id: { in: orphans.map((o) => o.id) } },
+  })
+}
 
 export async function endGame(
   io: Server,
@@ -10,6 +31,11 @@ export async function endGame(
   await prisma.game.update({
     where: { id: gameId },
     data: { status: 'ended' },
+  })
+
+  void sweepOrphanUploads(gameId).catch((err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`Orphan upload sweep failed: ${message}`)
   })
 
   const teams = await prisma.team.findMany({

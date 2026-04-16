@@ -86,3 +86,17 @@ model TemplateValue {
 
   @@unique([category, value])
 }
+
+model PendingUpload {
+  id          String   @id @default(cuid())
+  gameId      String
+  teamId      String
+  roundItemId String
+  photoKey    String   @unique
+  photoUrl    String
+  issuedAt    DateTime @default(now())
+  consumedAt  DateTime?
+
+  @@index([gameId, consumedAt])
+  @@index([teamId])
+}

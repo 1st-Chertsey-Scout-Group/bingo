@@ -117,6 +117,11 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           },
         })
 
+        await tx.pendingUpload.updateMany({
+          where: { photoUrl, consumedAt: null },
+          data: { consumedAt: new Date() },
+        })
+
         return { kind: 'ok' as const }
       })
 

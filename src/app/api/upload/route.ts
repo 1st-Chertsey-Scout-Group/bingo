@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     )
   }
 
-  const { gameId, teamId, contentType, sessionToken } = body as {
+  const { gameId, teamId, roundItemId, contentType, sessionToken } = body as {
     gameId: string
     teamId: string
     roundItemId: string
@@ -69,10 +69,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { uploadUrl, photoUrl } = await getPresignedUploadUrl(
+  const { uploadUrl, photoUrl, key } = await getPresignedUploadUrl(
     gameId,
     contentType,
   )
+
+  await prisma.pendingUpload.create({
+    data: {
+      gameId,
+      teamId,
+      roundItemId,
+      photoKey: key,
+      photoUrl,
+    },
+  })
 
   return NextResponse.json({ uploadUrl, photoUrl })
 }
