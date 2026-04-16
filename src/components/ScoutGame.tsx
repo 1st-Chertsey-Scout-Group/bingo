@@ -231,6 +231,11 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       const teamId = state.myTeam?.id
       if (!teamId) return
 
+      const session = loadSession()
+      const sessionToken =
+        session && session.role === 'scout' ? session.sessionToken : null
+      if (!sessionToken) return
+
       const getPresignedUrl = async () => {
         const res = await fetch('/api/upload', {
           method: 'POST',
@@ -240,6 +245,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
             teamId,
             roundItemId,
             contentType: 'image/webp',
+            sessionToken,
           }),
         })
         if (!res.ok) throw new Error('Failed to get upload URL')
