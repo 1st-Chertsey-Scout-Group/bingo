@@ -62,7 +62,6 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
     const updatedGame = await prisma.game.update({
       where: { id: gameId },
       data: {
-        round: game.round + 1,
         status: 'active',
         roundStartedAt: new Date(),
       },
@@ -101,7 +100,7 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
         err instanceof Error ? err.message : 'Board generation failed'
       await prisma.game.update({
         where: { id: gameId },
-        data: { status: 'lobby', round: game.round, roundStartedAt: null },
+        data: { status: 'lobby', roundStartedAt: null },
       })
       socket.emit('error', { message })
       return
@@ -177,7 +176,11 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
 
     await prisma.game.update({
       where: { id: gameId },
-      data: { status: 'lobby' },
+      data: {
+        round: game.round + 1,
+        roundStartedAt: null,
+        status: 'lobby',
+      },
     })
 
     io.to(`game:${gameId}`).emit('game:lobby', {})
