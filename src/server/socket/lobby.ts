@@ -1,6 +1,7 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
 import { cancelLockTimeout } from '@/server/socket-handler'
+import { withGameMutex } from '@/lib/game-mutex'
 import {
   generateSessionToken,
   hashSessionToken,
@@ -103,32 +104,41 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      const teamCount = await prisma.team.count({
-        where: {
-          gameId: game.id,
-          round: game.round,
-        },
+      const sessionToken = generateSessionToken()
+      const sessionTokenHash = hashSessionToken(sessionToken)
+
+      const assigned = await withGameMutex(game.id, async () => {
+        const teamCount = await prisma.team.count({
+          where: {
+            gameId: game.id,
+            round: game.round,
+          },
+        })
+
+        const nextTeam = getNextTeam(teamCount)
+        if (!nextTeam) {
+          return { kind: 'full' as const }
+        }
+
+        const created = await prisma.team.create({
+          data: {
+            gameId: game.id,
+            name: nextTeam.name,
+            colour: nextTeam.colour,
+            socketId: socket.id,
+            sessionTokenHash,
+            round: game.round,
+          },
+        })
+        return { kind: 'ok' as const, team: created }
       })
 
-      const nextTeam = getNextTeam(teamCount)
-      if (!nextTeam) {
+      if (assigned.kind === 'full') {
         socket.emit('error', { message: 'No more teams available' })
         return
       }
 
-      const sessionToken = generateSessionToken()
-      const sessionTokenHash = hashSessionToken(sessionToken)
-
-      const team = await prisma.team.create({
-        data: {
-          gameId: game.id,
-          name: nextTeam.name,
-          colour: nextTeam.colour,
-          socketId: socket.id,
-          sessionTokenHash,
-          round: game.round,
-        },
-      })
+      const team = assigned.team
 
       await socket.join(`game:${game.id}`)
       await socket.join(`team:${team.id}`)
