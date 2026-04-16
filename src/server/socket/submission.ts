@@ -476,6 +476,16 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
 
+      if (submission.status !== 'pending') {
+        socket.emit('error', { message: 'Submission is no longer pending' })
+        return
+      }
+
+      if (submission.roundItem.lockedByLeader !== leaderName) {
+        socket.emit('error', { message: 'You do not hold the lock' })
+        return
+      }
+
       // Reject the submission
       await prisma.submission.update({
         where: { id: submissionId },
