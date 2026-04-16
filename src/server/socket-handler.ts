@@ -23,7 +23,19 @@ export function cancelLockTimeout(gameId: string, leaderName: string): void {
   }
 }
 
+async function sweepStaleLocks(): Promise<void> {
+  await prisma.roundItem.updateMany({
+    where: { lockedAt: { not: null } },
+    data: { lockedByLeader: null, lockedAt: null },
+  })
+}
+
 export function registerSocketHandlers(io: Server): void {
+  void sweepStaleLocks().catch((err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error(`Failed to sweep stale locks on startup: ${message}`)
+  })
+
   io.on('connection', (socket: Socket) => {
     console.log(`Socket connected: ${socket.id}`)
 
