@@ -368,7 +368,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         socket.data.role = 'leader'
 
         // Cancel any pending lock timeout from a previous disconnect
-        cancelLockTimeout(leaderName)
+        cancelLockTimeout(game.id, leaderName)
 
         const allTeams = await prisma.team.findMany({
           where: { gameId: game.id, round: game.round },

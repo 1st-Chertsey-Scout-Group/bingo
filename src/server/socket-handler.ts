@@ -7,14 +7,19 @@ import { registerSubmissionHandlers } from '@/server/socket/submission'
 
 const LOCK_TIMEOUT_MS = 30_000
 
-// Track pending lock timeouts by leader name
+// Track pending lock timeouts by composite (gameId, leaderName) key
 const lockTimeouts = new Map<string, ReturnType<typeof setTimeout>>()
 
-export function cancelLockTimeout(leaderName: string): void {
-  const timeout = lockTimeouts.get(leaderName)
+function lockTimeoutKey(gameId: string, leaderName: string): string {
+  return `${gameId}:${leaderName}`
+}
+
+export function cancelLockTimeout(gameId: string, leaderName: string): void {
+  const key = lockTimeoutKey(gameId, leaderName)
+  const timeout = lockTimeouts.get(key)
   if (timeout) {
     clearTimeout(timeout)
-    lockTimeouts.delete(leaderName)
+    lockTimeouts.delete(key)
   }
 }
 
@@ -34,9 +39,10 @@ export function registerSocketHandlers(io: Server): void {
 
       if (!leaderName || !gameId) return
 
+      const key = lockTimeoutKey(gameId, leaderName)
       // Start 30-second lock timeout
       const timeout = setTimeout(() => {
-        lockTimeouts.delete(leaderName)
+        lockTimeouts.delete(key)
         void (async () => {
           const lockedItem = await prisma.roundItem.findFirst({
             where: { gameId, lockedByLeader: leaderName },
@@ -54,7 +60,7 @@ export function registerSocketHandlers(io: Server): void {
         })()
       }, LOCK_TIMEOUT_MS)
 
-      lockTimeouts.set(leaderName, timeout)
+      lockTimeouts.set(key, timeout)
     })
   })
 }
