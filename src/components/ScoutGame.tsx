@@ -195,6 +195,11 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       window.location.href = '/'
     }
 
+    const handleServerError = (payload: { message?: string } | undefined) => {
+      toast(payload?.message ?? 'Something went wrong')
+    }
+
+    socket.on('error', handleServerError)
     socket.on('lobby:joined', handleLobbyJoined)
     socket.on('lobby:teams', handleLobbyTeams)
     socket.on('game:started', handleGameStarted)
@@ -210,6 +215,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket.on('rejoin:error', handleRejoinError)
 
     return () => {
+      socket.off('error', handleServerError)
       socket.off('lobby:joined', handleLobbyJoined)
       socket.off('lobby:teams', handleLobbyTeams)
       socket.off('game:started', handleGameStarted)

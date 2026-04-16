@@ -45,7 +45,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
       if (isLeader) {
         const leaderPin = payload?.leaderPin
         if (typeof leaderPin !== 'string' || leaderPin !== game.leaderPin) {
-          socket.emit('error', { error: 'Invalid leader PIN' })
+          socket.emit('error', { message: 'Invalid leader PIN' })
           return
         }
 
@@ -68,7 +68,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         )
         if (isDuplicate) {
           socket.emit('error', {
-            error: 'That leader name is already in use',
+            message: 'That leader name is already in use',
           })
           return
         }
