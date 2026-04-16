@@ -43,6 +43,13 @@ export async function POST(request: Request) {
     sessionToken: string
   }
 
+  if (contentType !== 'image/webp') {
+    return NextResponse.json(
+      { error: 'Unsupported contentType' },
+      { status: 400 },
+    )
+  }
+
   const game = await prisma.game.findUnique({ where: { id: gameId } })
 
   if (!game) {
