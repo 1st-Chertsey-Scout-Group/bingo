@@ -51,6 +51,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       session &&
       session.role === 'scout' &&
       'teamId' in session &&
+      'sessionToken' in session &&
       session.gameId === gameId
     ) {
       // Rejoin with cached session
@@ -58,6 +59,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       socket.emit('rejoin', {
         gamePin: session.gamePin,
         teamId: session.teamId,
+        sessionToken: session.sessionToken,
       })
     } else {
       // Normal join flow
@@ -71,6 +73,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       teamId: string
       teamName: string
       teamColour: string
+      sessionToken: string
     }) => {
       dispatch({
         type: 'LOBBY_JOINED',
@@ -85,6 +88,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
           teamId: payload.teamId,
           teamName: payload.teamName,
           teamColour: payload.teamColour,
+          sessionToken: payload.sessionToken,
           role: 'scout',
         })
       }

@@ -39,6 +39,11 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
 
+      if (socket.data.role !== 'scout') {
+        socket.emit('error', { message: 'Only scouts can submit' })
+        return
+      }
+
       const gameId = getGameIdFromSocket(socket)
       const teamId = getTeamIdFromSocket(socket)
 
@@ -69,6 +74,11 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
       const team = await prisma.team.findUnique({ where: { id: teamId } })
       if (!team || team.gameId !== gameId) {
         socket.emit('error', { message: 'Invalid team' })
+        return
+      }
+
+      if (team.socketId !== socket.id) {
+        socket.emit('error', { message: 'Team session is not yours' })
         return
       }
 

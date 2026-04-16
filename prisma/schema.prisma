@@ -23,15 +23,16 @@ model Game {
 }
 
 model Team {
-  id          String       @id @default(cuid())
-  gameId      String
-  game        Game         @relation(fields: [gameId], references: [id])
-  name        String
-  colour      String
-  socketId    String?
-  round       Int
-  createdAt   DateTime     @default(now())
-  submissions Submission[]
+  id               String       @id @default(cuid())
+  gameId           String
+  game             Game         @relation(fields: [gameId], references: [id])
+  name             String
+  colour           String
+  socketId         String?
+  sessionTokenHash String?
+  round            Int
+  createdAt        DateTime     @default(now())
+  submissions      Submission[]
 
   @@index([gameId])
 }

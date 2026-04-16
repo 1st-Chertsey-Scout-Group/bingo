@@ -6,6 +6,7 @@ export type ScoutSession = {
   teamId: string
   teamName: string
   teamColour: string
+  sessionToken: string
   role: 'scout'
 }
 
@@ -53,6 +54,7 @@ export function clearTeamIdFromSession(): void {
     delete parsed.teamId
     delete parsed.teamName
     delete parsed.teamColour
+    delete parsed.sessionToken
     localStorage.setItem(SESSION_KEY, JSON.stringify(parsed))
   } catch {
     // localStorage unavailable

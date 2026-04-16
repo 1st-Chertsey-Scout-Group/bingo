@@ -1,6 +1,11 @@
 import type { Server, Socket } from 'socket.io'
 import { prisma } from '@/lib/prisma'
 import { cancelLockTimeout } from '@/server/socket-handler'
+import {
+  generateSessionToken,
+  hashSessionToken,
+  verifySessionToken,
+} from '@/lib/session-token'
 import { getNextTeam } from '@/lib/teams'
 
 export function registerLobbyHandlers(io: Server, socket: Socket): void {
@@ -111,12 +116,16 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         return
       }
 
+      const sessionToken = generateSessionToken()
+      const sessionTokenHash = hashSessionToken(sessionToken)
+
       const team = await prisma.team.create({
         data: {
           gameId: game.id,
           name: nextTeam.name,
           colour: nextTeam.colour,
           socketId: socket.id,
+          sessionTokenHash,
           round: game.round,
         },
       })
@@ -124,10 +133,15 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
       await socket.join(`game:${game.id}`)
       await socket.join(`team:${team.id}`)
 
+      socket.data.gameId = game.id
+      socket.data.teamId = team.id
+      socket.data.role = 'scout'
+
       socket.emit('lobby:joined', {
         teamId: team.id,
         teamName: team.name,
         teamColour: team.colour,
+        sessionToken,
       })
 
       const allTeams = await prisma.team.findMany({
@@ -156,6 +170,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         | {
             gamePin: string
             teamId?: string
+            sessionToken?: string
             leaderPin?: string
             leaderName?: string
           }
@@ -198,6 +213,12 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        const sessionToken = payload?.sessionToken
+        if (typeof sessionToken !== 'string' || sessionToken.trim() === '') {
+          socket.emit('rejoin:error', { message: 'sessionToken is required' })
+          return
+        }
+
         const team = await prisma.team.findUnique({
           where: { id: teamId },
         })
@@ -214,6 +235,14 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        if (
+          team.sessionTokenHash === null ||
+          !verifySessionToken(sessionToken, team.sessionTokenHash)
+        ) {
+          socket.emit('rejoin:error', { message: 'Invalid session token' })
+          return
+        }
+
         // Update socket ID
         await prisma.team.update({
           where: { id: teamId },
@@ -223,6 +252,10 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         // Join rooms
         await socket.join(`game:${game.id}`)
         await socket.join(`team:${teamId}`)
+
+        socket.data.gameId = game.id
+        socket.data.teamId = teamId
+        socket.data.role = 'scout'
 
         // Build full state
         const allTeams = await prisma.team.findMany({
