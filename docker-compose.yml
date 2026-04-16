@@ -4,6 +4,5 @@ services:
     ports:
       - '3000:3000'
     environment:
-      - DATABASE_URL=file:/app/data/scout-bingo.db
       - NODE_ENV=production
     env_file: .env
