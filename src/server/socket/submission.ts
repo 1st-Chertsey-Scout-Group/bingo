@@ -317,6 +317,10 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           return { error: 'Submission not found' } as const
         }
 
+        if (submission.status !== 'pending') {
+          return { error: 'Submission is no longer pending' } as const
+        }
+
         // Re-check claim status inside the transaction
         const roundItem = await tx.roundItem.findUnique({
           where: { id: submission.roundItemId },
@@ -324,6 +328,10 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
 
         if (!roundItem) {
           return { error: 'Round item not found' } as const
+        }
+
+        if (roundItem.lockedByLeader !== leaderName) {
+          return { error: 'You do not hold the lock' } as const
         }
 
         if (roundItem.claimedByTeamId !== null) {
