@@ -14,6 +14,7 @@ See [architecture.md](./architecture.md) for room structure (`game:{gameId}`, `l
 | `game:ended`     | `{ summary: TeamSummary[] }`                     | Round over — all teams ranked by claims. Triggered by leader pressing "End Round" or all squares claimed. Scouts see "Head back to base!" |
 | `game:lobby`     | `{}`                                             | New round — everyone return to lobby. Clients must clear cached teamId from localStorage — scouts re-join for fresh team assignment       |
 | `lobby:teams`    | `{ teams: Team[] }`                              | Updated lobby team list (join/leave)                                                                                                      |
+| `team:locked`    | `{ locked: boolean }`                            | Team selection lock state changed — scouts disable/enable team switching                                                                  |
 
 ### Payload Types
 
@@ -49,13 +50,30 @@ type SubmissionForReview = {
   teamColour: string
   photoUrl: string
 }
+
+type BoardItem = {
+  itemId: string
+  displayName: string
+  category: string
+}
+
+type TeamPosition = {
+  teamId: string
+  teamName: string
+  teamColour: string
+  lat: number
+  lng: number
+  accuracy: number
+  updatedAt: string
+}
 ```
 
 ## Server -> Joining Scout Only (direct emit)
 
-| Event          | Payload                            | Description                                          |
-| -------------- | ---------------------------------- | ---------------------------------------------------- |
-| `lobby:joined` | `{ teamId, teamName, teamColour }` | Confirms team assignment after scout joins the lobby |
+| Event           | Payload                                          | Description                                          |
+| --------------- | ------------------------------------------------ | ---------------------------------------------------- |
+| `lobby:joined`  | `{ teamId, teamName, teamColour }`               | Confirms team assignment after scout joins the lobby |
+| `team:switched` | `{ teamId, teamName, teamColour, sessionToken }` | Confirms team switch in lobby                        |
 
 ## Server -> Submitting Scout Only (room: `team:{teamId}`)
 
@@ -68,11 +86,14 @@ type SubmissionForReview = {
 
 ## Server -> Leaders Only (room: `leaders:{gameId}`)
 
-| Event               | Payload                       | Description                                                                                             |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------- |
-| `square:locked`     | `{ roundItemId, leaderName }` | A leader has opened the review modal for this square                                                    |
-| `square:unlocked`   | `{ roundItemId }`             | Lock released (dismissed, acted on, or timed out)                                                       |
-| `review:submission` | `SubmissionForReview`         | The reviewable submission for a square (sent when leader opens modal, or auto-promoted after rejection) |
+| Event                | Payload                                           | Description                                                                                             |
+| -------------------- | ------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `square:locked`      | `{ roundItemId, leaderName }`                     | A leader has opened the review modal for this square                                                    |
+| `square:unlocked`    | `{ roundItemId, hasPendingSubmissions: boolean }` | Lock released (dismissed, acted on, or timed out). Includes whether pending submissions remain          |
+| `review:submission`  | `SubmissionForReview`                             | The reviewable submission for a square (sent when leader opens modal, or auto-promoted after rejection) |
+| `board:preview`      | `{ board: BoardItem[] }`                          | Response to `board:preview` request — generated board for leader to review before starting              |
+| `board:refresh-item` | `{ index: number, item: BoardItem }`              | Response to `board:refresh-item` — single replaced item                                                 |
+| `location:positions` | `{ positions: TeamPosition[] }`                   | Periodic broadcast of all team GPS positions to leaders                                                 |
 
 ## Client (Scout) -> Server
 
@@ -80,21 +101,26 @@ type SubmissionForReview = {
 | ------------------- | --------------------------- | ------------------------------------------- |
 | `lobby:join`        | `{ gamePin }`               | Scout joins lobby, server auto-assigns team |
 | `submission:submit` | `{ roundItemId, photoUrl }` | Photo submitted for a square                |
+| `location:update`   | `{ lat, lng, accuracy }`    | Scout sends GPS coordinates                 |
+| `team:switch`       | `{ targetTeamName }`        | Scout switches teams in lobby               |
 | `rejoin`            | `{ gamePin, teamId }`       | Reconnect with cached session               |
 
 ## Client (Leader) -> Server
 
-| Event            | Payload                              | Description                                                                                                                                                         |
-| ---------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `lobby:join`     | `{ gamePin, leaderPin, leaderName }` | Leader joins lobby. Server rejects if another leader with the same display name is already connected                                                                |
-| `game:start`     | `{}`                                 | Start the round (selects items per board config, notifies all)                                                                                                      |
-| `review:open`    | `{ roundItemId }`                    | Leader opens review modal — server locks square, sends `review:submission` back with the current reviewable submission, broadcasts `square:locked` to other leaders |
-| `review:close`   | `{ roundItemId }`                    | Leader dismisses modal without acting — server releases lock, broadcasts `square:unlocked`                                                                          |
-| `review:approve` | `{ submissionId, leaderName }`       | Approve a submission — releases lock                                                                                                                                |
-| `review:reject`  | `{ submissionId }`                   | Reject a submission — if more queued, auto-promotes next and sends `review:submission` back; otherwise releases lock                                                |
-| `game:end`       | `{}`                                 | End the round — triggers `game:ended` to all clients                                                                                                                |
-| `game:newround`  | `{}`                                 | New round — everyone to lobby with fresh team assignments                                                                                                           |
-| `rejoin`         | `{ gamePin, leaderPin, leaderName }` | Reconnect with cached session                                                                                                                                       |
+| Event                | Payload                                        | Description                                                                                                                                                         |
+| -------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `lobby:join`         | `{ gamePin, leaderPin, leaderName }`           | Leader joins lobby. Server rejects if another leader with the same display name is already connected                                                                |
+| `board:preview`      | `{ categories, boardSize, templateCount }`     | Request a board preview before starting the round                                                                                                                   |
+| `board:refresh-item` | `{ currentBoard, indexToReplace, categories }` | Refresh a single item on the previewed board                                                                                                                        |
+| `game:start`         | `{}`                                           | Start the round (selects items per board config, notifies all)                                                                                                      |
+| `review:open`        | `{ roundItemId }`                              | Leader opens review modal — server locks square, sends `review:submission` back with the current reviewable submission, broadcasts `square:locked` to other leaders |
+| `review:close`       | `{ roundItemId }`                              | Leader dismisses modal without acting — server releases lock, broadcasts `square:unlocked`                                                                          |
+| `review:approve`     | `{ submissionId, leaderName }`                 | Approve a submission — releases lock                                                                                                                                |
+| `review:reject`      | `{ submissionId }`                             | Reject a submission — if more queued, auto-promotes next and sends `review:submission` back; otherwise releases lock                                                |
+| `game:end`           | `{}`                                           | End the round — triggers `game:ended` to all clients                                                                                                                |
+| `team:lock`          | `{ locked: boolean }`                          | Lock or unlock team selection in lobby                                                                                                                              |
+| `game:newround`      | `{}`                                           | New round — everyone to lobby with fresh team assignments                                                                                                           |
+| `rejoin`             | `{ gamePin, leaderPin, leaderName }`           | Reconnect with cached session                                                                                                                                       |
 
 ## Server -> Reconnecting Client
 
