@@ -1,24 +1,72 @@
 import type { Server, Socket } from 'socket.io'
+import { GAME_STATUS, SUBMISSION_STATUS } from '@/lib/constants'
 import { prisma } from '@/lib/prisma'
-import { cancelLockTimeout } from '@/server/socket-handler'
+import {
+  isLeaderNameTaken,
+  requireLeaderContext,
+  requireScoutContext,
+  requireString,
+  ROOM_PREFIXES,
+  SOCKET_ROOMS,
+} from '@/lib/socket-helpers'
+import {
+  cancelLockTimeout,
+  cancelTeamDeleteTimeout,
+} from '@/server/socket-handler'
 import { withGameMutex } from '@/lib/game-mutex'
 import {
   generateSessionToken,
   hashSessionToken,
   verifySessionToken,
 } from '@/lib/session-token'
-import { pickRandomUnusedTeam } from '@/lib/teams'
+import { getAllTeamsInGame, getTeamsInGame } from '@/lib/repositories/team'
+import { pickRandomUnusedTeam, TEAMS } from '@/lib/teams'
 
 async function leaveGameRooms(socket: Socket): Promise<void> {
   for (const room of Array.from(socket.rooms)) {
     if (
-      room.startsWith('game:') ||
-      room.startsWith('team:') ||
-      room.startsWith('leaders:')
+      room.startsWith(ROOM_PREFIXES.GAME) ||
+      room.startsWith(ROOM_PREFIXES.TEAM) ||
+      room.startsWith(ROOM_PREFIXES.LEADERS)
     ) {
       await socket.leave(room)
     }
   }
+}
+
+async function buildRejoinBoard(gameId: string) {
+  const [allTeams, roundItems, claimTeams] = await Promise.all([
+    getTeamsInGame(gameId),
+    prisma.roundItem.findMany({
+      where: { gameId },
+      include: {
+        submissions: {
+          where: { status: SUBMISSION_STATUS.PENDING },
+          select: { id: true },
+        },
+      },
+    }),
+    getAllTeamsInGame(gameId),
+  ])
+
+  const teamMap = new Map(claimTeams.map((t) => [t.id, t]))
+
+  const board = roundItems.map((ri) => {
+    const claimTeam = ri.claimedByTeamId
+      ? teamMap.get(ri.claimedByTeamId)
+      : null
+    return {
+      roundItemId: ri.id,
+      displayName: ri.displayName,
+      claimedByTeamId: ri.claimedByTeamId,
+      claimedByTeamName: claimTeam?.name ?? null,
+      claimedByTeamColour: claimTeam?.colour ?? null,
+      hasPendingSubmissions: ri.submissions.length > 0,
+      lockedByLeader: ri.lockedByLeader,
+    }
+  })
+
+  return { allTeams, board }
 }
 
 export function registerLobbyHandlers(io: Server, socket: Socket): void {
@@ -30,15 +78,12 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         | undefined,
     ) => {
       const gamePin = payload?.gamePin
-      if (typeof gamePin !== 'string' || gamePin.trim() === '') {
-        socket.emit('error', { message: 'gamePin is required' })
-        return
-      }
+      if (!requireString(socket, gamePin, 'gamePin')) return
 
       const game = await prisma.game.findFirst({
         where: {
           pin: gamePin,
-          status: { not: 'ended' },
+          status: { not: GAME_STATUS.ENDED },
         },
       })
 
@@ -47,7 +92,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      if (game.status !== 'lobby') {
+      if (game.status !== GAME_STATUS.LOBBY) {
         socket.emit('error', { message: 'Game is not in lobby' })
         return
       }
@@ -70,15 +115,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
-        const connectedLeaders = await io
-          .in(`leaders:${game.id}`)
-          .fetchSockets()
-        const isDuplicate = connectedLeaders.some(
-          (remote) =>
-            typeof remote.data.leaderName === 'string' &&
-            remote.data.leaderName.toLowerCase() === leaderName.toLowerCase(),
-        )
-        if (isDuplicate) {
+        if (await isLeaderNameTaken(io, game.id, leaderName)) {
           socket.emit('error', {
             message: 'That leader name is already in use',
           })
@@ -86,8 +123,8 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         }
 
         await leaveGameRooms(socket)
-        await socket.join(`game:${game.id}`)
-        await socket.join(`leaders:${game.id}`)
+        await socket.join(SOCKET_ROOMS.game(game.id))
+        await socket.join(SOCKET_ROOMS.leaders(game.id))
 
         socket.data.gameId = game.id
         socket.data.leaderName = leaderName
@@ -98,23 +135,20 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           leaderName,
         })
 
-        const allTeams = await prisma.team.findMany({
-          where: {
-            gameId: game.id,
-            round: game.round,
-          },
-          select: {
-            id: true,
-            name: true,
-            colour: true,
-          },
-          orderBy: {
-            createdAt: 'asc',
-          },
-        })
+        const allTeams = await getTeamsInGame(game.id)
 
         socket.emit('lobby:teams', { teams: allTeams })
         return
+      }
+
+      // Idempotency: if this socket already has a live team, don't create another
+      if (socket.data.teamId) {
+        const existingTeam = await prisma.team.findUnique({
+          where: { id: socket.data.teamId },
+        })
+        if (existingTeam) return
+        // Team was deleted (new round) — clear stale socket data
+        socket.data.teamId = undefined
       }
 
       const sessionToken = generateSessionToken()
@@ -122,10 +156,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
 
       const assigned = await withGameMutex(game.id, async () => {
         const existing = await prisma.team.findMany({
-          where: {
-            gameId: game.id,
-            round: game.round,
-          },
+          where: { gameId: game.id },
           select: { name: true },
         })
 
@@ -141,7 +172,6 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
             colour: nextTeam.colour,
             socketId: socket.id,
             sessionTokenHash,
-            round: game.round,
           },
         })
         return { kind: 'ok' as const, team: created }
@@ -155,8 +185,8 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
       const team = assigned.team
 
       await leaveGameRooms(socket)
-      await socket.join(`game:${game.id}`)
-      await socket.join(`team:${team.id}`)
+      await socket.join(SOCKET_ROOMS.game(game.id))
+      await socket.join(SOCKET_ROOMS.team(team.id))
 
       socket.data.gameId = game.id
       socket.data.teamId = team.id
@@ -167,24 +197,12 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         teamName: team.name,
         teamColour: team.colour,
         sessionToken,
+        teamsLocked: game.teamsLocked,
       })
 
-      const allTeams = await prisma.team.findMany({
-        where: {
-          gameId: game.id,
-          round: game.round,
-        },
-        select: {
-          id: true,
-          name: true,
-          colour: true,
-        },
-        orderBy: {
-          createdAt: 'asc',
-        },
-      })
+      const allTeams = await getTeamsInGame(game.id)
 
-      io.to(`game:${game.id}`).emit('lobby:teams', { teams: allTeams })
+      io.to(SOCKET_ROOMS.game(game.id)).emit('lobby:teams', { teams: allTeams })
     },
   )
 
@@ -216,7 +234,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      if (game.status === 'ended') {
+      if (game.status === GAME_STATUS.ENDED) {
         socket.emit('rejoin:error', { message: 'Game has ended' })
         return
       }
@@ -225,13 +243,6 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
 
       if (!isLeader) {
         // Scout rejoin
-        if (game.status === 'lobby') {
-          socket.emit('rejoin:error', {
-            message: 'Round has ended — please rejoin',
-          })
-          return
-        }
-
         const teamId = payload?.teamId
         if (typeof teamId !== 'string' || teamId.trim() === '') {
           socket.emit('rejoin:error', { message: 'teamId is required' })
@@ -253,12 +264,9 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
-        const roundMatches =
-          team.round === game.round ||
-          (game.status === 'active' && team.round === game.round - 1)
-        if (team.gameId !== game.id || !roundMatches) {
+        if (team.gameId !== game.id) {
           socket.emit('rejoin:error', {
-            message: 'Team not in current round',
+            message: 'Team not in this game',
           })
           return
         }
@@ -271,6 +279,9 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
+        // Cancel any pending lobby-disconnect deletion for this team
+        cancelTeamDeleteTimeout(teamId)
+
         // Update socket ID
         await prisma.team.update({
           where: { id: teamId },
@@ -279,54 +290,17 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
 
         // Join rooms
         await leaveGameRooms(socket)
-        await socket.join(`game:${game.id}`)
-        await socket.join(`team:${teamId}`)
+        await socket.join(SOCKET_ROOMS.game(game.id))
+        await socket.join(SOCKET_ROOMS.team(teamId))
 
         socket.data.gameId = game.id
         socket.data.teamId = teamId
         socket.data.role = 'scout'
 
-        // Build full state
-        const allTeams = await prisma.team.findMany({
-          where: { gameId: game.id, round: game.round },
-          select: { id: true, name: true, colour: true },
-          orderBy: { createdAt: 'asc' },
-        })
-
-        const roundItems = await prisma.roundItem.findMany({
-          where: { gameId: game.id, round: game.round },
-          include: {
-            submissions: {
-              where: { status: 'pending' },
-              select: { id: true },
-            },
-          },
-        })
-
-        const claimTeams = await prisma.team.findMany({
-          where: { gameId: game.id },
-          select: { id: true, name: true, colour: true },
-        })
-
-        const teamMap = new Map(claimTeams.map((t) => [t.id, t]))
-
-        const board = roundItems.map((ri) => {
-          const claimTeam = ri.claimedByTeamId
-            ? teamMap.get(ri.claimedByTeamId)
-            : null
-          return {
-            roundItemId: ri.id,
-            displayName: ri.displayName,
-            claimedByTeamId: ri.claimedByTeamId,
-            claimedByTeamName: claimTeam?.name ?? null,
-            claimedByTeamColour: claimTeam?.colour ?? null,
-            hasPendingSubmissions: ri.submissions.length > 0,
-            lockedByLeader: ri.lockedByLeader,
-          }
-        })
+        const { allTeams, board } = await buildRejoinBoard(game.id)
 
         const mySubmissions = await prisma.submission.findMany({
-          where: { teamId, roundItem: { gameId: game.id, round: game.round } },
+          where: { teamId, roundItem: { gameId: game.id } },
           select: { roundItemId: true, status: true },
         })
 
@@ -346,6 +320,8 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
             : null,
           reviewingRoundItemId: null,
           currentSubmission: null,
+          previewBoard: null,
+          teamsLocked: game.teamsLocked,
         })
       } else {
         // Leader rejoin — implemented in step 137
@@ -362,23 +338,14 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
-        // Check leader name uniqueness
-        const connectedLeaders = await io
-          .in(`leaders:${game.id}`)
-          .fetchSockets()
-        const isDuplicate = connectedLeaders.some(
-          (remote) =>
-            typeof remote.data.leaderName === 'string' &&
-            remote.data.leaderName.toLowerCase() === leaderName.toLowerCase(),
-        )
-        if (isDuplicate) {
+        if (await isLeaderNameTaken(io, game.id, leaderName, socket.id)) {
           socket.emit('rejoin:error', { message: 'Name already taken' })
           return
         }
 
         await leaveGameRooms(socket)
-        await socket.join(`game:${game.id}`)
-        await socket.join(`leaders:${game.id}`)
+        await socket.join(SOCKET_ROOMS.game(game.id))
+        await socket.join(SOCKET_ROOMS.leaders(game.id))
 
         socket.data.gameId = game.id
         socket.data.leaderName = leaderName
@@ -387,43 +354,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
         // Cancel any pending lock timeout from a previous disconnect
         cancelLockTimeout(game.id, leaderName)
 
-        const allTeams = await prisma.team.findMany({
-          where: { gameId: game.id, round: game.round },
-          select: { id: true, name: true, colour: true },
-          orderBy: { createdAt: 'asc' },
-        })
-
-        const roundItems = await prisma.roundItem.findMany({
-          where: { gameId: game.id, round: game.round },
-          include: {
-            submissions: {
-              where: { status: 'pending' },
-              select: { id: true },
-            },
-          },
-        })
-
-        const claimTeams = await prisma.team.findMany({
-          where: { gameId: game.id },
-          select: { id: true, name: true, colour: true },
-        })
-
-        const teamMap = new Map(claimTeams.map((t) => [t.id, t]))
-
-        const board = roundItems.map((ri) => {
-          const claimTeam = ri.claimedByTeamId
-            ? teamMap.get(ri.claimedByTeamId)
-            : null
-          return {
-            roundItemId: ri.id,
-            displayName: ri.displayName,
-            claimedByTeamId: ri.claimedByTeamId,
-            claimedByTeamName: claimTeam?.name ?? null,
-            claimedByTeamColour: claimTeam?.colour ?? null,
-            hasPendingSubmissions: ri.submissions.length > 0,
-            lockedByLeader: ri.lockedByLeader,
-          }
-        })
+        const { allTeams, board } = await buildRejoinBoard(game.id)
 
         socket.emit('rejoin:state', {
           status: game.status,
@@ -437,8 +368,119 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
             : null,
           reviewingRoundItemId: null,
           currentSubmission: null,
+          previewBoard: null,
+          teamsLocked: game.teamsLocked,
         })
       }
     },
   )
+
+  socket.on(
+    'team:switch',
+    async (payload: { targetTeamName: string } | undefined) => {
+      const targetTeamName = payload?.targetTeamName
+      if (!requireString(socket, targetTeamName, 'targetTeamName')) return
+
+      const ctx = requireScoutContext(socket)
+      if (!ctx) return
+      const { gameId, teamId } = ctx
+
+      const targetPreset = TEAMS.find((t) => t.name === targetTeamName)
+      if (!targetPreset) {
+        socket.emit('error', { message: 'Invalid team name' })
+        return
+      }
+
+      const sessionToken = generateSessionToken()
+      const sessionTokenHash = hashSessionToken(sessionToken)
+
+      const result = await withGameMutex(gameId, async () => {
+        const game = await prisma.game.findUnique({ where: { id: gameId } })
+        if (!game || game.status !== GAME_STATUS.LOBBY) {
+          return { kind: 'not_lobby' as const }
+        }
+
+        if (game.teamsLocked) {
+          return { kind: 'locked' as const }
+        }
+
+        const existing = await prisma.team.findUnique({
+          where: { gameId_name: { gameId, name: targetTeamName } },
+        })
+        if (existing) {
+          return { kind: 'taken' as const }
+        }
+
+        await prisma.team.delete({ where: { id: teamId } })
+
+        const created = await prisma.team.create({
+          data: {
+            gameId,
+            name: targetPreset.name,
+            colour: targetPreset.colour,
+            socketId: socket.id,
+            sessionTokenHash,
+          },
+        })
+
+        return { kind: 'ok' as const, team: created }
+      })
+
+      if (result.kind === 'not_lobby') {
+        socket.emit('error', { message: 'Game is not in lobby' })
+        return
+      }
+      if (result.kind === 'locked') {
+        socket.emit('error', { message: 'Team selection is locked' })
+        return
+      }
+      if (result.kind === 'taken') {
+        socket.emit('error', { message: 'That team is already taken' })
+        return
+      }
+
+      const team = result.team
+
+      // Update socket room
+      await socket.leave(SOCKET_ROOMS.team(teamId))
+      await socket.join(SOCKET_ROOMS.team(team.id))
+      socket.data.teamId = team.id
+
+      socket.emit('team:switched', {
+        teamId: team.id,
+        teamName: team.name,
+        teamColour: team.colour,
+        sessionToken,
+      })
+
+      const allTeams = await getTeamsInGame(gameId)
+      io.to(SOCKET_ROOMS.game(gameId)).emit('lobby:teams', { teams: allTeams })
+    },
+  )
+
+  socket.on('team:lock', async (payload: { locked: boolean } | undefined) => {
+    if (typeof payload?.locked !== 'boolean') {
+      socket.emit('error', { message: 'locked is required' })
+      return
+    }
+
+    const ctx = requireLeaderContext(socket)
+    if (!ctx) return
+    const { gameId } = ctx
+
+    const game = await prisma.game.findUnique({ where: { id: gameId } })
+    if (!game || game.status !== GAME_STATUS.LOBBY) {
+      socket.emit('error', { message: 'Game is not in lobby' })
+      return
+    }
+
+    await prisma.game.update({
+      where: { id: gameId },
+      data: { teamsLocked: payload.locked },
+    })
+
+    io.to(SOCKET_ROOMS.game(gameId)).emit('team:locked', {
+      locked: payload.locked,
+    })
+  })
 }

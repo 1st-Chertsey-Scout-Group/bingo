@@ -1,16 +1,61 @@
 import type { Server, Socket } from 'socket.io'
+import { GAME_STATUS, SUBMISSION_STATUS } from '@/lib/constants'
 import { prisma } from '@/lib/prisma'
 import { getPhotoUrlPrefix } from '@/lib/s3'
+import {
+  acquireLock,
+  releaseLock,
+  releaseLeaderLock,
+  UNLOCK_DATA,
+} from '@/lib/services/lock-service'
+import {
+  requireLeaderContext,
+  requireScoutContext,
+  requireString,
+  SOCKET_ROOMS,
+} from '@/lib/socket-helpers'
+import { getNextPendingSubmission } from '@/lib/repositories/submission'
 import { endGame } from '@/server/socket/game'
 
-function getTeamIdFromSocket(socket: Socket): string | undefined {
-  const teamId = socket.data.teamId
-  return typeof teamId === 'string' ? teamId : undefined
+type SubmissionWithContext = NonNullable<
+  Awaited<ReturnType<typeof getNextPendingSubmission>>
+>
+
+function emitReviewSubmission(
+  socket: Socket,
+  submission: SubmissionWithContext,
+): void {
+  socket.emit('review:submission', {
+    submissionId: submission.id,
+    roundItemId: submission.roundItemId,
+    displayName: submission.roundItem.displayName,
+    teamName: submission.team.name,
+    teamColour: submission.team.colour,
+    photoUrl: submission.photoUrl,
+  })
 }
 
-function getGameIdFromSocket(socket: Socket): string | undefined {
-  const gameId = socket.data.gameId
-  return typeof gameId === 'string' ? gameId : undefined
+function broadcastSquareUnlocked(
+  io: Server,
+  gameId: string,
+  roundItemId: string,
+  hasPendingSubmissions = true,
+): void {
+  io.to(SOCKET_ROOMS.leaders(gameId)).emit('square:unlocked', {
+    roundItemId,
+    hasPendingSubmissions,
+  })
+}
+
+function emitSubmissionDiscarded(
+  io: Server,
+  teamId: string,
+  roundItemId: string,
+): void {
+  io.to(SOCKET_ROOMS.team(teamId)).emit('submission:discarded', {
+    roundItemId,
+    reason: 'already_claimed',
+  })
 }
 
 export function registerSubmissionHandlers(io: Server, socket: Socket): void {
@@ -21,14 +66,9 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
       const photoUrl = payload?.photoUrl
 
       if (
-        typeof roundItemId !== 'string' ||
-        roundItemId.trim() === '' ||
-        typeof photoUrl !== 'string' ||
-        photoUrl.trim() === ''
+        !requireString(socket, roundItemId, 'roundItemId') ||
+        !requireString(socket, photoUrl, 'photoUrl')
       ) {
-        socket.emit('error', {
-          message: 'roundItemId and photoUrl are required',
-        })
         return
       }
 
@@ -37,16 +77,12 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      const gameId = getGameIdFromSocket(socket)
-      const teamId = getTeamIdFromSocket(socket)
-
-      if (!gameId || !teamId) {
-        socket.emit('error', { message: 'Not connected to a game' })
-        return
-      }
+      const ctx = requireScoutContext(socket)
+      if (!ctx) return
+      const { gameId, teamId } = ctx
 
       const game = await prisma.game.findUnique({ where: { id: gameId } })
-      if (!game || game.status !== 'active') {
+      if (!game || game.status !== GAME_STATUS.ACTIVE) {
         socket.emit('error', { message: 'Game is not active' })
         return
       }
@@ -55,11 +91,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         where: { id: roundItemId },
       })
 
-      if (
-        !roundItem ||
-        roundItem.gameId !== gameId ||
-        roundItem.round !== game.round
-      ) {
+      if (!roundItem || roundItem.gameId !== gameId) {
         socket.emit('error', { message: 'Invalid round item' })
         return
       }
@@ -93,7 +125,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         }
 
         const existingPending = await tx.submission.findFirst({
-          where: { roundItemId, teamId, status: 'pending' },
+          where: { roundItemId, teamId, status: SUBMISSION_STATUS.PENDING },
           select: { id: true },
         })
         if (existingPending) {
@@ -112,7 +144,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
             roundItemId,
             teamId,
             photoUrl,
-            status: 'pending',
+            status: SUBMISSION_STATUS.PENDING,
             position,
           },
         })
@@ -136,15 +168,14 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
       if (createResult.kind === 'claimed') {
-        io.to(`team:${teamId}`).emit('submission:discarded', {
-          roundItemId,
-          reason: 'already_claimed',
-        })
+        emitSubmissionDiscarded(io, teamId, roundItemId)
         return
       }
 
-      io.to(`game:${gameId}`).emit('square:pending', { roundItemId })
-      io.to(`team:${teamId}`).emit('submission:received', { roundItemId })
+      io.to(SOCKET_ROOMS.game(gameId)).emit('square:pending', { roundItemId })
+      io.to(SOCKET_ROOMS.team(teamId)).emit('submission:received', {
+        roundItemId,
+      })
     },
   )
 
@@ -152,21 +183,14 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     'review:open',
     async (payload: { roundItemId: string } | undefined) => {
       const roundItemId = payload?.roundItemId
-      if (typeof roundItemId !== 'string' || roundItemId.trim() === '') {
-        socket.emit('error', { message: 'roundItemId is required' })
-        return
-      }
+      if (!requireString(socket, roundItemId, 'roundItemId')) return
 
-      const gameId = getGameIdFromSocket(socket)
-      const leaderName = socket.data.leaderName as string | undefined
-
-      if (!gameId || !leaderName) {
-        socket.emit('error', { message: 'Not connected as a leader' })
-        return
-      }
+      const ctx = requireLeaderContext(socket)
+      if (!ctx) return
+      const { gameId, leaderName } = ctx
 
       const game = await prisma.game.findUnique({ where: { id: gameId } })
-      if (!game || game.status !== 'active') {
+      if (!game || game.status !== GAME_STATUS.ACTIVE) {
         socket.emit('error', { message: 'Game is not active' })
         return
       }
@@ -175,11 +199,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         where: { id: roundItemId },
       })
 
-      if (
-        !roundItem ||
-        roundItem.gameId !== gameId ||
-        roundItem.round !== game.round
-      ) {
+      if (!roundItem || roundItem.gameId !== gameId) {
         socket.emit('error', { message: 'Invalid round item' })
         return
       }
@@ -191,7 +211,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
 
       // Check for pending submissions
       const pendingCount = await prisma.submission.count({
-        where: { roundItemId, status: 'pending' },
+        where: { roundItemId, status: SUBMISSION_STATUS.PENDING },
       })
 
       if (pendingCount === 0) {
@@ -211,52 +231,29 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
       }
 
       // One-lock-per-leader: release any existing lock held by this leader
-      const existingLock = await prisma.roundItem.findFirst({
-        where: {
-          gameId,
-          round: game.round,
-          lockedByLeader: leaderName,
-          id: { not: roundItemId },
-        },
-      })
+      const releasedId = await releaseLeaderLock(
+        gameId,
+        leaderName,
+        roundItemId,
+      )
 
-      if (existingLock) {
-        await prisma.roundItem.update({
-          where: { id: existingLock.id },
-          data: { lockedByLeader: null, lockedAt: null },
-        })
-        io.to(`leaders:${gameId}`).emit('square:unlocked', {
-          roundItemId: existingLock.id,
-        })
+      if (releasedId) {
+        broadcastSquareUnlocked(io, gameId, releasedId)
       }
 
       // Lock the square
-      await prisma.roundItem.update({
-        where: { id: roundItemId },
-        data: { lockedByLeader: leaderName, lockedAt: new Date() },
-      })
+      await acquireLock(roundItemId, leaderName)
 
-      io.to(`leaders:${gameId}`).emit('square:locked', {
+      io.to(SOCKET_ROOMS.leaders(gameId)).emit('square:locked', {
         roundItemId,
         leaderName,
       })
 
       // Find the first pending submission
-      const submission = await prisma.submission.findFirst({
-        where: { roundItemId, status: 'pending' },
-        orderBy: { position: 'asc' },
-        include: { team: true, roundItem: true },
-      })
+      const submission = await getNextPendingSubmission(roundItemId)
 
       if (submission) {
-        socket.emit('review:submission', {
-          submissionId: submission.id,
-          roundItemId: submission.roundItemId,
-          displayName: submission.roundItem.displayName,
-          teamName: submission.team.name,
-          teamColour: submission.team.colour,
-          photoUrl: submission.photoUrl,
-        })
+        emitReviewSubmission(socket, submission)
       }
     },
   )
@@ -265,18 +262,11 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     'review:close',
     async (payload: { roundItemId: string } | undefined) => {
       const roundItemId = payload?.roundItemId
-      if (typeof roundItemId !== 'string' || roundItemId.trim() === '') {
-        socket.emit('error', { message: 'roundItemId is required' })
-        return
-      }
+      if (!requireString(socket, roundItemId, 'roundItemId')) return
 
-      const gameId = getGameIdFromSocket(socket)
-      const leaderName = socket.data.leaderName as string | undefined
-
-      if (!gameId || !leaderName) {
-        socket.emit('error', { message: 'Not connected as a leader' })
-        return
-      }
+      const ctx = requireLeaderContext(socket)
+      if (!ctx) return
+      const { gameId, leaderName } = ctx
 
       const roundItem = await prisma.roundItem.findUnique({
         where: { id: roundItemId },
@@ -292,12 +282,9 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         return
       }
 
-      await prisma.roundItem.update({
-        where: { id: roundItemId },
-        data: { lockedByLeader: null, lockedAt: null },
-      })
+      await releaseLock(roundItemId)
 
-      io.to(`leaders:${gameId}`).emit('square:unlocked', { roundItemId })
+      broadcastSquareUnlocked(io, gameId, roundItemId)
     },
   )
 
@@ -305,18 +292,11 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     'review:approve',
     async (payload: { submissionId: string } | undefined) => {
       const submissionId = payload?.submissionId
-      if (typeof submissionId !== 'string' || submissionId.trim() === '') {
-        socket.emit('error', { message: 'submissionId is required' })
-        return
-      }
+      if (!requireString(socket, submissionId, 'submissionId')) return
 
-      const gameId = getGameIdFromSocket(socket)
-      const leaderName = socket.data.leaderName as string | undefined
-
-      if (!gameId || !leaderName) {
-        socket.emit('error', { message: 'Not connected as a leader' })
-        return
-      }
+      const ctx = requireLeaderContext(socket)
+      if (!ctx) return
+      const { gameId, leaderName } = ctx
 
       const result = await prisma.$transaction(async (tx) => {
         const submission = await tx.submission.findUnique({
@@ -328,7 +308,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           return { error: 'Submission not found' } as const
         }
 
-        if (submission.status !== 'pending') {
+        if (submission.status !== SUBMISSION_STATUS.PENDING) {
           return { error: 'Submission is no longer pending' } as const
         }
 
@@ -349,7 +329,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           // Race lost: square already claimed
           await tx.submission.update({
             where: { id: submissionId },
-            data: { status: 'discarded' },
+            data: { status: SUBMISSION_STATUS.DISCARDED },
           })
           return {
             discarded: true,
@@ -363,15 +343,14 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
           where: { id: roundItem.id },
           data: {
             claimedByTeamId: submission.teamId,
-            lockedByLeader: null,
-            lockedAt: null,
+            ...UNLOCK_DATA,
           },
         })
 
         // Approve the submission
         await tx.submission.update({
           where: { id: submissionId },
-          data: { status: 'approved', reviewedBy: leaderName },
+          data: { status: SUBMISSION_STATUS.APPROVED, reviewedBy: leaderName },
         })
 
         // Discard all other pending submissions atomically so no
@@ -379,7 +358,7 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         const competing = await tx.submission.findMany({
           where: {
             roundItemId: roundItem.id,
-            status: 'pending',
+            status: SUBMISSION_STATUS.PENDING,
           },
           select: { id: true, teamId: true },
         })
@@ -387,9 +366,9 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         await tx.submission.updateMany({
           where: {
             roundItemId: roundItem.id,
-            status: 'pending',
+            status: SUBMISSION_STATUS.PENDING,
           },
-          data: { status: 'discarded' },
+          data: { status: SUBMISSION_STATUS.DISCARDED },
         })
 
         return {
@@ -408,16 +387,13 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
       }
 
       if ('discarded' in result) {
-        io.to(`team:${result.teamId}`).emit('submission:discarded', {
-          roundItemId: result.roundItemId,
-          reason: 'already_claimed',
-        })
+        emitSubmissionDiscarded(io, result.teamId, result.roundItemId)
         return
       }
 
       if ('approved' in result) {
         // Broadcast square:claimed to all clients
-        io.to(`game:${gameId}`).emit('square:claimed', {
+        io.to(SOCKET_ROOMS.game(gameId)).emit('square:claimed', {
           roundItemId: result.roundItemId,
           teamId: result.teamId,
           teamName: result.teamName,
@@ -425,35 +401,29 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
         })
 
         // Notify the team
-        io.to(`team:${result.teamId}`).emit('submission:approved', {
+        io.to(SOCKET_ROOMS.team(result.teamId)).emit('submission:approved', {
           roundItemId: result.roundItemId,
         })
 
         // Notify leaders that the lock is released
-        io.to(`leaders:${gameId}`).emit('square:unlocked', {
-          roundItemId: result.roundItemId,
-        })
+        broadcastSquareUnlocked(io, gameId, result.roundItemId)
 
         for (const teamId of result.discardedTeamIds) {
-          io.to(`team:${teamId}`).emit('submission:discarded', {
-            roundItemId: result.roundItemId,
-            reason: 'already_claimed',
-          })
+          emitSubmissionDiscarded(io, teamId, result.roundItemId)
         }
 
         // Auto-end check: if all squares are claimed, end the game
         const game = await prisma.game.findUnique({ where: { id: gameId } })
-        if (game && game.status === 'active') {
+        if (game && game.status === GAME_STATUS.ACTIVE) {
           const unclaimedCount = await prisma.roundItem.count({
             where: {
               gameId,
-              round: game.round,
               claimedByTeamId: null,
             },
           })
 
           if (unclaimedCount === 0) {
-            await endGame(io, gameId, game.round)
+            await endGame(io, gameId)
           }
         }
       }
@@ -464,83 +434,69 @@ export function registerSubmissionHandlers(io: Server, socket: Socket): void {
     'review:reject',
     async (payload: { submissionId: string } | undefined) => {
       const submissionId = payload?.submissionId
-      if (typeof submissionId !== 'string' || submissionId.trim() === '') {
-        socket.emit('error', { message: 'submissionId is required' })
-        return
-      }
+      if (!requireString(socket, submissionId, 'submissionId')) return
 
-      const gameId = getGameIdFromSocket(socket)
-      const leaderName = socket.data.leaderName as string | undefined
+      const ctx = requireLeaderContext(socket)
+      if (!ctx) return
+      const { gameId, leaderName } = ctx
 
-      if (!gameId || !leaderName) {
-        socket.emit('error', { message: 'Not connected as a leader' })
-        return
-      }
-
-      const submission = await prisma.submission.findUnique({
-        where: { id: submissionId },
-        include: { roundItem: true, team: true },
-      })
-
-      if (!submission) {
-        socket.emit('error', { message: 'Submission not found' })
-        return
-      }
-
-      if (submission.status !== 'pending') {
-        socket.emit('error', { message: 'Submission is no longer pending' })
-        return
-      }
-
-      if (submission.roundItem.lockedByLeader !== leaderName) {
-        socket.emit('error', { message: 'You do not hold the lock' })
-        return
-      }
-
-      // Reject the submission
-      await prisma.submission.update({
-        where: { id: submissionId },
-        data: { status: 'rejected', reviewedBy: leaderName },
-      })
-
-      // Notify the team
-      io.to(`team:${submission.teamId}`).emit('submission:rejected', {
-        roundItemId: submission.roundItemId,
-      })
-
-      // Find the next pending submission in the queue
-      const nextSubmission = await prisma.submission.findFirst({
-        where: {
-          roundItemId: submission.roundItemId,
-          status: 'pending',
-        },
-        orderBy: { position: 'asc' },
-        include: { team: true, roundItem: true },
-      })
-
-      if (nextSubmission) {
-        // Auto-promote: send the next submission to the reviewing leader
-        socket.emit('review:submission', {
-          submissionId: nextSubmission.id,
-          roundItemId: nextSubmission.roundItemId,
-          displayName: nextSubmission.roundItem.displayName,
-          teamName: nextSubmission.team.name,
-          teamColour: nextSubmission.team.colour,
-          photoUrl: nextSubmission.photoUrl,
+      const result = await prisma.$transaction(async (tx) => {
+        const submission = await tx.submission.findUnique({
+          where: { id: submissionId },
+          include: { roundItem: true, team: true },
         })
-      } else {
-        // No more submissions: release the lock
-        await prisma.roundItem.update({
-          where: { id: submission.roundItemId },
+
+        if (!submission) {
+          return { error: 'Submission not found' } as const
+        }
+
+        if (submission.status !== SUBMISSION_STATUS.PENDING) {
+          return { error: 'Submission is no longer pending' } as const
+        }
+
+        if (submission.roundItem.lockedByLeader !== leaderName) {
+          return { error: 'You do not hold the lock' } as const
+        }
+
+        if (submission.roundItem.claimedByTeamId !== null) {
+          return { error: 'Square already claimed' } as const
+        }
+
+        await tx.submission.update({
+          where: { id: submissionId },
           data: {
-            lockedByLeader: null,
-            lockedAt: null,
+            status: SUBMISSION_STATUS.REJECTED,
+            reviewedBy: leaderName,
           },
         })
 
-        io.to(`leaders:${gameId}`).emit('square:unlocked', {
+        return {
+          rejected: true,
           roundItemId: submission.roundItemId,
-        })
+          teamId: submission.teamId,
+        } as const
+      })
+
+      if ('error' in result) {
+        socket.emit('error', { message: result.error })
+        return
+      }
+
+      // Notify the team
+      io.to(SOCKET_ROOMS.team(result.teamId)).emit('submission:rejected', {
+        roundItemId: result.roundItemId,
+      })
+
+      // Find the next pending submission in the queue
+      const nextSubmission = await getNextPendingSubmission(result.roundItemId)
+
+      if (nextSubmission) {
+        emitReviewSubmission(socket, nextSubmission)
+      } else {
+        // No more submissions: release the lock
+        await releaseLock(result.roundItemId)
+
+        broadcastSquareUnlocked(io, gameId, result.roundItemId, false)
       }
     },
   )
