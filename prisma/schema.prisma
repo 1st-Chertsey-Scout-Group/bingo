@@ -13,13 +13,13 @@ model Game {
   pin            String    @unique
   leaderPin      String
   status         String    @default("lobby") // lobby | active | ended
-  round          Int       @default(1)
-  boardSize      Int       @default(25)
-  templateCount  Int       @default(5)
   roundStartedAt DateTime?
+  teamsLocked    Boolean   @default(false)
   createdAt      DateTime  @default(now())
   teams          Team[]
   roundItems     RoundItem[]
+
+  @@index([leaderPin])
 }
 
 model Team {
@@ -30,17 +30,17 @@ model Team {
   colour           String
   socketId         String?
   sessionTokenHash String?
-  round            Int
   createdAt        DateTime     @default(now())
   submissions      Submission[]
 
-  @@unique([gameId, round, name])
+  @@unique([gameId, name])
   @@index([gameId])
 }
 
 model Item {
   id         String      @id @default(cuid())
   name       String
+  category   String      @default("")
   isTemplate Boolean     @default(false)
   isDefault  Boolean     @default(true)
   roundItems RoundItem[]
@@ -56,10 +56,9 @@ model RoundItem {
   claimedByTeamId String?
   lockedByLeader  String?
   lockedAt        DateTime?
-  round           Int
   submissions     Submission[]
-  @@index([gameId, round])
-  @@unique([gameId, round, itemId])
+  @@index([gameId])
+  @@unique([gameId, itemId])
 }
 
 model Submission {
@@ -74,6 +73,7 @@ model Submission {
   reviewedBy  String?
   createdAt   DateTime  @default(now())
 
+  @@unique([roundItemId, teamId, status])
   @@index([roundItemId, status])
   @@index([roundItemId, position])
   @@index([teamId])
