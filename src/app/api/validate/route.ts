@@ -1,37 +1,35 @@
 import { NextResponse } from 'next/server'
 
+import type { ValidateRequest, ValidateResponse } from '@/lib/api-types'
+import { parseBody } from '@/lib/api-validation'
+import { GAME_STATUS } from '@/lib/constants'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(request: Request) {
-  const body: unknown = await request.json()
-
-  if (
-    typeof body !== 'object' ||
-    body === null ||
-    !('pin' in body) ||
-    typeof (body as Record<string, unknown>).pin !== 'string'
-  ) {
-    return NextResponse.json({ error: 'pin is required' }, { status: 400 })
-  }
-
-  const { pin } = body as { pin: string }
+  const parsed = parseBody<ValidateRequest>(await request.json(), ['pin'])
+  if (!parsed.ok) return parsed.response
+  const { pin } = parsed.data
 
   const game = await prisma.game.findFirst({
     where: {
-      status: { not: 'ended' },
+      status: { not: GAME_STATUS.ENDED },
       OR: [{ pin }, { leaderPin: pin }],
     },
   })
 
   if (!game) {
-    return NextResponse.json({ valid: false })
+    return NextResponse.json<ValidateResponse>({ valid: false })
   }
 
   if (game.pin === pin) {
-    return NextResponse.json({ valid: true, role: 'scout', gameId: game.id })
+    return NextResponse.json<ValidateResponse>({
+      valid: true,
+      role: 'scout',
+      gameId: game.id,
+    })
   }
 
-  return NextResponse.json({
+  return NextResponse.json<ValidateResponse>({
     valid: true,
     role: 'leader',
     gameId: game.id,

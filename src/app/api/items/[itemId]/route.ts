@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
 
-import { checkAdminPin, unauthorizedResponse } from '@/lib/admin'
+import {
+  checkAdminPin,
+  conflict,
+  notFound,
+  unauthorizedResponse,
+} from '@/lib/admin'
+import type { ItemResponse, UpdateItemRequest } from '@/lib/api-types'
+import { parseBody } from '@/lib/api-validation'
+import { GAME_STATUS } from '@/lib/constants'
 import { prisma } from '@/lib/prisma'
 
 export async function PUT(
@@ -13,27 +21,16 @@ export async function PUT(
 
   const { itemId } = await params
 
-  const body: unknown = await request.json()
-
-  if (
-    typeof body !== 'object' ||
-    body === null ||
-    !('name' in body) ||
-    typeof (body as Record<string, unknown>).name !== 'string' ||
-    (body as Record<string, unknown>).name === '' ||
-    ((body as Record<string, unknown>).name as string).trim() === ''
-  ) {
-    return NextResponse.json({ error: 'name is required' }, { status: 400 })
-  }
-
-  const { name } = body as { name: string }
+  const parsed = parseBody<UpdateItemRequest>(await request.json(), ['name'])
+  if (!parsed.ok) return parsed.response
+  const { name } = parsed.data
 
   const existing = await prisma.item.findUnique({
     where: { id: itemId },
   })
 
   if (!existing) {
-    return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+    return notFound('Item not found')
   }
 
   const item = await prisma.item.update({
@@ -41,7 +38,7 @@ export async function PUT(
     data: { name: name.trim() },
   })
 
-  return NextResponse.json({
+  return NextResponse.json<ItemResponse>({
     id: item.id,
     name: item.name,
     isDefault: item.isDefault,
@@ -64,23 +61,20 @@ export async function DELETE(
   })
 
   if (!existing) {
-    return NextResponse.json({ error: 'Item not found' }, { status: 404 })
+    return notFound('Item not found')
   }
 
   const activeRoundItem = await prisma.roundItem.findFirst({
     where: {
       itemId,
       game: {
-        status: 'active',
+        status: GAME_STATUS.ACTIVE,
       },
     },
   })
 
   if (activeRoundItem) {
-    return NextResponse.json(
-      { error: 'Cannot delete item that is in use in an active round' },
-      { status: 409 },
-    )
+    return conflict('Cannot delete item that is in use in an active round')
   }
 
   await prisma.item.delete({

@@ -1,6 +1,10 @@
 import { NextResponse } from 'next/server'
 
+import { notFound } from '@/lib/admin'
+import type { GameDetailResponse } from '@/lib/api-types'
+import { GAME_STATUS } from '@/lib/constants'
 import { prisma } from '@/lib/prisma'
+import { getTeamsInGame } from '@/lib/repositories/team'
 
 export async function GET(
   _request: Request,
@@ -13,13 +17,10 @@ export async function GET(
   })
 
   if (!game) {
-    return NextResponse.json({ error: 'Game not found' }, { status: 404 })
+    return notFound('Game not found')
   }
 
-  const teams = await prisma.team.findMany({
-    where: { gameId: game.id, round: game.round },
-    select: { id: true, name: true, colour: true },
-  })
+  const teams = await getTeamsInGame(game.id)
 
   let board: {
     roundItemId: string
@@ -27,9 +28,9 @@ export async function GET(
     claimedByTeamId: string | null
   }[] = []
 
-  if (game.status === 'active') {
+  if (game.status === GAME_STATUS.ACTIVE) {
     const roundItems = await prisma.roundItem.findMany({
-      where: { gameId: game.id, round: game.round },
+      where: { gameId: game.id },
       include: { item: true },
     })
 
@@ -40,13 +41,10 @@ export async function GET(
     }))
   }
 
-  return NextResponse.json({
+  return NextResponse.json<GameDetailResponse>({
     gameId: game.id,
     pin: game.pin,
-    status: game.status,
-    round: game.round,
-    boardSize: game.boardSize,
-    templateCount: game.templateCount,
+    status: game.status as GameDetailResponse['status'],
     teams,
     board,
   })

@@ -1,104 +1,38 @@
 import { NextResponse } from 'next/server'
 
 import { checkAdminPin, unauthorizedResponse } from '@/lib/admin'
-import { generatePin } from '@/lib/game-logic'
+import type { CreateGameResponse } from '@/lib/api-types'
+import { GAME_STATUS } from '@/lib/constants'
+import { generateLeaderPin, generateScoutPin } from '@/lib/game-logic'
 import { prisma } from '@/lib/prisma'
+
+async function findUniquePin(generator: () => string): Promise<string | null> {
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const candidate = generator()
+    const existing = await prisma.game.findFirst({
+      where: {
+        status: { not: GAME_STATUS.ENDED },
+        OR: [{ pin: candidate }, { leaderPin: candidate }],
+      },
+    })
+    if (!existing) return candidate
+  }
+  return null
+}
 
 export async function POST(request: Request) {
   if (!checkAdminPin(request.headers)) {
     return unauthorizedResponse()
   }
 
-  const body: unknown = await request.json()
+  const [pin, leaderPin] = await Promise.all([
+    findUniquePin(generateScoutPin),
+    findUniquePin(generateLeaderPin),
+  ])
 
-  if (
-    typeof body !== 'object' ||
-    body === null ||
-    !('leaderPin' in body) ||
-    typeof (body as Record<string, unknown>).leaderPin !== 'string' ||
-    (body as Record<string, unknown>).leaderPin === ''
-  ) {
+  if (!pin || !leaderPin) {
     return NextResponse.json(
-      { error: 'leaderPin is required' },
-      { status: 400 },
-    )
-  }
-
-  const {
-    leaderPin,
-    boardSize = 25,
-    templateCount = 5,
-  } = body as {
-    leaderPin: string
-    boardSize?: number
-    templateCount?: number
-  }
-
-  if (!/^\d{4}$/.test(leaderPin)) {
-    return NextResponse.json(
-      { error: 'leaderPin must be exactly 4 digits' },
-      { status: 400 },
-    )
-  }
-
-  if (typeof boardSize !== 'number' || boardSize < 9 || boardSize > 25) {
-    return NextResponse.json(
-      { error: 'boardSize must be between 9 and 25' },
-      { status: 400 },
-    )
-  }
-
-  if (
-    typeof templateCount !== 'number' ||
-    templateCount < 0 ||
-    templateCount > 10
-  ) {
-    return NextResponse.json(
-      { error: 'templateCount must be between 0 and 10' },
-      { status: 400 },
-    )
-  }
-
-  if (templateCount > boardSize) {
-    return NextResponse.json(
-      { error: 'templateCount must not exceed boardSize' },
-      { status: 400 },
-    )
-  }
-
-  const leaderPinCollision = await prisma.game.findFirst({
-    where: {
-      status: { not: 'ended' },
-      OR: [{ pin: leaderPin }, { leaderPin }],
-    },
-  })
-
-  if (leaderPinCollision) {
-    return NextResponse.json(
-      { error: 'Leader PIN conflicts with an existing active game' },
-      { status: 409 },
-    )
-  }
-
-  let pin: string | null = null
-  for (let attempt = 0; attempt < 10; attempt++) {
-    const candidate = generatePin()
-    if (candidate === leaderPin) continue
-    const existing = await prisma.game.findFirst({
-      where: {
-        status: { not: 'ended' },
-        OR: [{ pin: candidate }, { leaderPin: candidate }],
-      },
-    })
-    if (!existing) {
-      pin = candidate
-      break
-    }
-  }
-
-  if (!pin) {
-    return NextResponse.json(
-      { error: 'Failed to generate unique PIN' },
+      { error: 'Failed to generate unique PINs' },
       { status: 500 },
     )
   }
@@ -107,20 +41,16 @@ export async function POST(request: Request) {
     data: {
       pin,
       leaderPin,
-      boardSize,
-      templateCount,
-      status: 'lobby',
+      status: GAME_STATUS.LOBBY,
     },
   })
 
-  return NextResponse.json(
+  return NextResponse.json<CreateGameResponse>(
     {
       gameId: game.id,
       pin: game.pin,
       leaderPin: game.leaderPin,
-      status: game.status,
-      boardSize: game.boardSize,
-      templateCount: game.templateCount,
+      status: game.status as CreateGameResponse['status'],
     },
     { status: 201 },
   )
