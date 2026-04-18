@@ -28,16 +28,18 @@ function createS3Client(): S3Client {
   })
 }
 
-export function getPhotoUrlPrefix(gameId: string): string {
+function buildS3BaseUrl(): string {
   const bucket = getEnvVar('S3_BUCKET')
   const region = getEnvVar('S3_REGION')
   const endpoint = process.env['S3_ENDPOINT']
 
-  const base = endpoint
+  return endpoint
     ? `${endpoint}/${bucket}`
     : `https://${bucket}.s3.${region}.amazonaws.com`
+}
 
-  return `${base}/games/${gameId}/submissions/`
+export function getPhotoUrlPrefix(gameId: string): string {
+  return `${buildS3BaseUrl()}/games/${gameId}/submissions/`
 }
 
 export async function getPresignedUploadUrl(
@@ -45,9 +47,6 @@ export async function getPresignedUploadUrl(
   contentType: string,
 ): Promise<{ uploadUrl: string; photoUrl: string; key: string }> {
   const bucket = getEnvVar('S3_BUCKET')
-  const region = getEnvVar('S3_REGION')
-  const endpoint = process.env['S3_ENDPOINT']
-
   const key = `games/${gameId}/submissions/${createId()}.webp`
   const client = createS3Client()
 
@@ -58,10 +57,7 @@ export async function getPresignedUploadUrl(
   })
 
   const uploadUrl = await getSignedUrl(client, command, { expiresIn: 300 })
-
-  const photoUrl = endpoint
-    ? `${endpoint}/${bucket}/${key}`
-    : `https://${bucket}.s3.${region}.amazonaws.com/${key}`
+  const photoUrl = `${buildS3BaseUrl()}/${key}`
 
   return { uploadUrl, photoUrl, key }
 }

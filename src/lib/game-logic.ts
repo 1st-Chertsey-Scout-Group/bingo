@@ -1,8 +1,10 @@
 import { resolveTemplate } from '@/lib/templates'
+import type { BoardItem } from '@/types'
 
 type Item = {
   id: string
   name: string
+  category: string
   isTemplate: boolean
 }
 
@@ -12,18 +14,24 @@ type TemplateValue = {
   value: string
 }
 
-type BoardItem = {
-  itemId: string
-  displayName: string
-}
-
 type GenerateBoardOptions = {
   boardSize: number
   templateCount: number
   allItems: Item[]
   templateItems: Item[]
   templateValues: TemplateValue[]
-  recentItemIds: string[]
+  recentItemIds?: string[]
+  categories?: string[]
+}
+
+type RefreshBoardItemOptions = {
+  currentBoard: BoardItem[]
+  indexToReplace: number
+  allItems: Item[]
+  templateItems: Item[]
+  templateValues: TemplateValue[]
+  recentItemIds?: string[]
+  categories?: string[]
 }
 
 function fisherYatesShuffle<T>(array: T[]): T[] {
@@ -44,8 +52,14 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
     allItems,
     templateItems,
     templateValues,
-    recentItemIds,
+    recentItemIds = [],
+    categories,
   } = options
+
+  // Filter by selected categories if provided
+  const filteredItems = categories
+    ? allItems.filter((item) => categories.includes(item.category))
+    : allItems
 
   const boardItems: BoardItem[] = []
 
@@ -81,10 +95,10 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
 
   // Select concrete items, avoiding recent where possible
   const recentSet = new Set(recentItemIds)
-  const nonRecent = allItems.filter((item) => !recentSet.has(item.id))
+  const nonRecent = filteredItems.filter((item) => !recentSet.has(item.id))
   const recent = recentItemIds
-    .filter((id) => allItems.some((item) => item.id === id))
-    .map((id) => allItems.find((item) => item.id === id) as Item)
+    .filter((id) => filteredItems.some((item) => item.id === id))
+    .map((id) => filteredItems.find((item) => item.id === id) as Item)
 
   const shuffledNonRecent = fisherYatesShuffle(nonRecent)
   const selectedConcrete: Item[] = []
@@ -111,9 +125,90 @@ export function generateBoard(options: GenerateBoardOptions): BoardItem[] {
   return fisherYatesShuffle(boardItems)
 }
 
-export function generatePin(): string {
-  const pin = Math.floor(Math.random() * 10000)
-  return pin.toString().padStart(4, '0')
+export function refreshBoardItem(
+  options: RefreshBoardItemOptions,
+): BoardItem | null {
+  const {
+    currentBoard,
+    indexToReplace,
+    allItems,
+    templateItems,
+    templateValues,
+    recentItemIds = [],
+    categories,
+  } = options
+
+  if (indexToReplace < 0 || indexToReplace >= currentBoard.length) return null
+
+  // Collect itemIds already on the board (excluding the one being replaced)
+  const usedItemIds = new Set(
+    currentBoard
+      .filter((_, i) => i !== indexToReplace)
+      .map((item) => item.itemId),
+  )
+
+  // Filter available items by categories
+  const filteredItems = categories
+    ? allItems.filter((item) => categories.includes(item.category))
+    : allItems
+
+  // Exclude items already on the board
+  const available = filteredItems.filter((item) => !usedItemIds.has(item.id))
+
+  if (available.length === 0) {
+    // Try a template instead
+    const usedValues = new Set<string>()
+    // Collect existing template display names to avoid duplicates
+    for (const boardItem of currentBoard) {
+      if (boardItem.itemId !== currentBoard[indexToReplace].itemId) {
+        usedValues.add(boardItem.displayName)
+      }
+    }
+
+    const shuffledTemplates = fisherYatesShuffle(templateItems)
+    for (const template of shuffledTemplates) {
+      const match = template.name.match(/\[(\w+)]/)
+      if (!match) continue
+      const category = match[1]
+      const values = templateValues
+        .filter((tv) => tv.category === category)
+        .map((tv) => tv.value)
+      const resolved = resolveTemplate(
+        template.name,
+        category,
+        values,
+        usedValues,
+      )
+      if (resolved !== null) {
+        return { itemId: template.id, displayName: resolved }
+      }
+    }
+
+    return null
+  }
+
+  // Prefer non-recent items
+  const recentSet = new Set(recentItemIds)
+  const nonRecent = available.filter((item) => !recentSet.has(item.id))
+  const pool = nonRecent.length > 0 ? nonRecent : available
+
+  const randomIndex = Math.floor(Math.random() * pool.length)
+  const picked = pool[randomIndex]
+  return { itemId: picked.id, displayName: picked.name }
+}
+
+export function generateScoutPin(): string {
+  // Scout PINs start with 0-4
+  const first = Math.floor(Math.random() * 5)
+  const rest = Math.floor(Math.random() * 1000)
+  return `${String(first)}${rest.toString().padStart(3, '0')}`
+}
+
+export function generateLeaderPin(): string {
+  // Leader PINs start with 5-9
+  const first = 5 + Math.floor(Math.random() * 5)
+  const rest = Math.floor(Math.random() * 1000)
+  return `${String(first)}${rest.toString().padStart(3, '0')}`
 }
 
 export function validatePinUnique(

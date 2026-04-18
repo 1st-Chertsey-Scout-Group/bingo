@@ -1,10 +1,10 @@
-type Team = {
+type TeamPreset = {
   index: number
   name: string
   colour: string
 }
 
-export const TEAMS: Team[] = [
+export const TEAMS: TeamPreset[] = [
   { index: 0, name: 'Red Rabbits', colour: '#E03131' },
   { index: 1, name: 'Orange Ocelots', colour: '#E8590C' },
   { index: 2, name: 'Yellow Yaks', colour: '#F59F00' },
@@ -37,18 +37,29 @@ export const TEAMS: Team[] = [
   { index: 29, name: 'Copper Chameleons', colour: '#B87333' },
 ]
 
-export function getTeamByIndex(index: number): Team | undefined {
+export function getTeamByIndex(index: number): TeamPreset | undefined {
   return TEAMS[index]
 }
 
-export function getNextTeam(currentTeamCount: number): Team | null {
+export function getNextTeam(currentTeamCount: number): TeamPreset | null {
   return TEAMS[currentTeamCount] ?? null
 }
 
-export function pickRandomUnusedTeam(usedNames: string[]): Team | null {
+export const PRIMARY_TEAM_COUNT = 15
+
+export function pickRandomUnusedTeam(usedNames: string[]): TeamPreset | null {
   const used = new Set(usedNames)
-  const available = TEAMS.filter((t) => !used.has(t.name))
-  if (available.length === 0) return null
-  const index = Math.floor(Math.random() * available.length)
-  return available[index]
+
+  // Prefer primary teams (first 15); only use backups when all primaries are taken
+  const primaryAvailable = TEAMS.slice(0, PRIMARY_TEAM_COUNT).filter(
+    (t) => !used.has(t.name),
+  )
+  const pool =
+    primaryAvailable.length > 0
+      ? primaryAvailable
+      : TEAMS.filter((t) => !used.has(t.name))
+
+  if (pool.length === 0) return null
+  const index = Math.floor(Math.random() * pool.length)
+  return pool[index]
 }
