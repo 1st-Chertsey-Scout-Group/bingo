@@ -1,16 +1,38 @@
 import { describe, expect, it } from 'vitest'
-import { generateBoard, generatePin, validatePinUnique } from './game-logic'
+import {
+  generateBoard,
+  generateLeaderPin,
+  generateScoutPin,
+  refreshBoardItem,
+  validatePinUnique,
+} from './game-logic'
 
 const mockConcreteItems = Array.from({ length: 30 }, (_, i) => ({
   id: `item-${i + 1}`,
   name: `Item ${i + 1}`,
+  category: i < 15 ? 'cat-a' : 'cat-b',
   isTemplate: false,
 }))
 
 const mockTemplateItems = [
-  { id: 'tpl-1', name: 'A [colour] flower', isTemplate: true },
-  { id: 'tpl-2', name: 'A [colour] leaf', isTemplate: true },
-  { id: 'tpl-3', name: 'A [tree] tree', isTemplate: true },
+  {
+    id: 'tpl-1',
+    name: 'A [colour] flower',
+    category: 'templates',
+    isTemplate: true,
+  },
+  {
+    id: 'tpl-2',
+    name: 'A [colour] leaf',
+    category: 'templates',
+    isTemplate: true,
+  },
+  {
+    id: 'tpl-3',
+    name: 'A [tree] tree',
+    category: 'templates',
+    isTemplate: true,
+  },
 ]
 
 const mockTemplateValues = [
@@ -177,6 +199,31 @@ describe('generateBoard', () => {
     }
   })
 
+  it('backfills concrete items when templateCount exceeds available templates', () => {
+    const board = generateBoard({
+      boardSize: 9,
+      templateCount: 8,
+      allItems: mockConcreteItems,
+      templateItems: mockTemplateItems,
+      templateValues: mockTemplateValues,
+      recentItemIds: [],
+    })
+
+    expect(board).toHaveLength(9)
+
+    const templateItemsOnBoard = board.filter((b) =>
+      mockTemplateItems.some((t) => t.id === b.itemId),
+    )
+    expect(templateItemsOnBoard.length).toBeLessThanOrEqual(
+      mockTemplateItems.length,
+    )
+
+    const concreteItemsOnBoard = board.filter((b) =>
+      mockConcreteItems.some((c) => c.id === b.itemId),
+    )
+    expect(templateItemsOnBoard.length + concreteItemsOnBoard.length).toBe(9)
+  })
+
   it('works correctly with an empty recentItemIds array', () => {
     const board = generateBoard({
       boardSize: 9,
@@ -189,25 +236,126 @@ describe('generateBoard', () => {
 
     expect(board).toHaveLength(9)
   })
-})
 
-describe('generatePin', () => {
-  it('returns a string of exactly 4 characters', () => {
-    const pin = generatePin()
-    expect(pin).toHaveLength(4)
-  })
+  it('filters items by categories when provided', () => {
+    const board = generateBoard({
+      boardSize: 9,
+      templateCount: 0,
+      allItems: mockConcreteItems,
+      templateItems: [],
+      templateValues: [],
+      recentItemIds: [],
+      categories: ['cat-a'],
+    })
 
-  it('contains only digits 0-9', () => {
-    for (let i = 0; i < 20; i++) {
-      const pin = generatePin()
-      expect(pin).toMatch(/^\d{4}$/)
+    expect(board).toHaveLength(9)
+    for (const item of board) {
+      const source = mockConcreteItems.find((c) => c.id === item.itemId)
+      expect(source?.category).toBe('cat-a')
     }
   })
 
-  it('generates different values on subsequent calls', () => {
-    const pins = Array.from({ length: 10 }, () => generatePin())
-    const uniquePins = new Set(pins)
-    expect(uniquePins.size).toBeGreaterThan(1)
+  it('uses all items when categories is undefined', () => {
+    const board = generateBoard({
+      boardSize: 25,
+      templateCount: 0,
+      allItems: mockConcreteItems,
+      templateItems: [],
+      templateValues: [],
+      recentItemIds: [],
+    })
+
+    expect(board).toHaveLength(25)
+    const catACount = board.filter((b) => {
+      const source = mockConcreteItems.find((c) => c.id === b.itemId)
+      return source?.category === 'cat-a'
+    }).length
+    const catBCount = board.filter((b) => {
+      const source = mockConcreteItems.find((c) => c.id === b.itemId)
+      return source?.category === 'cat-b'
+    }).length
+    expect(catACount + catBCount).toBe(25)
+  })
+})
+
+describe('generateScoutPin', () => {
+  it('returns a 4-digit string starting with 0-4', () => {
+    for (let i = 0; i < 50; i++) {
+      const pin = generateScoutPin()
+      expect(pin).toMatch(/^[0-4]\d{3}$/)
+    }
+  })
+
+  it('generates different values', () => {
+    const pins = new Set(Array.from({ length: 10 }, () => generateScoutPin()))
+    expect(pins.size).toBeGreaterThan(1)
+  })
+})
+
+describe('generateLeaderPin', () => {
+  it('returns a 4-digit string starting with 5-9', () => {
+    for (let i = 0; i < 50; i++) {
+      const pin = generateLeaderPin()
+      expect(pin).toMatch(/^[5-9]\d{3}$/)
+    }
+  })
+
+  it('generates different values', () => {
+    const pins = new Set(Array.from({ length: 10 }, () => generateLeaderPin()))
+    expect(pins.size).toBeGreaterThan(1)
+  })
+})
+
+describe('refreshBoardItem', () => {
+  const baseBoardItems = Array.from({ length: 9 }, (_, i) => ({
+    itemId: `item-${i + 1}`,
+    displayName: `Item ${i + 1}`,
+  }))
+
+  it('returns a new item not already on the board', () => {
+    const result = refreshBoardItem({
+      currentBoard: baseBoardItems,
+      indexToReplace: 0,
+      allItems: mockConcreteItems,
+      templateItems: mockTemplateItems,
+      templateValues: mockTemplateValues,
+      recentItemIds: [],
+    })
+
+    expect(result).not.toBeNull()
+    const otherIds = baseBoardItems.slice(1).map((b) => b.itemId)
+    expect(otherIds).not.toContain(result?.itemId)
+  })
+
+  it('respects category filtering', () => {
+    const result = refreshBoardItem({
+      currentBoard: baseBoardItems,
+      indexToReplace: 0,
+      allItems: mockConcreteItems,
+      templateItems: mockTemplateItems,
+      templateValues: mockTemplateValues,
+      recentItemIds: [],
+      categories: ['cat-b'],
+    })
+
+    expect(result).not.toBeNull()
+    const source = mockConcreteItems.find((c) => c.id === result?.itemId)
+    if (source) {
+      expect(source.category).toBe('cat-b')
+    }
+  })
+
+  it('returns null for invalid index', () => {
+    const result = refreshBoardItem({
+      currentBoard: baseBoardItems,
+      indexToReplace: -1,
+      allItems: mockConcreteItems,
+      templateItems: mockTemplateItems,
+      templateValues: mockTemplateValues,
+      recentItemIds: [],
+    })
+
+    expect(result).toBeNull()
   })
 })
 

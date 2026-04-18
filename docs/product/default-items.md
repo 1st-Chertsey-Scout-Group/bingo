@@ -4,7 +4,7 @@
 
 ## Templates
 
-Templates generate board items at round time by substituting a random value. Max 5 template-generated items per board of 25. No duplicate values on the same board.
+Templates generate board items at round time by substituting a random value. Max 5 template-generated items per board of 24. No duplicate values on the same board.
 
 ### Something [colour]
 
@@ -123,7 +123,7 @@ Templates generate board items at round time by substituting a random value. Max
 
 ## Template Rules
 
-Board size and template count are configured per game by the admin (see product spec). Defaults: 25 board size, 5 template items.
+Board size and template count are configured per game by the admin (see product spec). Defaults: 24 board size, 5 template items.
 
 When generating a round board:
 

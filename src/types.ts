@@ -14,7 +14,9 @@ export type RoundItem = {
   lockedByLeader: string | null
 }
 
-export type SubmissionStatus = 'pending' | 'approved' | 'rejected' | 'discarded'
+import type { GameStatus, SubmissionStatus } from '@/lib/constants'
+
+export type { GameStatus, SubmissionStatus }
 
 export type TeamSummary = {
   teamId: string
@@ -38,8 +40,18 @@ export type BoardItem = {
   displayName: string
 }
 
+export type TeamPosition = {
+  teamId: string
+  teamName: string
+  teamColour: string
+  lat: number
+  lng: number
+  accuracy: number
+  updatedAt: number
+}
+
 export type GameState = {
-  status: 'lobby' | 'active' | 'ended'
+  status: GameStatus
   teams: Team[]
   board: RoundItem[]
   myTeam: Team | null
@@ -48,6 +60,8 @@ export type GameState = {
   roundStartedAt: string | null
   reviewingRoundItemId: string | null
   currentSubmission: SubmissionForReview | null
+  previewBoard: BoardItem[] | null
+  teamsLocked: boolean
 }
 
 export type GameAction =
@@ -61,12 +75,17 @@ export type GameAction =
     }
   | { type: 'SQUARE_PENDING'; roundItemId: string }
   | { type: 'SQUARE_LOCKED'; roundItemId: string; leaderName: string }
-  | { type: 'SQUARE_UNLOCKED'; roundItemId: string }
+  | {
+      type: 'SQUARE_UNLOCKED'
+      roundItemId: string
+      hasPendingSubmissions: boolean
+    }
   | { type: 'SUBMISSION_SENT'; roundItemId: string }
-  | { type: 'SUBMISSION_RECEIVED'; itemId: string }
-  | { type: 'SUBMISSION_APPROVED'; itemId: string }
-  | { type: 'SUBMISSION_REJECTED'; itemId: string }
-  | { type: 'SUBMISSION_DISCARDED'; itemId: string }
+  | {
+      type: 'SET_SUBMISSION_STATUS'
+      roundItemId: string
+      status: SubmissionStatus
+    }
   | { type: 'SUBMISSION_RESOLVED'; roundItemId: string }
   | {
       type: 'REVIEW_PROMOTED'
@@ -84,3 +103,13 @@ export type GameAction =
     }
   | { type: 'LOBBY_TEAMS'; teams: Team[] }
   | { type: 'FULL_STATE'; state: GameState }
+  | { type: 'BOARD_PREVIEW'; board: BoardItem[] }
+  | { type: 'BOARD_PREVIEW_REFRESH'; index: number; item: BoardItem }
+  | { type: 'BOARD_PREVIEW_CLEAR' }
+  | {
+      type: 'TEAM_SWITCHED'
+      teamId: string
+      teamName: string
+      teamColour: string
+    }
+  | { type: 'TEAMS_LOCKED'; locked: boolean }

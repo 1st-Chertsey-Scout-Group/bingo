@@ -7,6 +7,7 @@ export const getSocket = (): Socket | null => {
 
   if (!socket) {
     socket = io(window.location.origin, {
+      autoConnect: false,
       reconnection: true,
       reconnectionAttempts: Infinity,
       reconnectionDelay: 1000,

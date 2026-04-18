@@ -48,7 +48,7 @@ A real-time web app for scout nature bingo evenings. Teams of 2 scouts race to p
 ### 3. Round Start
 
 - Leader presses "Start Round"
-- Items randomly selected from the pool based on board configuration (default: 25 items). Concrete items are selected first, then template-generated items fill the remaining slots. Items used in the last 2 rounds are avoided where possible (soft constraint — oldest-reused-first when pool is exhausted).
+- Items randomly selected from the pool based on board configuration (default: 24 items). Concrete items are selected first, then template-generated items fill the remaining slots. Items used in the last 2 rounds are avoided where possible (soft constraint — oldest-reused-first when pool is exhausted).
 - All scout devices show the board simultaneously
 
 ### 4. Active Round
@@ -87,9 +87,9 @@ Triggered by either:
 
 ### Layout
 
-- 3-column grid, variable rows based on board size (e.g. 25 items = 9 rows, 9 items = 3 rows)
+- 3-column grid, variable rows based on board size (e.g. 24 items = 8 rows, 9 items = 3 rows)
 - Portrait orientation, vertical scroll only — columns fit screen width
-- Board size configured per game by admin (9-25 items, default 25)
+- Board size configured per game by admin (9-24 items, default 24)
 
 ### Square States (Scout View)
 
@@ -166,7 +166,7 @@ Leaders interact directly with the board — no separate review queue.
 ### Board Configuration
 
 - Admin configures per game when creating the game:
-  - **Board size** (9-25, default 25) — total items on the board
+  - **Board size** (9-24, default 24) — total items on the board
   - **Template count** (0-10, default 5) — how many template-generated items
 - Concrete items = board size minus template count
 - Settings persist across all rounds in the game

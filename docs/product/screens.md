@@ -72,7 +72,7 @@ Leaders review submissions directly from the board — no separate review queue.
 
 - "End Round" button with confirmation dialog ("End this round?")
 - Round timer: MM:SS since round started
-- Progress: claimed/total fraction (e.g. "12/25")
+- Progress: claimed/total fraction (e.g. "12/24")
 
 #### Board Grid
 
@@ -113,7 +113,7 @@ Leaders review submissions directly from the board — no separate review queue.
 - Protected by `ADMIN_PIN`
 - Leader PIN input (for the new game)
 - Display name input ("Your name" — used as leader identity in the game)
-- Board size slider (9-25, default 25)
+- Board size slider (9-24, default 24)
 - Template item count slider (0-10, default 5)
 - "Create Game" button
 - On success: seeds localStorage with leader session data, auto-redirects to L2 (leader lobby) as a joined leader

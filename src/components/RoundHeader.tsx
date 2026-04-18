@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -11,41 +12,27 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
+import { useElapsedTime } from '@/hooks/useElapsedTime'
+import { formatElapsed } from '@/lib/format'
 import type { RoundItem } from '@/types'
 
 type RoundHeaderProps = {
   roundStartedAt: string
   board: RoundItem[]
   onEndRound: () => void
-}
-
-function formatElapsed(seconds: number): string {
-  const mins = Math.floor(seconds / 60)
-  const secs = seconds % 60
-  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`
+  onToggleMap?: () => void
+  mapOpen?: boolean
 }
 
 export function RoundHeader({
   roundStartedAt,
   board,
   onEndRound,
+  onToggleMap,
+  mapOpen,
 }: RoundHeaderProps) {
-  const [elapsed, setElapsed] = useState(0)
+  const elapsed = useElapsedTime(roundStartedAt)
   const [dialogOpen, setDialogOpen] = useState(false)
-
-  useEffect(() => {
-    const startTime = new Date(roundStartedAt).getTime()
-
-    const tick = () => {
-      const now = Date.now()
-      setElapsed(Math.floor((now - startTime) / 1000))
-    }
-
-    tick()
-    const interval = setInterval(tick, 1000)
-
-    return () => clearInterval(interval)
-  }, [roundStartedAt])
 
   const claimed = board.filter((item) => item.claimedByTeamId !== null).length
   const total = board.length
@@ -56,14 +43,24 @@ export function RoundHeader({
   }
 
   return (
-    <div className="bg-background/95 sticky top-0 z-10 flex items-center justify-between border-b px-4 py-2 backdrop-blur">
-      <span className="font-mono text-lg font-semibold">
+    <div className="bg-background/95 sticky top-0 z-10 flex items-center justify-between border-b px-4 py-2.5 backdrop-blur">
+      <span className="font-mono text-lg font-bold">
         {formatElapsed(elapsed)}
       </span>
 
-      <span className="text-muted-foreground text-sm font-medium">
+      <span className="bg-muted rounded-full px-3 py-0.5 text-sm font-bold">
         {claimed}/{total}
       </span>
+
+      {onToggleMap && (
+        <Button
+          variant={mapOpen ? 'default' : 'outline'}
+          size="sm"
+          onClick={onToggleMap}
+        >
+          <MapPin className="h-4 w-4" />
+        </Button>
+      )}
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger

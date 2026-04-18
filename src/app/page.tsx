@@ -7,11 +7,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
-
-type ValidateResponse =
-  | { valid: false }
-  | { valid: true; role: 'scout'; gameId: string }
-  | { valid: true; role: 'leader'; gameId: string; gamePin: string }
+import type { ValidateRequest, ValidateResponse } from '@/lib/api-types'
+import { savePartialSession, saveSession } from '@/lib/session'
 
 type Phase = 'pin' | 'leader-name'
 
@@ -78,20 +75,13 @@ export default function LandingPage() {
       return
     }
 
-    try {
-      localStorage.setItem(
-        'scout-bingo-session',
-        JSON.stringify({
-          gamePin,
-          leaderPin: validatedPin,
-          gameId,
-          leaderName: trimmed,
-          role: 'leader',
-        }),
-      )
-    } catch {
-      // If localStorage write fails, still attempt the redirect
-    }
+    saveSession({
+      gamePin,
+      leaderPin: validatedPin,
+      gameId,
+      leaderName: trimmed,
+      role: 'leader',
+    })
 
     router.push(`/leader/${gameId}`)
   }
@@ -107,7 +97,7 @@ export default function LandingPage() {
       const res = await fetch('/api/validate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin }),
+        body: JSON.stringify({ pin } satisfies ValidateRequest),
       })
 
       const data: ValidateResponse = await res.json()
@@ -119,14 +109,11 @@ export default function LandingPage() {
       }
 
       if (data.role === 'scout') {
-        localStorage.setItem(
-          'scout-bingo-session',
-          JSON.stringify({
-            gamePin: pin,
-            gameId: data.gameId,
-            role: 'scout',
-          }),
-        )
+        savePartialSession({
+          gamePin: pin,
+          gameId: data.gameId,
+          role: 'scout',
+        })
         router.push(`/play/${data.gameId}`)
         return
       }
@@ -163,12 +150,12 @@ export default function LandingPage() {
       )}
       <Card className="w-full max-w-sm">
         <CardHeader className="items-center">
-          <h1 className="text-foreground text-4xl font-bold tracking-tight">
+          <h1 className="text-foreground text-4xl font-extrabold tracking-tight">
             Scout Bingo
           </h1>
           <p className="text-muted-foreground">
             {phase === 'pin'
-              ? 'Enter your game PIN to join'
+              ? 'Your leader will tell you the PIN'
               : 'Enter your name to continue as leader'}
           </p>
         </CardHeader>

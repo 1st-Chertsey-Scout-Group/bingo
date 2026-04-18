@@ -4,6 +4,7 @@ import next from 'next'
 import { Server as SocketIOServer } from 'socket.io'
 
 import { registerSocketHandlers } from '@/server/socket-handler'
+import { startLocationBroadcast } from '@/server/socket/location'
 
 const dev = process.env.NODE_ENV !== 'production'
 const port = parseInt(process.env.PORT ?? '3000', 10)
@@ -21,6 +22,7 @@ nextApp.prepare().then(() => {
   })
 
   registerSocketHandlers(io)
+  startLocationBroadcast(io)
 
   httpServer.listen(port, () => {
     console.log(`Server listening on http://localhost:${port}`)

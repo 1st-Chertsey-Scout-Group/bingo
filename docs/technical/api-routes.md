@@ -81,9 +81,7 @@ X-Admin-Pin: <ADMIN_PIN env var>
   "gameId": "clx...",
   "pin": "3847",
   "leaderPin": "8472",
-  "status": "lobby",
-  "boardSize": 25,
-  "templateCount": 5
+  "status": "lobby"
 }
 ```
 
@@ -108,9 +106,6 @@ Get current game state. Used on reconnect to hydrate full state.
   "gameId": "clx...",
   "pin": "3847",
   "status": "active",
-  "round": 2,
-  "boardSize": 25,
-  "templateCount": 5,
   "teams": [{ "id": "clx...", "name": "Red Rabbits", "colour": "#E03131" }],
   "board": [
     {
@@ -131,7 +126,6 @@ Get current game state. Used on reconnect to hydrate full state.
 
 - Board only returned when status is `active`
 - Board uses `displayName` (resolved template names)
-- `boardSize` and `templateCount` included for client-side layout/display
 
 ## Photo Upload
 

@@ -1,28 +1,19 @@
 'use client'
 
-import { useCallback, useEffect } from 'react'
-import { toast } from 'sonner'
+import { useCallback, useState } from 'react'
 import { Board } from '@/components/Board'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Lobby } from '@/components/Lobby'
 import { Button } from '@/components/ui/button'
 import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
+import { TeamMapDynamic } from '@/components/TeamMapDynamic'
 import { GameProvider, useGame } from '@/hooks/useGameState'
+import { useLeaderSocket } from '@/hooks/useLeaderSocket'
 import { useSocket } from '@/hooks/useSocket'
-import {
-  clearSession,
-  clearTeamIdFromSession,
-  loadSession,
-} from '@/lib/session'
-import type {
-  GameState,
-  RoundItem,
-  SubmissionForReview,
-  SubmissionStatus,
-  Team,
-  TeamSummary,
-} from '@/types'
+import { useTeamPositions } from '@/hooks/useTeamPositions'
+import { GAME_STATUS } from '@/lib/constants'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -33,180 +24,46 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
   const socket = useSocket()
   const { state, dispatch } = useGame()
 
-  useEffect(() => {
-    if (!socket) return
+  useLeaderSocket(socket, dispatch, gamePin, leaderPin)
+  const positions = useTeamPositions(socket)
+  const [mapOpen, setMapOpen] = useState(false)
 
-    const session = loadSession()
-    let leaderName: string | undefined
+  const handleToggleMap = useCallback(() => {
+    setMapOpen((prev) => !prev)
+  }, [])
 
-    if (
-      session &&
-      session.role === 'leader' &&
-      'leaderName' in session &&
-      session.gamePin === gamePin
-    ) {
-      leaderName = session.leaderName
-      socket.emit('rejoin', {
-        gamePin: session.gamePin,
-        leaderPin: session.leaderPin,
-        leaderName: session.leaderName,
+  const handlePreviewBoard = useCallback(
+    (categories: string[], boardSize: number, templateCount: number) => {
+      if (!socket) return
+      socket.emit('board:preview', { categories, boardSize, templateCount })
+    },
+    [socket],
+  )
+
+  const handleRefreshItem = useCallback(
+    (index: number, categories: string[]) => {
+      if (!socket || !state.previewBoard) return
+      socket.emit('board:refresh-item', {
+        currentBoard: state.previewBoard,
+        indexToReplace: index,
+        categories,
       })
-    } else {
-      try {
-        const raw = localStorage.getItem('scout-bingo-session')
-        if (raw) {
-          const parsed = JSON.parse(raw) as { leaderName?: string }
-          leaderName = parsed.leaderName
-        }
-      } catch {
-        // localStorage unavailable
-      }
-      if (leaderName) {
-        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
-      }
-    }
+    },
+    [socket, state.previewBoard],
+  )
 
-    const handleLobbyJoined = (payload: {
-      gameId: string
-      leaderName: string
-    }) => {
-      dispatch({
-        type: 'LOBBY_JOINED',
-        teamId: '',
-        teamName: payload.leaderName,
-        teamColour: '',
-      })
-    }
-
-    const handleLobbyTeams = ({ teams }: { teams: Team[] }) => {
-      dispatch({ type: 'LOBBY_TEAMS', teams })
-    }
-
-    const handleGameStarted = (payload: {
-      board: RoundItem[]
-      roundStartedAt: string
-    }) => {
-      dispatch({
-        type: 'GAME_STARTED',
-        items: payload.board,
-        roundStartedAt: payload.roundStartedAt,
-      })
-    }
-
-    const handleSquarePending = (payload: { roundItemId: string }) => {
-      dispatch({
-        type: 'SQUARE_PENDING',
-        roundItemId: payload.roundItemId,
-      })
-    }
-
-    const handleReviewSubmission = (payload: SubmissionForReview) => {
-      dispatch({
-        type: 'REVIEW_PROMOTED',
-        roundItemId: payload.roundItemId,
-        submission: payload,
-      })
-    }
-
-    const handleSquareLocked = (payload: {
-      roundItemId: string
-      leaderName: string
-    }) => {
-      dispatch({
-        type: 'SQUARE_LOCKED',
-        roundItemId: payload.roundItemId,
-        leaderName: payload.leaderName,
-      })
-    }
-
-    const handleSquareUnlocked = (payload: { roundItemId: string }) => {
-      dispatch({
-        type: 'SQUARE_UNLOCKED',
-        roundItemId: payload.roundItemId,
-      })
-    }
-
-    const handleSquareClaimed = (payload: {
-      roundItemId: string
-      teamId: string
-      teamName: string
-      teamColour: string
-    }) => {
-      dispatch({
-        type: 'SQUARE_CLAIMED',
-        roundItemId: payload.roundItemId,
-        teamId: payload.teamId,
-        teamName: payload.teamName,
-        teamColour: payload.teamColour,
-      })
-    }
-
-    const handleGameEnded = (payload: { summary: TeamSummary[] }) => {
-      dispatch({ type: 'GAME_ENDED', summary: payload.summary })
-    }
-
-    const handleGameLobby = () => {
-      clearTeamIdFromSession()
-      dispatch({ type: 'GAME_LOBBY' })
-      // Re-join lobby
-      if (leaderName) {
-        socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
-      }
-    }
-
-    const handleRejoinState = (
-      payload: Omit<GameState, 'mySubmissions'> & {
-        mySubmissions: Array<[string, string]>
-      },
-    ) => {
-      const fullState: GameState = {
-        ...payload,
-        mySubmissions: new Map(
-          payload.mySubmissions.map(([k, v]) => [k, v as SubmissionStatus]),
-        ),
-      }
-      dispatch({ type: 'FULL_STATE', state: fullState })
-    }
-
-    const handleRejoinError = (payload: { message: string }) => {
-      clearSession()
-      toast(payload.message)
-      window.location.href = '/'
-    }
-
-    socket.on('lobby:joined', handleLobbyJoined)
-    socket.on('lobby:teams', handleLobbyTeams)
-    socket.on('game:started', handleGameStarted)
-    socket.on('square:pending', handleSquarePending)
-    socket.on('review:submission', handleReviewSubmission)
-    socket.on('square:locked', handleSquareLocked)
-    socket.on('square:unlocked', handleSquareUnlocked)
-    socket.on('square:claimed', handleSquareClaimed)
-    socket.on('game:ended', handleGameEnded)
-    socket.on('game:lobby', handleGameLobby)
-    socket.on('rejoin:state', handleRejoinState)
-    socket.on('rejoin:error', handleRejoinError)
-
-    return () => {
-      socket.off('lobby:joined', handleLobbyJoined)
-      socket.off('lobby:teams', handleLobbyTeams)
-      socket.off('game:started', handleGameStarted)
-      socket.off('square:pending', handleSquarePending)
-      socket.off('review:submission', handleReviewSubmission)
-      socket.off('square:locked', handleSquareLocked)
-      socket.off('square:unlocked', handleSquareUnlocked)
-      socket.off('square:claimed', handleSquareClaimed)
-      socket.off('game:ended', handleGameEnded)
-      socket.off('game:lobby', handleGameLobby)
-      socket.off('rejoin:state', handleRejoinState)
-      socket.off('rejoin:error', handleRejoinError)
-    }
-  }, [socket, dispatch, gamePin, leaderPin])
+  const handleClearPreview = useCallback(() => {
+    dispatch({ type: 'BOARD_PREVIEW_CLEAR' })
+  }, [dispatch])
 
   const handleStartRound = useCallback(() => {
     if (!socket) return
-    socket.emit('game:start', {})
-  }, [socket])
+    if (state.previewBoard) {
+      socket.emit('game:start', { confirmedBoard: state.previewBoard })
+    } else {
+      socket.emit('game:start', {})
+    }
+  }, [socket, state.previewBoard])
 
   const handleSquareTap = useCallback(
     (roundItemId: string) => {
@@ -253,26 +110,47 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.emit('game:newround', {})
   }, [socket])
 
+  const handleToggleTeamLock = useCallback(
+    (locked: boolean) => {
+      if (!socket) return
+      socket.emit('team:lock', { locked })
+    },
+    [socket],
+  )
+
   switch (state.status) {
-    case 'lobby':
+    case GAME_STATUS.LOBBY:
       return (
         <Lobby
           role="leader"
           myTeam={null}
           teams={state.teams}
+          teamsLocked={state.teamsLocked}
           gamePin={gamePin}
           leaderPin={leaderPin}
+          previewBoard={state.previewBoard}
+          onPreviewBoard={handlePreviewBoard}
+          onRefreshItem={handleRefreshItem}
           onStartRound={handleStartRound}
+          onClearPreview={handleClearPreview}
+          onToggleTeamLock={handleToggleTeamLock}
         />
       )
-    case 'active':
+    case GAME_STATUS.ACTIVE:
       return (
         <div className="flex h-[calc(100dvh)] flex-col">
           <RoundHeader
             roundStartedAt={state.roundStartedAt ?? new Date().toISOString()}
             board={state.board}
             onEndRound={handleEndRound}
+            onToggleMap={handleToggleMap}
+            mapOpen={mapOpen}
           />
+          {mapOpen && (
+            <div className="h-[45dvh] shrink-0 border-b">
+              <TeamMapDynamic positions={positions} />
+            </div>
+          )}
           <Board
             items={state.board}
             role="leader"
@@ -290,25 +168,33 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
           )}
         </div>
       )
-    case 'ended':
+    case GAME_STATUS.ENDED:
       return (
         <div className="flex h-[calc(100dvh)] flex-col items-center justify-center p-6">
-          <h1 className="mb-6 text-2xl font-bold">Round Over</h1>
+          <h1 className="mb-6 text-3xl font-extrabold">Round Over</h1>
           <div className="w-full max-w-md space-y-3">
             {(state.summary ?? []).map((team, index) => (
               <div
                 key={team.teamId}
-                className="flex items-center gap-3 rounded-lg border p-3"
+                className={`flex items-center gap-3 rounded-xl border-2 p-3.5 shadow-sm ${
+                  index === 0
+                    ? 'border-amber-300 bg-amber-50'
+                    : 'border-gray-100 bg-white'
+                }`}
               >
-                <span className="text-muted-foreground w-6 text-right text-lg font-bold">
+                <span
+                  className={`w-7 text-right text-lg font-extrabold ${
+                    index === 0 ? 'text-amber-500' : 'text-gray-400'
+                  }`}
+                >
                   {index + 1}
                 </span>
                 <span
-                  className="h-4 w-4 shrink-0 rounded-full"
+                  className="h-5 w-5 shrink-0 rounded-full shadow-sm"
                   style={{ backgroundColor: team.teamColour }}
                 />
-                <span className="flex-1 font-medium">{team.teamName}</span>
-                <span className="text-muted-foreground text-sm">
+                <span className="flex-1 font-bold">{team.teamName}</span>
+                <span className="text-sm font-semibold text-gray-500">
                   {team.claimedCount}{' '}
                   {team.claimedCount === 1 ? 'square' : 'squares'}
                 </span>
@@ -326,16 +212,17 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
 }
 
 type LeaderGameProps = {
-  gameId: string
   gamePin: string
   leaderPin: string
 }
 
-export function LeaderGame({ gameId, gamePin, leaderPin }: LeaderGameProps) {
+export function LeaderGame({ gamePin, leaderPin }: LeaderGameProps) {
   return (
-    <GameProvider>
-      <ConnectionBanner />
-      <LeaderGameInner gamePin={gamePin} leaderPin={leaderPin} />
-    </GameProvider>
+    <ErrorBoundary>
+      <GameProvider>
+        <ConnectionBanner />
+        <LeaderGameInner gamePin={gamePin} leaderPin={leaderPin} />
+      </GameProvider>
+    </ErrorBoundary>
   )
 }

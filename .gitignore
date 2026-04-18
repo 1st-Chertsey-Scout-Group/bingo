@@ -46,5 +46,9 @@ next-env.d.ts
 
 # AI Tools
 .claude/**.local.**
+.claude/agent-memory
+
+
+
 /src/generated/prisma
 dist/
