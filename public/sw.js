@@ -35,12 +35,28 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/socket.io/')) return
   if (url.origin !== self.location.origin) return
 
-  // Navigation requests: network-first with cache fallback
+  // Navigation requests: network-first, cache response, fallback to cached page or root
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() =>
-        caches.match('/').then((cached) => cached || new Response('Offline')),
-      ),
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone()
+          caches.open(CACHE_NAME).then((cache) => {
+            cache.put(event.request, clone)
+          })
+          return response
+        })
+        .catch(() =>
+          caches
+            .match(event.request)
+            .then(
+              (cached) =>
+                cached ||
+                caches
+                  .match('/')
+                  .then((root) => root || new Response('Offline')),
+            ),
+        ),
     )
     return
   }

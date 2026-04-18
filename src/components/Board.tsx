@@ -1,5 +1,7 @@
 'use client'
 
+import { memo } from 'react'
+
 import { Square } from '@/components/Square'
 import type { RoundItem } from '@/types'
 
@@ -12,7 +14,7 @@ type BoardProps = {
   onSquareTap: (roundItemId: string) => void
 }
 
-export function Board({
+export const Board = memo(function Board({
   items,
   role,
   myTeamId,
@@ -21,7 +23,11 @@ export function Board({
   onSquareTap,
 }: BoardProps) {
   return (
-    <div className="grid flex-1 grid-cols-3 gap-2 overflow-y-auto p-2">
+    <div
+      className="grid flex-1 grid-cols-3 content-start gap-2.5 overflow-y-auto bg-gray-50/60 p-3"
+      aria-label="Bingo board"
+      role="grid"
+    >
       {items.map((item) => (
         <Square
           key={item.roundItemId}
@@ -35,4 +41,4 @@ export function Board({
       ))}
     </div>
   )
-}
+})

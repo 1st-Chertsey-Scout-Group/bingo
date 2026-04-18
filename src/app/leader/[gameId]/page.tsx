@@ -19,7 +19,5 @@ export default async function LeaderPage({ params }: LeaderPageProps) {
     notFound()
   }
 
-  return (
-    <LeaderGame gameId={gameId} gamePin={game.pin} leaderPin={game.leaderPin} />
-  )
+  return <LeaderGame gamePin={game.pin} leaderPin={game.leaderPin} />
 }

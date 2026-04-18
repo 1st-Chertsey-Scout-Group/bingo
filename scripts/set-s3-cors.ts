@@ -21,6 +21,7 @@ async function main() {
             AllowedOrigins: [
               'https://bingo.1stchertseyscoutgroup.com',
               'https://bingo.1stchertsey.com',
+              'http://localhost:3000',
             ],
             AllowedMethods: ['PUT', 'GET', 'HEAD'],
             AllowedHeaders: ['*'],

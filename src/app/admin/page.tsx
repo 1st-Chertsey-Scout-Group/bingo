@@ -1,27 +1,9 @@
 'use client'
 
-import {
-  useCallback,
-  useEffect,
-  useState,
-  type FormEvent,
-  type KeyboardEvent,
-} from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Lock, Shield, Trash2 } from 'lucide-react'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog'
-import { Badge } from '@/components/ui/badge'
+import { Lock, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -32,38 +14,44 @@ import {
 } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { ScrollArea } from '@/components/ui/scroll-area'
-
-type GameResponse = {
-  gameId: string
-  pin: string
-  leaderPin: string
-  status: string
-  boardSize: number
-  templateCount: number
-}
+import type { CreateGameResponse, ErrorResponse } from '@/lib/api-types'
+import { saveSession } from '@/lib/session'
 
 type GameCreationFormProps = {
   adminPin: string
 }
 
+const ADMIN_PIN_KEY = 'scout-bingo-admin-pin'
+const LEADER_NAME_KEY = 'scout-bingo-leader-name'
+
+function loadStored(key: string): string {
+  try {
+    return localStorage.getItem(key) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+function storeValue(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value)
+  } catch {
+    // localStorage unavailable
+  }
+}
+
 function GameCreationForm({ adminPin }: GameCreationFormProps) {
   const router = useRouter()
-  const [leaderPin, setLeaderPin] = useState('')
   const [displayName, setDisplayName] = useState('')
-  const [boardSize, setBoardSize] = useState(25)
-  const [templateCount, setTemplateCount] = useState(5)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [createdGame, setCreatedGame] = useState<GameResponse | null>(null)
-  const [formError, setFormError] = useState('')
-
-  const templateCountMax = Math.min(10, boardSize)
 
   useEffect(() => {
-    if (templateCount > templateCountMax) {
-      setTemplateCount(templateCountMax)
-    }
-  }, [templateCount, templateCountMax])
+    setDisplayName(loadStored(LEADER_NAME_KEY))
+  }, [])
+  const [createdGame, setCreatedGame] = useState<CreateGameResponse | null>(
+    null,
+  )
+  const [formError, setFormError] = useState('')
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -77,34 +65,30 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
           'Content-Type': 'application/json',
           'X-Admin-Pin': adminPin,
         },
-        body: JSON.stringify({ leaderPin, boardSize, templateCount }),
+        body: JSON.stringify({}),
       })
 
       if (response.status === 201) {
-        const data = (await response.json()) as GameResponse
+        const data = (await response.json()) as CreateGameResponse
         setCreatedGame(data)
-        toast.success(`Game created! PIN: ${data.pin}`)
+        toast.success(
+          `Game created! Scout: ${data.pin} / Leader: ${data.leaderPin}`,
+        )
 
-        try {
-          localStorage.setItem(
-            'scout-bingo-session',
-            JSON.stringify({
-              gamePin: data.pin,
-              leaderPin,
-              gameId: data.gameId,
-              leaderName: displayName,
-              role: 'leader',
-            }),
-          )
-        } catch {
-          // localStorage may be unavailable in private browsing
-        }
+        storeValue(LEADER_NAME_KEY, displayName)
+        saveSession({
+          gamePin: data.pin,
+          leaderPin: data.leaderPin,
+          gameId: data.gameId,
+          leaderName: displayName,
+          role: 'leader',
+        })
 
         setTimeout(() => {
           router.push(`/leader/${data.gameId}`)
         }, 500)
       } else {
-        const errorData = (await response.json()) as { error: string }
+        const errorData = (await response.json()) as ErrorResponse
         setFormError(errorData.error)
       }
     } catch {
@@ -125,23 +109,7 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
       <CardContent>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-2">
-            <Label htmlFor="leader-pin">Leader PIN</Label>
-            <Input
-              id="leader-pin"
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              maxLength={4}
-              value={leaderPin}
-              onChange={(e) => setLeaderPin(e.target.value)}
-              placeholder="4-digit PIN"
-              required
-              className="h-12 text-lg"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="display-name">Display Name</Label>
+            <Label htmlFor="display-name">Your Name</Label>
             <Input
               id="display-name"
               type="text"
@@ -150,36 +118,6 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
               placeholder="Your name"
               required
               className="h-12 text-lg"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="board-size">
-              Board Size: <span className="font-bold">{boardSize}</span>
-            </Label>
-            <input
-              id="board-size"
-              type="range"
-              min={9}
-              max={25}
-              value={boardSize}
-              onChange={(e) => setBoardSize(Number(e.target.value))}
-              className="h-10 w-full"
-            />
-          </div>
-
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="template-count">
-              Template Count: <span className="font-bold">{templateCount}</span>
-            </Label>
-            <input
-              id="template-count"
-              type="range"
-              min={0}
-              max={templateCountMax}
-              value={templateCount}
-              onChange={(e) => setTemplateCount(Number(e.target.value))}
-              className="h-10 w-full"
             />
           </div>
 
@@ -201,7 +139,10 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
                 Game created!
               </p>
               <p className="mt-1 text-3xl font-bold text-green-900 dark:text-green-100">
-                PIN: {createdGame.pin}
+                Scout PIN: {createdGame.pin}
+              </p>
+              <p className="mt-1 text-3xl font-bold text-green-900 dark:text-green-100">
+                Leader PIN: {createdGame.leaderPin}
               </p>
             </div>
           )}
@@ -211,336 +152,35 @@ function GameCreationForm({ adminPin }: GameCreationFormProps) {
   )
 }
 
-type Item = {
-  id: string
-  name: string
-  isTemplate: boolean
-}
-
-type ItemListProps = {
-  adminPin: string
-}
-
-type AddItemFormProps = {
-  adminPin: string
-  refreshItems: () => Promise<void>
-}
-
-function AddItemForm({ adminPin, refreshItems }: AddItemFormProps) {
-  const [name, setName] = useState('')
-  const [isAdding, setIsAdding] = useState(false)
-  const [addError, setAddError] = useState('')
-
-  async function handleAdd(e: FormEvent) {
-    e.preventDefault()
-    const trimmed = name.trim()
-    if (!trimmed) {
-      setAddError('Item name cannot be empty')
-      return
-    }
-
-    setIsAdding(true)
-    setAddError('')
-
-    try {
-      const response = await fetch('/api/items', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Pin': adminPin,
-        },
-        body: JSON.stringify({ name: trimmed }),
-      })
-
-      if (response.status === 201) {
-        setName('')
-        await refreshItems()
-      } else {
-        const data = (await response.json()) as { error: string }
-        setAddError(data.error)
-      }
-    } catch {
-      setAddError('Failed to add item. Please try again.')
-    } finally {
-      setIsAdding(false)
-    }
-  }
-
-  return (
-    <form onSubmit={handleAdd} className="flex flex-col gap-2">
-      <div className="flex gap-2">
-        <Input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="New item name"
-          disabled={isAdding}
-          className="flex-1"
-        />
-        <Button type="submit" disabled={isAdding || !name.trim()}>
-          {isAdding ? 'Adding…' : 'Add'}
-        </Button>
-      </div>
-      {addError && (
-        <p className="text-destructive text-sm font-medium">{addError}</p>
-      )}
-    </form>
-  )
-}
-
-function ItemList({ adminPin }: ItemListProps) {
-  const [items, setItems] = useState<Item[]>([])
-  const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [editingItemId, setEditingItemId] = useState<string | null>(null)
-  const [editName, setEditName] = useState('')
-  const [isSaving, setIsSaving] = useState(false)
-  const [editError, setEditError] = useState('')
-  const [deletingItemId, setDeletingItemId] = useState<string | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-
-  const refreshItems = useCallback(async () => {
-    setIsLoading(true)
-    setError('')
-
-    try {
-      const response = await fetch('/api/items', {
-        headers: { 'X-Admin-Pin': adminPin },
-      })
-
-      if (!response.ok) {
-        setError('Failed to load items')
-        return
-      }
-
-      const data = (await response.json()) as { items: Item[] }
-      setItems(data.items)
-    } catch {
-      setError('Failed to load items')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [adminPin])
-
-  useEffect(() => {
-    void refreshItems()
-  }, [refreshItems])
-
-  function startEditing(item: Item) {
-    setEditingItemId(item.id)
-    setEditName(item.name)
-    setEditError('')
-  }
-
-  function cancelEditing() {
-    setEditingItemId(null)
-    setEditName('')
-    setEditError('')
-  }
-
-  async function saveEdit() {
-    const trimmed = editName.trim()
-    if (!trimmed) {
-      setEditError('Item name cannot be empty')
-      return
-    }
-
-    if (!editingItemId) return
-
-    setIsSaving(true)
-    setEditError('')
-
-    try {
-      const response = await fetch(`/api/items/${editingItemId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Admin-Pin': adminPin,
-        },
-        body: JSON.stringify({ name: trimmed }),
-      })
-
-      if (response.ok) {
-        await refreshItems()
-        setEditingItemId(null)
-        setEditName('')
-      } else {
-        const data = (await response.json()) as { error: string }
-        setEditError(data.error)
-      }
-    } catch {
-      setEditError('Failed to update item. Please try again.')
-    } finally {
-      setIsSaving(false)
-    }
-  }
-
-  function handleEditKeyDown(e: KeyboardEvent<HTMLInputElement>) {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      void saveEdit()
-    } else if (e.key === 'Escape') {
-      cancelEditing()
-    }
-  }
-
-  async function handleDelete(itemId: string) {
-    setIsDeleting(true)
-
-    try {
-      const response = await fetch(`/api/items/${itemId}`, {
-        method: 'DELETE',
-        headers: { 'X-Admin-Pin': adminPin },
-      })
-
-      if (response.status === 204) {
-        setDeletingItemId(null)
-        await refreshItems()
-      } else if (response.status === 409) {
-        setDeletingItemId(null)
-        toast.error('Cannot delete item that is in use in an active round')
-      } else {
-        setDeletingItemId(null)
-        toast.error('Failed to delete item')
-      }
-    } catch {
-      setDeletingItemId(null)
-      toast.error('Failed to delete item')
-    } finally {
-      setIsDeleting(false)
-    }
-  }
-
-  return (
-    <div className="flex flex-col gap-4">
-      <AddItemForm adminPin={adminPin} refreshItems={refreshItems} />
-
-      {isLoading && (
-        <p className="text-muted-foreground text-sm">Loading items…</p>
-      )}
-
-      {!isLoading && error && (
-        <p className="text-destructive text-sm font-medium">{error}</p>
-      )}
-
-      {!isLoading && !error && items.length === 0 && (
-        <p className="text-muted-foreground text-sm">No items yet</p>
-      )}
-
-      {!isLoading && !error && items.length > 0 && (
-        <ScrollArea className="max-h-96">
-          <ul className="flex flex-col gap-2">
-            {items.map((item) => (
-              <li
-                key={item.id}
-                className="flex flex-col gap-1 rounded-md border px-3 py-2"
-              >
-                {editingItemId === item.id ? (
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-center gap-2">
-                      <Input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        onKeyDown={handleEditKeyDown}
-                        disabled={isSaving}
-                        className="flex-1 text-sm"
-                        autoFocus
-                      />
-                      <Button
-                        size="sm"
-                        onClick={() => void saveEdit()}
-                        disabled={isSaving}
-                      >
-                        {isSaving ? 'Saving…' : 'Save'}
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={cancelEditing}
-                        disabled={isSaving}
-                      >
-                        Cancel
-                      </Button>
-                    </div>
-                    {editError && (
-                      <p className="text-destructive text-sm font-medium">
-                        {editError}
-                      </p>
-                    )}
-                  </div>
-                ) : (
-                  <div className="flex items-center justify-between">
-                    <button
-                      type="button"
-                      className="cursor-pointer text-left text-sm hover:underline"
-                      onClick={() => startEditing(item)}
-                    >
-                      {item.name}
-                    </button>
-                    <div className="flex items-center gap-2">
-                      {item.isTemplate && (
-                        <Badge variant="secondary">Template</Badge>
-                      )}
-                      <AlertDialog
-                        open={deletingItemId === item.id}
-                        onOpenChange={(open) => {
-                          if (!open) setDeletingItemId(null)
-                        }}
-                      >
-                        <AlertDialogTrigger
-                          render={
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              onClick={() => setDeletingItemId(item.id)}
-                            />
-                          }
-                        >
-                          <Trash2 className="text-destructive size-4" />
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Delete item</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to delete &quot;{item.name}
-                              &quot;? This action cannot be undone.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel disabled={isDeleting}>
-                              Cancel
-                            </AlertDialogCancel>
-                            <AlertDialogAction
-                              disabled={isDeleting}
-                              onClick={(e) => {
-                                e.preventDefault()
-                                void handleDelete(item.id)
-                              }}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              {isDeleting ? 'Deleting…' : 'Delete'}
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </div>
-                  </div>
-                )}
-              </li>
-            ))}
-          </ul>
-        </ScrollArea>
-      )}
-    </div>
-  )
-}
-
-export function AdminPage() {
-  const [adminPin, setAdminPin] = useState<string | null>(null)
+function AdminPage() {
+  const [adminPin, setAdminPin] = useState('')
   const [pinInput, setPinInput] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [autoTrying, setAutoTrying] = useState(true)
+
+  useEffect(() => {
+    const stored = loadStored(ADMIN_PIN_KEY)
+    if (!stored) {
+      setAutoTrying(false)
+      return
+    }
+
+    void (async () => {
+      try {
+        const response = await fetch('/api/items', {
+          headers: { 'X-Admin-Pin': stored },
+        })
+        if (response.ok) {
+          setAdminPin(stored)
+        }
+      } catch {
+        // Failed — show manual form
+      } finally {
+        setAutoTrying(false)
+      }
+    })()
+  }, [])
 
   async function handleAuthenticate(e: FormEvent) {
     e.preventDefault()
@@ -553,6 +193,7 @@ export function AdminPage() {
       })
 
       if (response.ok) {
+        storeValue(ADMIN_PIN_KEY, pinInput)
         setAdminPin(pinInput)
         setPinInput('')
       } else if (response.status === 401) {
@@ -567,6 +208,14 @@ export function AdminPage() {
     }
   }
 
+  if (autoTrying) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <p className="text-muted-foreground">Authenticating...</p>
+      </div>
+    )
+  }
+
   if (!adminPin) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center p-4">
@@ -577,7 +226,7 @@ export function AdminPage() {
               Admin Access
             </CardTitle>
             <CardDescription>
-              Enter the admin PIN to manage games and items.
+              Enter the admin PIN to manage games.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -615,18 +264,6 @@ export function AdminPage() {
         </div>
 
         <GameCreationForm adminPin={adminPin} />
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Item Management</CardTitle>
-            <CardDescription>
-              Manage bingo board items for the game.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ItemList adminPin={adminPin} />
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
