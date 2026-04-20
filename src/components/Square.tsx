@@ -129,7 +129,7 @@ export const Square = memo(function Square({
               Photo didn&apos;t send — tap to try again
             </span>
           ) : (
-            <span className="line-clamp-2 leading-tight break-words">
+            <span className="line-clamp-3 text-sm leading-tight break-words">
               {roundItem.displayName}
             </span>
           )}

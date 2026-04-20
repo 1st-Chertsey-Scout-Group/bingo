@@ -110,6 +110,11 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
     socket.emit('game:newround', {})
   }, [socket])
 
+  const handleEndGame = useCallback(() => {
+    if (!socket) return
+    socket.emit('game:end', {})
+  }, [socket])
+
   const handleToggleTeamLock = useCallback(
     (locked: boolean) => {
       if (!socket) return
@@ -134,6 +139,7 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
           onStartRound={handleStartRound}
           onClearPreview={handleClearPreview}
           onToggleTeamLock={handleToggleTeamLock}
+          onEndGame={handleEndGame}
         />
       )
     case GAME_STATUS.ACTIVE:

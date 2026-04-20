@@ -3,6 +3,15 @@
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { TeamBadge } from '@/components/TeamBadge'
 import {
@@ -24,6 +33,7 @@ type LeaderLobbyConfigProps = {
     templateCount: number,
   ) => void
   onToggleTeamLock?: (locked: boolean) => void
+  onEndGame?: () => void
 }
 
 export function LeaderLobbyConfig({
@@ -33,6 +43,7 @@ export function LeaderLobbyConfig({
   leaderPin,
   onPreviewBoard,
   onToggleTeamLock,
+  onEndGame,
 }: LeaderLobbyConfigProps) {
   const [categories, setCategories] = useState<Record<string, boolean>>(() => {
     const initial: Record<string, boolean> = {}
@@ -41,6 +52,7 @@ export function LeaderLobbyConfig({
     }
     return initial
   })
+  const [endDialogOpen, setEndDialogOpen] = useState(false)
   const [boardSize, setBoardSize] = useState<number>(BOARD_CONFIG.SIZE_DEFAULT)
   const [templateCount, setTemplateCount] = useState<number>(
     BOARD_CONFIG.TEMPLATE_DEFAULT,
@@ -167,6 +179,40 @@ export function LeaderLobbyConfig({
         <p className="text-muted-foreground text-sm">
           Need at least 1 team to start
         </p>
+      )}
+
+      {onEndGame && (
+        <Dialog open={endDialogOpen} onOpenChange={setEndDialogOpen}>
+          <DialogTrigger
+            render={
+              <Button variant="outline" size="sm" className="text-destructive">
+                End Game
+              </Button>
+            }
+          />
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>End this game?</DialogTitle>
+              <DialogDescription>
+                This will disconnect all scouts and end the game session.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setEndDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => {
+                  setEndDialogOpen(false)
+                  onEndGame()
+                }}
+              >
+                End Game
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </div>
   )

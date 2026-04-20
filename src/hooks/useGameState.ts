@@ -175,6 +175,9 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
 
     case 'TEAMS_LOCKED':
       return { ...state, teamsLocked: action.locked }
+
+    default:
+      return state
   }
 }
 

@@ -91,7 +91,7 @@ export function useScoutSocket(
     }
 
     const handleSubmissionRejected = (payload: { roundItemId: string }) => {
-      toast('Rejected — try again!')
+      toast.error('Rejected — try again!')
       dispatch({
         type: 'SUBMISSION_RESOLVED',
         roundItemId: payload.roundItemId,
@@ -102,7 +102,7 @@ export function useScoutSocket(
       roundItemId: string
       reason: string
     }) => {
-      toast('Already claimed!')
+      toast.error('Already claimed!')
       dispatch({
         type: 'SUBMISSION_RESOLVED',
         roundItemId: payload.roundItemId,
@@ -136,19 +136,19 @@ export function useScoutSocket(
 
       if (fatal.has(message)) {
         clearSession()
-        toast(message)
+        toast.error(message)
         window.location.href = '/'
         return
       }
 
       if (recoverable.has(message) && gamePin) {
         clearTeamIdFromSession()
-        toast(message)
+        toast.error(message)
         socket.emit('lobby:join', { gamePin })
         return
       }
 
-      toast(message)
+      toast.error(message)
     }
 
     const handleTeamSwitched = (payload: {
@@ -195,7 +195,7 @@ export function useScoutSocket(
         'You already have a pending submission for this square':
           'Already submitted — waiting for a leader to review',
       }
-      toast(friendly[raw] ?? raw)
+      toast.error(friendly[raw] ?? raw)
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

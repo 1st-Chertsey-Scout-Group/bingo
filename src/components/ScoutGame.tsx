@@ -6,6 +6,7 @@ import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Lobby } from '@/components/Lobby'
 import { ScoutHeader } from '@/components/ScoutHeader'
+import { SquareDetailDialog } from '@/components/SquareDetailDialog'
 import { UploadOverlay } from '@/components/UploadOverlay'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -25,10 +26,13 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     uploadStage,
     failedUpload,
     pendingItems,
+    selectedItem,
     fileInputRef,
     handleFileSelected,
     handleCancelUpload,
     handleSquareTap,
+    handleConfirmPhoto,
+    handleCancelSelection,
   } = usePhotoUpload({
     gameId,
     teamId: state.myTeam?.id,
@@ -63,6 +67,14 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
           {uploadStage && (
             <UploadOverlay stage={uploadStage} onCancel={handleCancelUpload} />
           )}
+          <SquareDetailDialog
+            displayName={selectedItem?.displayName ?? null}
+            open={selectedItem !== null}
+            onOpenChange={(open) => {
+              if (!open) handleCancelSelection()
+            }}
+            onTakePhoto={handleConfirmPhoto}
+          />
           <input
             ref={fileInputRef}
             type="file"

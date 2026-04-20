@@ -33,10 +33,13 @@ type UsePhotoUploadReturn = {
   uploadStage: UploadStage | null
   failedUpload: { roundItemId: string; blob: Blob } | null
   pendingItems: Set<string>
+  selectedItem: { roundItemId: string; displayName: string } | null
   fileInputRef: RefObject<HTMLInputElement | null>
   handleFileSelected: (e: ChangeEvent<HTMLInputElement>) => void
   handleCancelUpload: () => void
   handleSquareTap: (roundItemId: string) => void
+  handleConfirmPhoto: () => void
+  handleCancelSelection: () => void
 }
 
 export function usePhotoUpload({
@@ -55,6 +58,10 @@ export function usePhotoUpload({
   } | null>(null)
   const [uploadStage, setUploadStage] = useState<UploadStage | null>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const [selectedItem, setSelectedItem] = useState<{
+    roundItemId: string
+    displayName: string
+  } | null>(null)
 
   const doUpload = useCallback(
     async (blob: Blob, roundItemId: string) => {
@@ -95,9 +102,14 @@ export function usePhotoUpload({
         if (abort.signal.aborted) return
 
         if (result.success) {
+          if (!socket?.connected) {
+            setFailedUpload({ roundItemId, blob })
+            toast.error('Lost connection — tap the square to retry')
+            return
+          }
           setUploadStage('submitting')
           setFailedUpload(null)
-          socket?.emit('submission:submit', {
+          socket.emit('submission:submit', {
             roundItemId,
             photoUrl: result.photoUrl,
           })
@@ -107,7 +119,7 @@ export function usePhotoUpload({
         }
       } catch {
         if (!abort.signal.aborted) {
-          toast('Upload failed')
+          toast.error('Upload failed')
         }
       } finally {
         setUploadStage(null)
@@ -136,7 +148,7 @@ export function usePhotoUpload({
           compressed = await compressImage(file)
         } catch {
           setUploadStage(null)
-          toast('Something went wrong. Try again.')
+          toast.error('Something went wrong. Try again.')
           return
         }
 
@@ -175,19 +187,35 @@ export function usePhotoUpload({
       if (!item) return
       if (item.claimedByTeamId !== null) return
       if (pendingItems.has(roundItemId)) return
-      pendingRoundItemIdRef.current = roundItemId
-      fileInputRef.current?.click()
+      setSelectedItem({
+        roundItemId,
+        displayName: item.displayName,
+      })
     },
     [board, pendingItems, failedUpload, doUpload],
   )
+
+  const handleConfirmPhoto = useCallback(() => {
+    if (!selectedItem) return
+    pendingRoundItemIdRef.current = selectedItem.roundItemId
+    setSelectedItem(null)
+    fileInputRef.current?.click()
+  }, [selectedItem])
+
+  const handleCancelSelection = useCallback(() => {
+    setSelectedItem(null)
+  }, [])
 
   return {
     uploadStage,
     failedUpload,
     pendingItems,
+    selectedItem,
     fileInputRef,
     handleFileSelected,
     handleCancelUpload,
     handleSquareTap,
+    handleConfirmPhoto,
+    handleCancelSelection,
   }
 }

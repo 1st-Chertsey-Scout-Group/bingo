@@ -26,6 +26,7 @@ type LobbyProps = {
   onClearPreview?: () => void
   onSwitchTeam?: (teamName: string) => void
   onToggleTeamLock?: (locked: boolean) => void
+  onEndGame?: () => void
 }
 
 export function Lobby({
@@ -42,6 +43,7 @@ export function Lobby({
   onClearPreview,
   onSwitchTeam,
   onToggleTeamLock,
+  onEndGame,
 }: LobbyProps) {
   const [isLandscape, setIsLandscape] = useState(
     () =>
@@ -131,6 +133,7 @@ export function Lobby({
         onPreviewBoard?.(categories, boardSize, templateCount)
       }}
       onToggleTeamLock={onToggleTeamLock}
+      onEndGame={onEndGame}
     />
   )
 }

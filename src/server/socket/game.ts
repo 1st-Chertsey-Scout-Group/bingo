@@ -1,10 +1,6 @@
 import type { Server, Socket } from 'socket.io'
-import {
-  ALL_CATEGORIES,
-  BOARD_CONFIG,
-  GAME_STATUS,
-  type ItemCategory,
-} from '@/lib/constants'
+import { validateCategories, validateBoardConfig } from '@/lib/board-validation'
+import { BOARD_CONFIG, GAME_STATUS } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/errors'
 import { prisma } from '@/lib/prisma'
 import { generateBoard, refreshBoardItem } from '@/lib/game-logic'
@@ -66,37 +62,6 @@ export async function endGame(io: Server, gameId: string): Promise<void> {
     .sort((a, b) => b.claimedCount - a.claimedCount)
 
   io.to(SOCKET_ROOMS.game(gameId)).emit('game:ended', { summary })
-}
-
-function validateCategories(categories: unknown): categories is string[] {
-  if (!Array.isArray(categories)) return false
-  const validSet = new Set<string>(ALL_CATEGORIES)
-  return categories.every(
-    (c) => typeof c === 'string' && validSet.has(c as ItemCategory),
-  )
-}
-
-function validateBoardConfig(
-  boardSize: unknown,
-  templateCount: unknown,
-): { boardSize: number; templateCount: number } | null {
-  if (
-    typeof boardSize !== 'number' ||
-    boardSize < BOARD_CONFIG.SIZE_MIN ||
-    boardSize > BOARD_CONFIG.SIZE_MAX ||
-    boardSize % BOARD_CONFIG.SIZE_STEP !== 0
-  ) {
-    return null
-  }
-  if (
-    typeof templateCount !== 'number' ||
-    templateCount < BOARD_CONFIG.TEMPLATE_MIN ||
-    templateCount > BOARD_CONFIG.TEMPLATE_MAX
-  ) {
-    return null
-  }
-  if (templateCount > boardSize) return null
-  return { boardSize, templateCount }
 }
 
 async function queryBoardData() {
@@ -384,7 +349,10 @@ export function registerGameHandlers(io: Server, socket: Socket): void {
     const { gameId } = ctx
 
     const game = await prisma.game.findUnique({ where: { id: gameId } })
-    if (!game || game.status !== GAME_STATUS.ACTIVE) {
+    if (
+      !game ||
+      (game.status !== GAME_STATUS.ACTIVE && game.status !== GAME_STATUS.LOBBY)
+    ) {
       socket.emit('error', { message: 'Game is not active' })
       return
     }

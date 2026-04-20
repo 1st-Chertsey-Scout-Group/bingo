@@ -39,13 +39,8 @@ export function useLeaderSocket(
       })
     } else {
       // Only reuse leaderName from a session that matches this game
-      const staleSession = loadSession()
-      if (
-        staleSession &&
-        staleSession.role === 'leader' &&
-        staleSession.gamePin === gamePin
-      ) {
-        leaderName = staleSession.leaderName
+      if (session && session.role === 'leader' && session.gamePin === gamePin) {
+        leaderName = session.leaderName
       }
       if (leaderName) {
         socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
@@ -115,13 +110,13 @@ export function useLeaderSocket(
 
       if (fatal.has(message)) {
         clearSession()
-        toast(message)
+        toast.error(message)
         window.location.href = '/'
         return
       }
 
       // Transient errors (e.g. "Name already taken" during reconnect) — just toast
-      toast(message)
+      toast.error(message)
     }
 
     const handleTeamsLocked = (payload: { locked: boolean }) => {
@@ -139,7 +134,7 @@ export function useLeaderSocket(
         'Submission is no longer pending':
           'This submission was already reviewed',
       }
-      toast(friendly[raw] ?? raw)
+      toast.error(friendly[raw] ?? raw)
     }
 
     const handleBoardPreview = (payload: { board: BoardItem[] }) => {

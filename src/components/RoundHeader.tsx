@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { MapPin } from 'lucide-react'
+import { ConnectionDot } from '@/components/ConnectionBanner'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -44,9 +45,12 @@ export function RoundHeader({
 
   return (
     <div className="bg-background/95 sticky top-0 z-10 flex items-center justify-between border-b px-4 py-2.5 backdrop-blur">
-      <span className="font-mono text-lg font-bold">
-        {formatElapsed(elapsed)}
-      </span>
+      <div className="flex items-center gap-2">
+        <span className="font-mono text-lg font-bold">
+          {formatElapsed(elapsed)}
+        </span>
+        <ConnectionDot />
+      </div>
 
       <span className="bg-muted rounded-full px-3 py-0.5 text-sm font-bold">
         {claimed}/{total}
