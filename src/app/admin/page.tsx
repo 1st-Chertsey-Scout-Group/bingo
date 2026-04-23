@@ -3,7 +3,8 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { Lock, Shield } from 'lucide-react'
+import Link from 'next/link'
+import { Lock, Printer, Shield } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -264,6 +265,13 @@ function AdminPage() {
         </div>
 
         <GameCreationForm adminPin={adminPin} />
+
+        <Link href="/admin/print-cards">
+          <Button variant="outline" className="h-12 w-full text-lg">
+            <Printer className="mr-2 size-5" />
+            Print Paper Bingo Cards
+          </Button>
+        </Link>
       </div>
     </div>
   )
