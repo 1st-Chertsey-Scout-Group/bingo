@@ -31,6 +31,7 @@ type UsePhotoUploadOptions = {
 
 type UsePhotoUploadReturn = {
   uploadStage: UploadStage | null
+  uploadProgress: number
   failedUpload: { roundItemId: string; blob: Blob } | null
   pendingItems: Set<string>
   fileInputRef: RefObject<HTMLInputElement | null>
@@ -54,6 +55,7 @@ export function usePhotoUpload({
     blob: Blob
   } | null>(null)
   const [uploadStage, setUploadStage] = useState<UploadStage | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
   const abortRef = useRef<AbortController | null>(null)
 
   const doUpload = useCallback(
@@ -70,6 +72,7 @@ export function usePhotoUpload({
 
       try {
         setUploadStage('uploading')
+        setUploadProgress(0)
 
         if (abort.signal.aborted) return
 
@@ -90,7 +93,11 @@ export function usePhotoUpload({
           return (await res.json()) as UploadResponse
         }
 
-        const result = await uploadWithRetry(blob, getPresignedUrl)
+        const result = await uploadWithRetry(
+          blob,
+          getPresignedUrl,
+          (fraction) => setUploadProgress(fraction),
+        )
 
         if (abort.signal.aborted) return
 
@@ -183,6 +190,7 @@ export function usePhotoUpload({
 
   return {
     uploadStage,
+    uploadProgress,
     failedUpload,
     pendingItems,
     fileInputRef,

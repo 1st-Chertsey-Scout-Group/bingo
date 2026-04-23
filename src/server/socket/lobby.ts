@@ -115,7 +115,7 @@ export function registerLobbyHandlers(io: Server, socket: Socket): void {
           return
         }
 
-        if (await isLeaderNameTaken(io, game.id, leaderName)) {
+        if (await isLeaderNameTaken(io, game.id, leaderName, socket.id)) {
           socket.emit('error', {
             message: 'That leader name is already in use',
           })

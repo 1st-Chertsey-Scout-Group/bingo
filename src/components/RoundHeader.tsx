@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { MapPin } from 'lucide-react'
+import { MapPin, ScrollText } from 'lucide-react'
+import { ConnectionDot } from '@/components/ConnectionDot'
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -22,6 +23,8 @@ type RoundHeaderProps = {
   onEndRound: () => void
   onToggleMap?: () => void
   mapOpen?: boolean
+  onToggleLog?: () => void
+  logOpen?: boolean
 }
 
 export function RoundHeader({
@@ -30,6 +33,8 @@ export function RoundHeader({
   onEndRound,
   onToggleMap,
   mapOpen,
+  onToggleLog,
+  logOpen,
 }: RoundHeaderProps) {
   const elapsed = useElapsedTime(roundStartedAt)
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -44,23 +49,38 @@ export function RoundHeader({
 
   return (
     <div className="bg-background/95 sticky top-0 z-10 flex items-center justify-between border-b px-4 py-2.5 backdrop-blur">
-      <span className="font-mono text-lg font-bold">
-        {formatElapsed(elapsed)}
-      </span>
+      <div className="flex items-center gap-2">
+        <ConnectionDot />
+        <span className="font-mono text-lg font-bold">
+          {formatElapsed(elapsed)}
+        </span>
+      </div>
 
       <span className="bg-muted rounded-full px-3 py-0.5 text-sm font-bold">
         {claimed}/{total}
       </span>
 
-      {onToggleMap && (
-        <Button
-          variant={mapOpen ? 'default' : 'outline'}
-          size="sm"
-          onClick={onToggleMap}
-        >
-          <MapPin className="h-4 w-4" />
-        </Button>
-      )}
+      <div className="flex gap-1.5">
+        {onToggleMap && (
+          <Button
+            variant={mapOpen ? 'default' : 'outline'}
+            size="sm"
+            onClick={onToggleMap}
+          >
+            <MapPin className="h-4 w-4" />
+          </Button>
+        )}
+
+        {onToggleLog && (
+          <Button
+            variant={logOpen ? 'default' : 'outline'}
+            size="sm"
+            onClick={onToggleLog}
+          >
+            <ScrollText className="h-4 w-4" />
+          </Button>
+        )}
+      </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger

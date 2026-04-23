@@ -91,7 +91,11 @@ export const Square = memo(function Square({
         isClaimed
           ? {
               backgroundColor: roundItem.claimedByTeamColour ?? undefined,
-              opacity: role === 'scout' && isOtherTeamClaimed ? 0.7 : undefined,
+              opacity: role === 'scout' && isOtherTeamClaimed ? 0.4 : undefined,
+              filter:
+                role === 'scout' && isOtherTeamClaimed
+                  ? 'saturate(0.3)'
+                  : undefined,
             }
           : undefined
       }

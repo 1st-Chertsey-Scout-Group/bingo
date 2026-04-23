@@ -5,12 +5,14 @@ import type { Dispatch } from 'react'
 import type { Socket } from 'socket.io-client'
 import { toast } from 'sonner'
 
+import type { AddLogEntry } from '@/hooks/useActivityLog'
 import { buildCommonHandlers } from '@/hooks/useSocketHandlers'
 import {
   clearSession,
   clearTeamIdFromSession,
   loadSession,
 } from '@/lib/session'
+import { LOG_CATEGORY } from '@/types'
 import type { BoardItem, GameAction, SubmissionForReview } from '@/types'
 
 export function useLeaderSocket(
@@ -18,6 +20,7 @@ export function useLeaderSocket(
   dispatch: Dispatch<GameAction>,
   gamePin: string,
   leaderPin: string,
+  addLogEntry?: AddLogEntry,
 ): void {
   useEffect(() => {
     if (!socket) return
@@ -64,13 +67,19 @@ export function useLeaderSocket(
       })
     }
 
-    const common = buildCommonHandlers(dispatch)
+    const common = buildCommonHandlers(dispatch, addLogEntry)
 
     const handleReviewSubmission = (payload: SubmissionForReview) => {
       dispatch({
         type: 'REVIEW_PROMOTED',
         roundItemId: payload.roundItemId,
         submission: payload,
+      })
+      addLogEntry?.({
+        category: LOG_CATEGORY.SUBMISSION,
+        teamName: payload.teamName,
+        teamColour: payload.teamColour,
+        message: `submitted photo for "${payload.displayName}"`,
       })
     }
 
@@ -83,6 +92,12 @@ export function useLeaderSocket(
         roundItemId: payload.roundItemId,
         leaderName: payload.leaderName,
       })
+      addLogEntry?.({
+        category: LOG_CATEGORY.SUBMISSION,
+        teamName: null,
+        teamColour: null,
+        message: `${payload.leaderName} is reviewing a square`,
+      })
     }
 
     const handleSquareUnlocked = (payload: {
@@ -94,11 +109,23 @@ export function useLeaderSocket(
         roundItemId: payload.roundItemId,
         hasPendingSubmissions: payload.hasPendingSubmissions,
       })
+      addLogEntry?.({
+        category: LOG_CATEGORY.SUBMISSION,
+        teamName: null,
+        teamColour: null,
+        message: 'square review complete',
+      })
     }
 
     const handleGameLobby = () => {
       clearTeamIdFromSession()
       dispatch({ type: 'GAME_LOBBY' })
+      addLogEntry?.({
+        category: LOG_CATEGORY.GAME_STATE,
+        teamName: null,
+        teamColour: null,
+        message: 'Returned to lobby',
+      })
       // Re-join lobby
       if (leaderName) {
         socket.emit('lobby:join', { gamePin, leaderPin, leaderName })
@@ -113,6 +140,13 @@ export function useLeaderSocket(
         'Invalid leader PIN',
       ])
 
+      addLogEntry?.({
+        category: LOG_CATEGORY.ERROR,
+        teamName: null,
+        teamColour: null,
+        message: `Rejoin error: ${message}`,
+      })
+
       if (fatal.has(message)) {
         clearSession()
         toast(message)
@@ -126,6 +160,12 @@ export function useLeaderSocket(
 
     const handleTeamsLocked = (payload: { locked: boolean }) => {
       dispatch({ type: 'TEAMS_LOCKED', locked: payload.locked })
+      addLogEntry?.({
+        category: LOG_CATEGORY.GAME_STATE,
+        teamName: null,
+        teamColour: null,
+        message: payload.locked ? 'Teams locked' : 'Teams unlocked',
+      })
     }
 
     const handleServerError = (payload: { message?: string } | undefined) => {
@@ -140,6 +180,12 @@ export function useLeaderSocket(
           'This submission was already reviewed',
       }
       toast(friendly[raw] ?? raw)
+      addLogEntry?.({
+        category: LOG_CATEGORY.ERROR,
+        teamName: null,
+        teamColour: null,
+        message: raw,
+      })
     }
 
     const handleBoardPreview = (payload: { board: BoardItem[] }) => {
@@ -181,5 +227,5 @@ export function useLeaderSocket(
         socket.off(event, handler)
       }
     }
-  }, [socket, dispatch, gamePin, leaderPin])
+  }, [socket, dispatch, gamePin, leaderPin, addLogEntry])
 }

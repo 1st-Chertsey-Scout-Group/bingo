@@ -15,7 +15,7 @@ import { registerLobbyHandlers } from '@/server/socket/lobby'
 import { registerLocationHandlers } from '@/server/socket/location'
 import { registerSubmissionHandlers } from '@/server/socket/submission'
 
-const LOCK_TIMEOUT_MS = 30_000
+const LOCK_TIMEOUT_MS = 60_000
 const LOBBY_TEAM_GRACE_MS = 15_000
 
 // Track pending lock timeouts by composite (gameId, leaderName) key

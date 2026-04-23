@@ -19,6 +19,12 @@ nextApp.prepare().then(() => {
 
   const io = new SocketIOServer(httpServer, {
     cors: dev ? { origin: '*' } : undefined,
+    pingInterval: 25000,
+    pingTimeout: 10000,
+    maxHttpBufferSize: 1e5,
+    transports: ['websocket', 'polling'],
+    allowUpgrades: true,
+    perMessageDeflate: false,
   })
 
   registerSocketHandlers(io)

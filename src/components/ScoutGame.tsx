@@ -1,11 +1,13 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Board } from '@/components/Board'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Lobby } from '@/components/Lobby'
 import { ScoutHeader } from '@/components/ScoutHeader'
+import { SquareModal } from '@/components/SquareModal'
 import { UploadOverlay } from '@/components/UploadOverlay'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useGeolocation } from '@/hooks/useGeolocation'
@@ -13,8 +15,17 @@ import { usePhotoUpload } from '@/hooks/usePhotoUpload'
 import { useScoutSocket } from '@/hooks/useScoutSocket'
 import { useSocket } from '@/hooks/useSocket'
 import { GAME_STATUS } from '@/lib/constants'
+import { loadSession } from '@/lib/session'
 
 function ScoutGameInner({ gameId }: { gameId: string }) {
+  const router = useRouter()
+
+  useEffect(() => {
+    const session = loadSession()
+    if (!session || !session.gamePin || session.gameId !== gameId) {
+      router.replace('/')
+    }
+  }, [gameId, router])
   const socket = useSocket()
   const { state, dispatch } = useGame()
 
@@ -23,6 +34,7 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
 
   const {
     uploadStage,
+    uploadProgress,
     failedUpload,
     pendingItems,
     fileInputRef,
@@ -37,6 +49,42 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
     socket,
     dispatch,
   })
+
+  const [selectedRoundItemId, setSelectedRoundItemId] = useState<string | null>(
+    null,
+  )
+
+  const selectedItem = selectedRoundItemId
+    ? (state.board.find((i) => i.roundItemId === selectedRoundItemId) ?? null)
+    : null
+
+  const handleBoardSquareTap = useCallback(
+    (roundItemId: string) => {
+      // Failed uploads bypass the modal — retry immediately
+      if (failedUpload && failedUpload.roundItemId === roundItemId) {
+        handleSquareTap(roundItemId)
+        return
+      }
+
+      const item = state.board.find((i) => i.roundItemId === roundItemId)
+      if (!item) return
+      if (item.claimedByTeamId !== null) return
+      if (pendingItems.has(roundItemId)) return
+
+      setSelectedRoundItemId(roundItemId)
+    },
+    [state.board, pendingItems, failedUpload, handleSquareTap],
+  )
+
+  const handleModalTakePhoto = useCallback(() => {
+    if (!selectedRoundItemId) return
+    setSelectedRoundItemId(null)
+    handleSquareTap(selectedRoundItemId)
+  }, [selectedRoundItemId, handleSquareTap])
+
+  const handleModalClose = useCallback(() => {
+    setSelectedRoundItemId(null)
+  }, [])
 
   const handleSwitchTeam = useCallback(
     (teamName: string) => {
@@ -61,7 +109,11 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
       return (
         <div className="flex h-[calc(100dvh)] flex-col">
           {uploadStage && (
-            <UploadOverlay stage={uploadStage} onCancel={handleCancelUpload} />
+            <UploadOverlay
+              stage={uploadStage}
+              progress={uploadProgress}
+              onCancel={handleCancelUpload}
+            />
           )}
           <input
             ref={fileInputRef}
@@ -86,8 +138,16 @@ function ScoutGameInner({ gameId }: { gameId: string }) {
             myTeamId={state.myTeam?.id ?? null}
             pendingItems={pendingItems}
             failedItemId={failedUpload?.roundItemId ?? null}
-            onSquareTap={handleSquareTap}
+            onSquareTap={handleBoardSquareTap}
           />
+          {selectedItem && (
+            <SquareModal
+              displayName={selectedItem.displayName}
+              open={true}
+              onClose={handleModalClose}
+              onTakePhoto={handleModalTakePhoto}
+            />
+          )}
         </div>
       )
     case GAME_STATUS.ENDED: {

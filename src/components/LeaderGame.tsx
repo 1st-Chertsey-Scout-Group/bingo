@@ -1,19 +1,23 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Board } from '@/components/Board'
 import { ConnectionBanner } from '@/components/ConnectionBanner'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { Lobby } from '@/components/Lobby'
+import { LogPanel } from '@/components/LogPanel'
 import { Button } from '@/components/ui/button'
 import { ReviewModal } from '@/components/ReviewModal'
 import { RoundHeader } from '@/components/RoundHeader'
 import { TeamMapDynamic } from '@/components/TeamMapDynamic'
+import { useActivityLog } from '@/hooks/useActivityLog'
 import { GameProvider, useGame } from '@/hooks/useGameState'
 import { useLeaderSocket } from '@/hooks/useLeaderSocket'
 import { useSocket } from '@/hooks/useSocket'
 import { useTeamPositions } from '@/hooks/useTeamPositions'
 import { GAME_STATUS } from '@/lib/constants'
+import { loadSession } from '@/lib/session'
 
 type LeaderGameInnerProps = {
   gamePin: string
@@ -21,15 +25,30 @@ type LeaderGameInnerProps = {
 }
 
 function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
+  const router = useRouter()
+
+  useEffect(() => {
+    const session = loadSession()
+    if (!session || session.role !== 'leader' || session.gamePin !== gamePin) {
+      router.replace('/')
+    }
+  }, [gamePin, router])
   const socket = useSocket()
   const { state, dispatch } = useGame()
 
-  useLeaderSocket(socket, dispatch, gamePin, leaderPin)
-  const positions = useTeamPositions(socket)
+  const { entries: logEntries, addEntry: addLogEntry } = useActivityLog()
+
+  useLeaderSocket(socket, dispatch, gamePin, leaderPin, addLogEntry)
+  const positions = useTeamPositions(socket, addLogEntry)
   const [mapOpen, setMapOpen] = useState(false)
+  const [logOpen, setLogOpen] = useState(false)
 
   const handleToggleMap = useCallback(() => {
     setMapOpen((prev) => !prev)
+  }, [])
+
+  const handleToggleLog = useCallback(() => {
+    setLogOpen((prev) => !prev)
   }, [])
 
   const handlePreviewBoard = useCallback(
@@ -145,10 +164,17 @@ function LeaderGameInner({ gamePin, leaderPin }: LeaderGameInnerProps) {
             onEndRound={handleEndRound}
             onToggleMap={handleToggleMap}
             mapOpen={mapOpen}
+            onToggleLog={handleToggleLog}
+            logOpen={logOpen}
           />
           {mapOpen && (
             <div className="h-[45dvh] shrink-0 border-b">
               <TeamMapDynamic positions={positions} />
+            </div>
+          )}
+          {logOpen && (
+            <div className="h-[45dvh] shrink-0 border-b">
+              <LogPanel entries={logEntries} />
             </div>
           )}
           <Board

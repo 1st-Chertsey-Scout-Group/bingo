@@ -2,6 +2,7 @@
 
 import { useMemo } from 'react'
 
+import { ConnectionDot } from '@/components/ConnectionDot'
 import { useElapsedTime } from '@/hooks/useElapsedTime'
 import { formatElapsed } from '@/lib/format'
 import type { RoundItem, Team } from '@/types'
@@ -59,9 +60,12 @@ export function ScoutHeader({
 
   return (
     <div className="bg-background/95 sticky top-0 z-10 flex items-center justify-between border-b px-3 py-2 backdrop-blur">
-      <span className="font-mono text-sm font-bold">
-        {formatElapsed(elapsed)}
-      </span>
+      <div className="flex items-center gap-2">
+        <ConnectionDot />
+        <span className="font-mono text-sm font-bold">
+          {formatElapsed(elapsed)}
+        </span>
+      </div>
 
       <div className="flex items-center gap-3 text-sm font-medium">
         <span className="text-muted-foreground">{remaining} left</span>

@@ -7,6 +7,7 @@ type UploadStage = 'compressing' | 'uploading' | 'submitting'
 
 type UploadOverlayProps = {
   stage: UploadStage
+  progress: number
   onCancel: () => void
 }
 
@@ -16,15 +17,24 @@ const STAGE_LABELS: Record<UploadStage, string> = {
   submitting: 'Submitting...',
 }
 
-const STAGE_PROGRESS: Record<UploadStage, number> = {
-  compressing: 20,
-  uploading: 60,
-  submitting: 90,
-}
+export function UploadOverlay({
+  stage,
+  progress,
+  onCancel,
+}: UploadOverlayProps) {
+  let percent: number
+  if (stage === 'compressing') {
+    percent = 0
+  } else if (stage === 'uploading') {
+    percent = Math.round(progress * 100)
+  } else {
+    percent = 100
+  }
 
-export function UploadOverlay({ stage, onCancel }: UploadOverlayProps) {
-  const progress = STAGE_PROGRESS[stage]
-  const label = STAGE_LABELS[stage]
+  const label =
+    stage === 'uploading' && percent > 0
+      ? `Uploading... ${String(percent)}%`
+      : STAGE_LABELS[stage]
 
   return (
     <div
@@ -37,8 +47,8 @@ export function UploadOverlay({ stage, onCancel }: UploadOverlayProps) {
 
         <div className="h-3 w-full overflow-hidden rounded-full bg-gray-200">
           <div
-            className="h-full rounded-full bg-gray-800 transition-all duration-500"
-            style={{ width: `${String(progress)}%` }}
+            className="h-full rounded-full bg-gray-800 transition-all duration-300"
+            style={{ width: `${String(percent)}%` }}
           />
         </div>
 

@@ -1,3 +1,30 @@
+// ---------------------------------------------------------------------------
+// Activity Log
+// ---------------------------------------------------------------------------
+
+export const LOG_CATEGORY = {
+  SUBMISSION: 'submission',
+  CONNECTION: 'connection',
+  ERROR: 'error',
+  GAME_STATE: 'game-state',
+  LOCATION: 'location',
+} as const
+
+export type LogCategory = (typeof LOG_CATEGORY)[keyof typeof LOG_CATEGORY]
+
+export type LogEntry = {
+  id: string
+  timestamp: number
+  category: LogCategory
+  teamName: string | null
+  teamColour: string | null
+  message: string
+}
+
+// ---------------------------------------------------------------------------
+// Game
+// ---------------------------------------------------------------------------
+
 export type Team = {
   id: string
   name: string

@@ -7,6 +7,8 @@ import type { Socket } from 'socket.io-client'
 type SocketHandler = (...args: any[]) => void
 export type SocketHandlerMap = Record<string, SocketHandler>
 
+import type { AddLogEntry } from '@/hooks/useActivityLog'
+import { LOG_CATEGORY } from '@/types'
 import type {
   GameAction,
   GameState,
@@ -36,9 +38,18 @@ export function useSocketHandlers(
   }, [socket, handlers])
 }
 
-export function buildCommonHandlers(dispatch: Dispatch<GameAction>) {
+export function buildCommonHandlers(
+  dispatch: Dispatch<GameAction>,
+  addLogEntry?: AddLogEntry,
+) {
   const handleLobbyTeams = ({ teams }: { teams: Team[] }) => {
     dispatch({ type: 'LOBBY_TEAMS', teams })
+    addLogEntry?.({
+      category: LOG_CATEGORY.CONNECTION,
+      teamName: null,
+      teamColour: null,
+      message: `Teams updated (${teams.length} ${teams.length === 1 ? 'team' : 'teams'})`,
+    })
   }
 
   const handleGameStarted = (payload: {
@@ -49,6 +60,12 @@ export function buildCommonHandlers(dispatch: Dispatch<GameAction>) {
       type: 'GAME_STARTED',
       items: payload.board,
       roundStartedAt: payload.roundStartedAt,
+    })
+    addLogEntry?.({
+      category: LOG_CATEGORY.GAME_STATE,
+      teamName: null,
+      teamColour: null,
+      message: `Round started with ${payload.board.length} squares`,
     })
   }
 
@@ -65,6 +82,12 @@ export function buildCommonHandlers(dispatch: Dispatch<GameAction>) {
       teamName: payload.teamName,
       teamColour: payload.teamColour,
     })
+    addLogEntry?.({
+      category: LOG_CATEGORY.SUBMISSION,
+      teamName: payload.teamName,
+      teamColour: payload.teamColour,
+      message: 'claimed a square',
+    })
   }
 
   const handleSquarePending = (payload: { roundItemId: string }) => {
@@ -72,10 +95,22 @@ export function buildCommonHandlers(dispatch: Dispatch<GameAction>) {
       type: 'SQUARE_PENDING',
       roundItemId: payload.roundItemId,
     })
+    addLogEntry?.({
+      category: LOG_CATEGORY.SUBMISSION,
+      teamName: null,
+      teamColour: null,
+      message: 'new pending submission',
+    })
   }
 
   const handleGameEnded = (payload: { summary: TeamSummary[] }) => {
     dispatch({ type: 'GAME_ENDED', summary: payload.summary })
+    addLogEntry?.({
+      category: LOG_CATEGORY.GAME_STATE,
+      teamName: null,
+      teamColour: null,
+      message: 'Round ended',
+    })
   }
 
   const handleRejoinState = (
